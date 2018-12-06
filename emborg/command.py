@@ -302,10 +302,38 @@ class Configs(Command):
             output('No configurations available.')
 
 
+# Delete command {{{1
+class Delete(Command):
+    NAMES = 'delete'.split()
+    DESCRIPTION = 'delete an archive currently contained in the repository'
+    USAGE = dedent("""
+        Usage:
+            emborg delete <archive>
+    """).strip()
+    REQUIRES_EXCLUSIVITY = True
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        archive = cmdline['<archive>']
+
+        # run borg
+        cmd = (
+            'borg delete'.split()
+            + settings.borg_options('delete', options)
+            + [settings.destination(archive)]
+        )
+        borg = run_borg(cmd, settings, options)
+        out = borg.stdout
+        if out:
+            output(out.rstrip())
+
+
 # Diff command {{{1
 class Diff(Command):
     NAMES = 'diff'.split()
-    DESCRIPTION = 'list the archives currently contained in the repository'
+    DESCRIPTION = 'show the differences between two archives'
     USAGE = dedent("""
         Usage:
             emborg diff <archive1> <archive2>
@@ -323,8 +351,8 @@ class Diff(Command):
         cmd = (
             'borg diff'.split()
             + settings.borg_options('diff', options)
-            + [settings.destination()]
-            + [archive1, archive2]
+            + [settings.destination(archive1)]
+            + [archive2]
         )
         borg = run_borg(cmd, settings, options)
         out = borg.stdout
@@ -536,7 +564,7 @@ class Info(Command):
         Usage:
             emborg info
     """).strip()
-    REQUIRES_EXCLUSIVITY = False
+    REQUIRES_EXCLUSIVITY = True
 
     @classmethod
     def run(cls, command, args, settings, options):

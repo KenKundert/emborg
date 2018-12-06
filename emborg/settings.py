@@ -240,10 +240,10 @@ class Settings:
         for name, attrs in BORG_SETTINGS.items():
             if cmd in attrs['cmds'] or 'all' in attrs['cmds']:
                 opt = convert_name_to_option(name)
-                val = self.value(name)
+                val = self.settings.get(name)
                 if val:
                     if 'arg' in attrs and attrs['arg']:
-                        args.extend([opt, val])
+                        args.extend([opt, str(val)])
                     else:
                         args.extend([opt])
         return args
