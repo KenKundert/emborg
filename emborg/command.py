@@ -578,7 +578,7 @@ class Info(Command):
         output(f'              logile: {settings.logfile}')
         try:
             backup_date = arrow.get(settings.date_file.read_text())
-            output(f'      last backed up: {backup_date}')
+            output(f'      last backed up: {backup_date}, {backup_date.humanize()}')
         except FileNotFoundError as e:
             narrate(os_error(e))
         except arrow.parser.ParserError as e:
