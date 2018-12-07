@@ -232,9 +232,9 @@ class Settings:
 
         if cmd == 'init':
             if self.passphrase or self.avendesora_account:
-                args.append('--encryption keyfile')
+                args.extend('--encryption keyfile'.split())
             else:
-                args.append('--encryption authenticated')
+                args.extend('--encryption authenticated'.split())
 
         # add the borg command line options appropriate to this command {{{3
         for name, attrs in BORG_SETTINGS.items():
