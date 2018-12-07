@@ -1,8 +1,8 @@
 emborg -- Encrypted Backups to a Remote Server
 ==============================================
 
-| Version: 0.1.2
-| Released: 2018-12-06
+| Version: 0.1.3
+| Released: 2018-12-07
 |
 
 Emborg is a simple command line utility to orchestrate backups. It is built as 
