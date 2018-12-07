@@ -281,12 +281,11 @@ class Check(Command):
 
 # Configs command {{{1
 class Configs(Command):
-    NAMES = 'configs c'.split()
+    NAMES = 'configs'.split()
     DESCRIPTION = 'list available backup configurations'
     USAGE = dedent("""
         Usage:
             emborg configs
-            emborg c
     """).strip()
     REQUIRES_EXCLUSIVITY = False
 
@@ -362,7 +361,7 @@ class Diff(Command):
 
 # Due command {{{1
 class Due(Command):
-    NAMES = 'due d'.split()
+    NAMES = 'due'.split()
     DESCRIPTION = 'days since last backup'
     USAGE = dedent("""
         Used with status bar programs, such as i3status, to make user aware that
@@ -436,12 +435,11 @@ class Due(Command):
 
 # Extract command {{{1
 class Extract(Command):
-    NAMES = 'extract e'.split()
+    NAMES = 'extract'.split()
     DESCRIPTION = 'recover file or files from archive'
     USAGE = dedent("""
         Usage:
             emborg [options] extract <path>...
-            emborg [options] e       <path>...
 
         Options:
             -d <date>, --date <date>            date of the desired version of paths
@@ -527,12 +525,11 @@ class Extract(Command):
 
 # Help {{{1
 class Help(Command):
-    NAMES = 'help h'.split()
+    NAMES = 'help'.split()
     DESCRIPTION = 'give information about commands or other topics'
     USAGE = dedent("""
         Usage:
             emborg help [<topic>]
-            emborg h    [<topic>]
     """).strip()
     REQUIRES_EXCLUSIVITY = False
     EMBORG_DESCRIPTION = dedent("""
@@ -599,11 +596,10 @@ class Info(Command):
 
 # Initialize command {{{1
 class Initialize(Command):
-    NAMES = 'initialize init'.split()
+    NAMES = 'init'.split()
     DESCRIPTION = 'initialize the repository'
     USAGE = dedent("""
         Usage:
-            emborg initialize
             emborg init
     """).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -627,13 +623,13 @@ class Initialize(Command):
 
 # List command {{{1
 class List(Command):
-    NAMES = 'list l archives'.split()
+    NAMES = 'list lr archives'.split()
     DESCRIPTION = 'list the archives currently contained in the repository'
     USAGE = dedent("""
         Usage:
             emborg list
             emborg archives
-            emborg l
+            emborg lr
     """).strip()
     REQUIRES_EXCLUSIVITY = True
 
@@ -678,12 +674,13 @@ class Log(Command):
 
 # Manifest command {{{1
 class Manifest(Command):
-    NAMES = 'manifest m'.split()
+    NAMES = 'manifest m la'.split()
     DESCRIPTION = 'list the files contained in an archive'
     USAGE = dedent("""
         Usage:
             emborg [options] manifest
             emborg [options] m
+            emborg [options] la
 
         Options:
             -d <date>, --date <date>            date of the desired version of paths
@@ -812,12 +809,11 @@ class Mount(Command):
 
 # Prune command {{{1
 class Prune(Command):
-    NAMES = 'prune p'.split()
+    NAMES = 'prune'.split()
     DESCRIPTION = 'list the archives currently contained in the repository'
     USAGE = dedent("""
         Usage:
             emborg prune
-            emborg p
     """).strip()
     REQUIRES_EXCLUSIVITY = True
 
@@ -850,12 +846,11 @@ class Prune(Command):
 
 # Settings command {{{1
 class Settings(Command):
-    NAMES = 'settings', 's'
+    NAMES = 'settings'.split()
     DESCRIPTION = 'list settings of chosen configuration'
     USAGE = dedent("""
         Usage:
             emborg [options] settings
-            emborg [options] s
 
         Options:
             -a, --available   list available settings
