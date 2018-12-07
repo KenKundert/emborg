@@ -237,7 +237,8 @@ contains values needed by Emborg. It might look like the following::
 
     default_configuration = 'home'        # default backup configuration
     configurations = 'home websites'      # available backup configurations
-    avendesora_account = 'duplicity'      # Avendesora account name (holds passphrase for encryption key)
+    avendesora_account = 'borg-backup'    # Avendesora account name (holds 
+    passphrase for encryption key)
     passphrase = None                     # passphrase to use (if specified, Avendesora is not used)
                                           # if both avendesora_account and passphrase are empty, encryption is not used
     notify = "me@mydomain.com"            # email address to notify when things go wrong
@@ -247,6 +248,17 @@ contains values needed by Emborg. It might look like the following::
     compression = 'lz4'                   # compression algorithm to use
     umask = '77'                          # umask to use when creating the archives
     lock_wait = 5                         # how long to wait for the lock
+    keep_hourly = 48                      # number of hourly archives to keep
+    keep_daily = 64                       # number of daily archives to keep
+    keep_weekly = 52                      # number of weekly archives to keep
+    keep_monthly = 48                     # number of weekly archives to keep
+    keep_yearly = 24                      # number of weekly archives to keep
+
+If you encrypt your backups, you can specify the encryption key in this file as 
+*passphrase*. In this case, you should be careful to assure the file is not 
+readable by others (chmod 600 settings).  Alternatively, you can use `Avendesora 
+<https://avendesora.readthedocs.io>`_ to securely hold your key by specifying 
+the Avendesora account name of the key to *avendesora_account*.
 
 
 Configuration Settings
@@ -266,13 +278,14 @@ the following::
     src_dirs = ['~', '/etc']              # absolute path to directory to be backed up
     excludes = '''
         ~/tmp
-        .hg
-        .git
-        *.pyc
-        .*.swp
-        .*.swo
-    '''.split()
-                            # list of glob strings of files or directories to skip
+        ~/**/.hg
+        ~/**/.git
+        ~/**/*.pyc
+        ~/**/.*.swp
+        ~/**/.*.swo
+    '''.split()                            # list of glob strings of files or directories to skip
+    one_file_system = False
+    exclude_caches = True
 
     # commands to be run before and after backups (run from working directory)
     run_before_backup = [
