@@ -67,10 +67,8 @@ def publish_passcode(settings):
             pw = PasswordGenerator()
             account = pw.get_account(settings.value('avendesora_account'))
             passcode = str(account.get_value('passcode'))
-        except PasswordError as err:
-            settings.fail(err)
         except ImportError:
-            settings.fail(
+            raise Error(
                 'Avendesora is not available',
                 'you must specify passphrase in settings.',
                 sep = ', '
@@ -824,7 +822,7 @@ class Prune(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # checking the settings
-        intervals = 'hourly daily weekly monthly yearly'
+        intervals = 'within last minutely hourly daily weekly monthly yearly'
         prune_settings = [('keep_' + s) for s in intervals.split()]
         if not any(settings.value(s) for s in prune_settings):
             prune_settings = conjoin(prune_settings, ', or ')

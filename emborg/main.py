@@ -68,12 +68,16 @@ def main():
             cmd, cmd_name = Command.find(command)
 
             with Settings(config, cmd.REQUIRES_EXCLUSIVITY, options) as settings:
-                cmd.execute(cmd_name, args, settings, options)
+                try:
+                    cmd.execute(cmd_name, args, settings, options)
+                except Error as e:
+                    settings.fail(e)
+                    e.terminate()
 
         except KeyboardInterrupt:
             display('Terminated by user.')
-        except Error as err:
-            err.terminate()
-        except OSError as err:
-            fatal(os_error(err))
+        except Error as e:
+            e.terminate()
+        except OSError as e:
+            fatal(os_error(e))
         terminate()

@@ -191,10 +191,10 @@ To do so, use the *umount* command.
 Prune
 -----
 
-Prune the repository of excess archives.  You can use the *keep_hourly*, 
-*keep_daily*, *keep_weekly*, *keep_monthly*, and *keep_yearly* settings to 
-control which archives should be kept. At least one of these settings must be 
-specified to use *prune*::
+Prune the repository of excess archives.  You can use the *keep_within*, 
+*keep_last*, *keep_minutely*, *keep_hourly*, *keep_daily*, *keep_weekly*, 
+*keep_monthly*, and *keep_yearly* settings to control which archives should be 
+kept. At least one of these settings must be specified to use *prune*::
 
    emborg prune
 

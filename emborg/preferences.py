@@ -82,6 +82,21 @@ BORG_SETTINGS = dict(
         arg = 'SECONDS',
         desc = 'wait at most SECONDS for acquiring a repository/cache lock (default: 1)'
     ),
+    keep_within = dict(
+        cmds = 'prune',
+        arg = 'INTERVAL',
+        desc = 'keep all archives within this time interval'
+    ),
+    keep_last = dict(
+        cmds = 'prune',
+        arg = 'NUM',
+        desc = 'number of the most recent archives to keep'
+    ),
+    keep_minutely = dict(
+        cmds = 'prune',
+        arg = 'NUM',
+        desc = 'number of minutely archives to keep'
+    ),
     keep_hourly = dict(
         cmds = 'prune',
         arg = 'NUM',
