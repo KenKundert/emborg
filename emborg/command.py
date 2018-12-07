@@ -86,12 +86,13 @@ def publish_passcode(settings):
 def run_borg(cmd, settings, options=None):
     os.environ.update(publish_passcode(settings))
     os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
-    for ssh_var in 'SSH_AGENT_PID SSH_AUTH_SOCK'.split():
-        if ssh_var not in os.environ:
-            warn(
-                'environment variable not found, is ssh-agent running?',
-                culprit=ssh_var
-            )
+    if settings.needs_ssh_agent:
+        for ssh_var in 'SSH_AGENT_PID SSH_AUTH_SOCK'.split():
+            if ssh_var not in os.environ:
+                warn(
+                    'environment variable not found, is ssh-agent running?',
+                    culprit=ssh_var
+                )
     narrating = options and ('verbose' in options or 'narrate' in options)
     narrate('running:\n{}'.format(indent(render_command(cmd, borg_options_args))))
     modes = 'soeW' if narrating else 'sOEW'

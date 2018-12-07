@@ -45,6 +45,7 @@ EMBORG_SETTINGS = dict(
     default_configuration = 'default emborg configuration',
     excludes = 'list of glob strings of files or directories to skip',
     must_exist = 'if set, each of these files or directorys must exist or create will quit with an error',
+    needs_ssh_agent = 'if set, emborg will complain if ssh_agent is not available',
     notifier = 'notification program',
     notify = 'email address to notify when things go wrong',
     passphrase = 'passphrase for encryption key (if specified, Avendesora is not used)',
