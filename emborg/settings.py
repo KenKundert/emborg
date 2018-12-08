@@ -1,7 +1,7 @@
 # Settings
 
 # License {{{1
-# Copyright (C) 2016 Kenneth S. Kundert
+# Copyright (C) 2018 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -296,7 +296,7 @@ class Settings:
         # perform locking
         if self.requires_exclusivity:
             # check for existance of lockfile
-            lockfile = self.lockfile = to_path(config_dir, LOCK_FILE)
+            lockfile = self.lockfile = to_path(config_dir, self.resolve(LOCK_FILE))
             if lockfile.exists():
                 raise Error(f'currently running (see {lockfile} for details).')
 

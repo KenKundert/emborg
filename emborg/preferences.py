@@ -1,6 +1,6 @@
 # Avendesora Password Generator Settings
 #
-# Copyright (C) 2016 Kenneth S. Kundert
+# Copyright (C) 2018 Kenneth S. Kundert
 
 # License {{{1
 # This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ CONFIG_DIR = user_config_dir(PROGRAM_NAME)
 SETTINGS_FILE = 'settings'
 LOG_FILE = '{config_name}.log'
 PREV_LOG_FILE = '.{config_name}.log.prev'
-LOCK_FILE = 'lock'
+LOCK_FILE = '{config_name}.lock'
 DATE_FILE = '.lastbackup'
 
 CONFIGS_SETTING = 'configurations'
