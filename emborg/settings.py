@@ -162,7 +162,7 @@ class Settings:
                         {comment}
                         config = {self.config_name}
                         source = {hostname}:{', '.join(str(d) for d in self.src_dirs)}
-                        destination = {self.dest_server}:{str(d) for d in self.dest_dir}
+                        destination = {self.repository}
                     ''').lstrip(),
                     modes='soeW'
                 )
