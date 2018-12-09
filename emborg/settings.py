@@ -125,7 +125,9 @@ class Settings:
                 missing.append(each)
         if missing:
             missing = conjoin(missing)
-            self.fail(f'{missing}: no value given.')
+            warn(f'{missing}: no value given.')
+            if 'src_dirs' in missing:
+                self.settings['src_dirs'] = []
 
     # resolve {{{2
     def resolve(self, value):
@@ -232,9 +234,22 @@ class Settings:
 
         if cmd == 'init':
             if self.passphrase or self.avendesora_account:
-                args.extend('--encryption keyfile'.split())
+                encryption = self.encryption if self.encryption else 'repokey'
+                args.append(f'--encryption={encryption}')
+                if encryption == 'none':
+                    warn('passphrase given but not needed as encryption set to none.')
+                if encryption in 'keyfile keyfile-blake2'.split():
+                    warn(
+                        "you should use 'borg export key' to export the",
+                        "encryption key, and then keep that key in a safe",
+                        "place.  If you loose the key you will loose access to",
+                        "your back ups.",
+                        wrap=True
+                    )
             else:
-                args.extend('--encryption authenticated'.split())
+                if encryption != 'none':
+                    raise Error('passphrase not specified.')
+                args.append(f'--encryption={encryption}')
 
         # add the borg command line options appropriate to this command {{{3
         for name, attrs in BORG_SETTINGS.items():

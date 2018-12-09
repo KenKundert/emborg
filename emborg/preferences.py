@@ -43,6 +43,7 @@ EMBORG_SETTINGS = dict(
     config_name = 'name of active configuration (set by program)',
     configurations = 'available emborg configurations',
     default_configuration = 'default emborg configuration',
+    encryption = 'encryption method (see borg documentation)',
     excludes = 'list of glob strings of files or directories to skip',
     must_exist = 'if set, each of these files or directorys must exist or create will quit with an error',
     needs_ssh_agent = 'if set, emborg will complain if ssh_agent is not available',
