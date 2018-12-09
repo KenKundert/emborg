@@ -161,8 +161,8 @@ class Settings:
                         {msg}
                         {comment}
                         config = {self.config_name}
-                        source = {hostname}:{', '.join(self.src_dirs)}
-                        destination = {self.dest_server}:{self.dest_dir}
+                        source = {hostname}:{', '.join(str(d) for d in self.src_dirs)}
+                        destination = {self.dest_server}:{str(d) for d in self.dest_dir}
                     ''').lstrip(),
                     modes='soeW'
                 )
