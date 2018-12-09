@@ -247,6 +247,7 @@ class Settings:
                         wrap=True
                     )
             else:
+                encryption = self.encryption if self.encryption else 'none'
                 if encryption != 'none':
                     raise Error('passphrase not specified.')
                 args.append(f'--encryption={encryption}')
