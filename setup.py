@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name = 'emborg',
-    version = '0.2.0',
+    version = '0.2.1',
     author = 'Ken Kundert',
     author_email = 'emborg@nurdletech.com',
     description = 'Borg front end.',
