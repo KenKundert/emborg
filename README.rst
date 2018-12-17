@@ -310,24 +310,27 @@ or Emborg's program name ('prog_name'). An example of this is shown in
 Precautions
 ===========
 
-You should assure you have a backup copy of the passphrase in a safe place.  
-This is very important. If the only copy of the passphrase is on the disk being 
-backed up, then if that disk were to fail you would not be able to access your 
-backups.
+You should assure you have a backup copies of the encryption key and its 
+passphrase in a safe place (run 'borg export' to extract the encryption keys).  
+This is very important.  If the only copy of the encryption credentials are on 
+the disk being backed up, then if that disk were to fail you would not be able 
+to access your backups.
 
 If you keep the passphrase in the emborg file, you should set its permissions so 
 that it is not readable by others::
 
    chmod 700 emborg
 
-Better yet is to simply not store the passphrase in the emborg script. This can 
-be arranged if you are using `Abraxas <https://github.com/KenKundert/abraxas>`_, 
-which is a flexible password management system. The interface to Abraxas is 
-already built in to emborg, but its use is optional (it need not be installed).
+Better is to simply not store the passphrase in the emborg script. This can be 
+arranged if you are using `Avendesora 
+<https://github.com/KenKundert/avendesora>`_, which is a flexible password 
+management system. The interface to Avendesora is already built in to emborg, 
+but its use is optional (it need not be installed).
 
 It is also best, if it can be arranged, to keep your backups at a remote site so 
 that your backups do not get destroyed in the same disaster, such as a fire or 
-flood, that claims your original files.
+flood, that claims your original files. One option is `rsync.net 
+<https://www.rsync.net/products/attic.html>`_.
 
 
 Borg
