@@ -31,7 +31,7 @@ SETTINGS_FILE = 'settings'
 LOG_FILE = '{config_name}.log'
 PREV_LOG_FILE = '.{config_name}.log.prev'
 LOCK_FILE = '{config_name}.lock'
-DATE_FILE = '.lastbackup'
+DATE_FILE = '{config_name}.lastbackup'
 
 CONFIGS_SETTING = 'configurations'
 DEFAULT_CONFIG_SETTING = 'default_configuration'
