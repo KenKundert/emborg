@@ -250,6 +250,16 @@ class Create(Command):
             except Error as e:
                 e.reraise(culprit='run_after_backup')
 
+        # prune the archives if requested
+        if settings.prune_after_create:
+            prune = Prune()
+            prune.run('prune', [], settings, options)
+
+        # check the archives if requested
+        if settings.check_after_create:
+            check = Check()
+            check.run('check', [], settings, options)
+
 
 # Check command {{{1
 class Check(Command):
