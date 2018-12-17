@@ -310,7 +310,7 @@ or Emborg's program name ('prog_name'). An example of this is shown in
 Precautions
 ===========
 
-You should assure you have a backup copies of the encryption key and its 
+You should assure you have a backup copy of the encryption key and its 
 passphrase in a safe place (run 'borg export' to extract the encryption keys).  
 This is very important.  If the only copy of the encryption credentials are on 
 the disk being backed up, then if that disk were to fail you would not be able 
