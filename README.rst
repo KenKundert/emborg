@@ -13,6 +13,11 @@ The details are contained in ~/.config/emborg.  That directory contains a file
 (settings) that contains shared settings, and then another file for each backup 
 configuration you have.
 
+Use of Emborg does not preclude the use of Borg directly on the same repository.  
+The philosophy of Emborg is to provide commands that you would use often and in 
+an interactive manner with the expectation that you would use Borg directly for 
+the remaining commands.
+
 
 Commands
 ========
