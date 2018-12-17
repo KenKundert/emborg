@@ -267,7 +267,10 @@ class Check(Command):
     DESCRIPTION = 'checks the repository and its archives'
     USAGE = dedent("""
         Usage:
-            emborg check
+            emborg check [options]
+
+        Options:
+            -v, --verify-data    perform a full integrity verification (slow)
     """).strip()
     REQUIRES_EXCLUSIVITY = True
 
@@ -275,11 +278,13 @@ class Check(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        verify = ['--verify-data'] if cmdline['--verify-data'] else []
 
         # run borg
         cmd = (
             'borg check'.split()
             + settings.borg_options('check', options)
+            + verify
             + [settings.destination()]
         )
         borg = run_borg(cmd, settings, options)
