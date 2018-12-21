@@ -231,6 +231,47 @@ Prints the *emborg* version.
    emborg version
 
 
+Getting Started
+===============
+
+Many Linux distributes include *Borg* in their package managers. In Fedora it is 
+referred to as *borgbackup*. In this case you would install *borg* by running 
+the following::
+
+    sudo dnf install borgbackup
+
+Alternately, you can download a precompiled version from `Borg Github Releases> 
+https://github.com/borgbackup/borg/releases/>`_. You can do so with following 
+commands (they will need to be adjusted for to get the latest version)::
+
+    cd ~/bin
+    wget https://github.com/borgbackup/borg/releases/download/1.1.8/borg-linux64
+    wget https://github.com/borgbackup/borg/releases/download/1.1.8/borg-linux64.asc
+    gpg --recv-keys "FAF7B393"
+    gpg --verify borg-linux64.asc
+    rm borg-linux64.asc
+    chmod 755 borg-linux64
+
+Download and *Emborg* as follows:
+
+    git clone https://github.com/KenKundert/emborg.git
+    pip3 install --user emborg
+
+Then you will need to create your *Emborg* settings directory and create 
+a shared settings file 'settings' and then one or more files, one for each 
+configuration you want. Normally people have two files, the shared settings file 
+and one configuration file, perhaps named 'home' because it used to back up your 
+home directory. However, you may wish to have a second configuration dedicated 
+to creating snapshots of your files every 15 minutes or so. These snapshots may 
+be kept locally and only for a day or so while your primary backups are kept 
+remotely and kept long term.
+
+Settings may be placed in either the shared settings file or the configuration 
+specific file. The ones placed in the configuration specific file dominate.
+The shared settings file must contain at least one setting, *configurations*, 
+which is a list of the available configurations.
+
+
 Configuration
 =============
 
@@ -273,10 +314,10 @@ Each backup configuration must have a settings file in ~/.config/emborg. The
 name of the file is the name of the backup configuration.  It might look like 
 the following::
 
-    repository = 'media:/mnt/backups/{host_name}/{config_name}'
+    repository = 'archives:/mnt/backups/{host_name}/{config_name}'
                                           # remote directory for backup sets
     archive = '{host_name}-{{now}}'       # naming pattern used for the archives
-        # May contain {<name>} where name is any of host_name, user_name, 
+        # May contain {<name>} where <name> may be any of host_name, user_name, 
         # prog_name config_name, or any of the user specified settings.
         # Double up the braces to specify parameters that should be interpreted 
         # by borg rather than by emborg.
@@ -308,8 +349,8 @@ the following::
 String values may incorporate other string valued settings. Use braces to 
 interpolate another setting. In addition, you may interpolate the configuration 
 name ('config_name'), the host name ('host_name'), the user name ('user_name') 
-or Emborg's program name ('prog_name'). An example of this is shown in 
-*dest_dir* above.
+or Emborg's program name ('prog_name'). An example of this is shown in both
+*repository* and *archive* above.
 
 
 Precautions
