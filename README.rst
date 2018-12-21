@@ -252,7 +252,7 @@ commands (they will need to be adjusted for to get the latest version)::
     rm borg-linux64.asc
     chmod 755 borg-linux64
 
-Download and *Emborg* as follows:
+Download and *Emborg* as follows::
 
     git clone https://github.com/KenKundert/emborg.git
     pip3 install --user emborg
@@ -380,7 +380,8 @@ flood, that claims your original files. One option is `rsync.net
 
 
 Borg
-----
+====
+
 *Borg* has considerably more power than what is exposed with *emborg*.  You may 
 use it directly when you need that power. More information about *Borg* can be 
 found at `borgbackup on readthedocs <https://borgbackup.readthedocs.io/en/stable/index.html>`_.
