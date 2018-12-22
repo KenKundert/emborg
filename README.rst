@@ -247,18 +247,27 @@ to access your backups.
 If you keep the passphrase in the emborg file, you should set its permissions so 
 that it is not readable by others::
 
-   chmod 700 emborg
+   chmod 700 settings
 
 Better is to simply not store the passphrase in the emborg script. This can be 
 arranged if you are using `Avendesora 
 <https://github.com/KenKundert/avendesora>`_, which is a flexible password 
-management system. The interface to Avendesora is already built in to emborg, 
-but its use is optional (it need not be installed).
+management system. The interface to Avendesora is already built in to *Emborg*, 
+but its use is optional (it need not be installed).  However, be sure to keep 
+a copy of your *Borg* passphrase in a safe place, preferably with the exported 
+encryption key. Remember, that if you lose all of your files, you need your 
+*Borg* password before you will be able to recover your Avendesora files.  
+Alternatively, you can backup your Avendesora files outside of Borg.
 
 It is also best, if it can be arranged, to keep your backups at a remote site so 
 that your backups do not get destroyed in the same disaster, such as a fire or 
 flood, that claims your original files. One option is `rsync.net 
 <https://www.rsync.net/products/attic.html>`_.
+
+Also, it is a good idea to practice a recovery. Pretend that you have lost all 
+your files and then see if you can do a restore from backup. Doing this and 
+working out the kinks before you lose your files can save you if you ever do 
+lose your files.
 
 
 Borg
