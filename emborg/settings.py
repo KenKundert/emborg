@@ -168,7 +168,7 @@ class Settings:
                     ''').lstrip(),
                     modes='soeW'
                 )
-        except OSError as e:
+        except Error as e:
             pass
         try:
             if self.notifier:
@@ -179,7 +179,7 @@ class Settings:
                     ),
                     modes='soeW'
                 )
-        except OSError as e:
+        except Error as e:
             pass
         except KeyError as e:
             warn('unknown key.', culprit=(self.settings_file, 'notifier', e))

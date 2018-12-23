@@ -95,7 +95,7 @@ encryption:
     repository, so it can be used with trusted repositories. Use *keyfile* if 
     the remote repository is not trusted. It does not copy the key to the 
     repository, meaning that it is extremely important for you export the key 
-    and keep a copy along with the passphrase.
+    using 'borg key export' and keep a copy along with the passphrase.
 
 passphrase:
 
@@ -142,7 +142,7 @@ and is writable on the remote server.  Then run::
 
 Once you have done that you can create your first backup using:
 
-    emborg backup
+    emborg create
 
 Then you can run any of the commands documented below.
 
@@ -239,10 +239,10 @@ Precautions
 ===========
 
 You should assure you have a backup copy of the encryption key and its 
-passphrase in a safe place (run 'borg export' to extract the encryption keys).  
-This is very important.  If the only copy of the encryption credentials are on 
-the disk being backed up, then if that disk were to fail you would not be able 
-to access your backups.
+passphrase in a safe place (run 'borg key export' to extract the encryption 
+keys).  This is very important.  If the only copy of the encryption credentials 
+are on the disk being backed up, then if that disk were to fail you would not be 
+able to access your backups.
 
 If you keep the passphrase in the emborg file, you should set its permissions so 
 that it is not readable by others::
@@ -333,9 +333,11 @@ example::
     > emborg due
     backup was performed 19 hours ago.
 
-You can also specify options that result in an output message if a time limit 
-has been exceeded. This allow you to use this with status bar programs such as 
-i3status to generate reminders.
+Adding the --days option results in the message only being printed if the backup 
+has not been performed within the specified number of days. Adding the --email 
+option results in the message being sent to the specified address rather than 
+printed.  This allows you to run the *due* command from a cron script in order 
+to send your self reminders to do a backup if one has not occurred for a while.
 
 
 Extract

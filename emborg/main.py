@@ -46,7 +46,7 @@ from docopt import docopt
 
 # Main {{{1
 def main():
-    with Inform() as inform:
+    with Inform(error_status=2) as inform:
         # read command line
         cmdline = docopt(
             __doc__.format(commands=Command.summarize()),
@@ -69,10 +69,10 @@ def main():
 
             with Settings(config, cmd.REQUIRES_EXCLUSIVITY, options) as settings:
                 try:
-                    cmd.execute(cmd_name, args, settings, options)
+                    exit_status = cmd.execute(cmd_name, args, settings, options)
                 except Error as e:
                     settings.fail(e)
-                    e.terminate()
+                    e.terminate(True)
 
         except KeyboardInterrupt:
             display('Terminated by user.')
@@ -80,4 +80,4 @@ def main():
             e.terminate()
         except OSError as e:
             fatal(os_error(e))
-        terminate()
+        terminate(exit_status)

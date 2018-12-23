@@ -18,21 +18,21 @@
 # Imports {{{1
 from .collection import Collection
 from .preferences import (
+    BORG_SETTINGS,
     DEFAULT_COMMAND,
     EMBORG_SETTINGS,
-    BORG_SETTINGS,
+    PROGRAM_NAME,
     convert_name_to_option,
 )
-from .utilities import two_columns, render_path_list
+from .utilities import two_columns, render_path_list, gethostname
+hostname = gethostname()
 from inform import (
     Color, Error,
     codicil, conjoin, cull, full_stop, indent, narrate, os_error, output,
     render, warn,
 )
 from docopt import docopt
-from shlib import (
-    mkdir, to_path, Run, set_prefs, render_command
-)
+from shlib import mkdir, to_path, Run, set_prefs, render_command
 set_prefs(use_inform=True, log_cmd=True)
 from textwrap import dedent, fill
 import arrow
@@ -165,7 +165,7 @@ class Command(object):
     @classmethod
     def execute(cls, name, args, settings, options):
         narrate('{}:'.format(name))
-        cls.run(name, args if args else [], settings, options)
+        return cls.run(name, args if args else [], settings, options)
 
     @classmethod
     def summarize(cls, width=16):
@@ -388,6 +388,7 @@ class Due(Command):
             -d <num>, --days <num>     emit message if this many days have passed
                                        since last backup
             -m <msg>, --message <msg>  the message to emit
+            -e <addr>, --email <addr>  send email message rather than print message
 
         If you specify the days, then the message is only printed if the backup
         is overdue.  If not overdue, nothing is printed. The message is always
@@ -413,6 +414,7 @@ class Due(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        email = cmdline['--email']
 
         def gen_message(date):
             if cmdline['--message']:
@@ -424,6 +426,23 @@ class Due(Command):
                 )
             else:
                 return f'The latest archive was created {date.humanize()}.'
+
+        if email:
+            def report(msg):
+                Run(
+                    ['mail', '-s', f'{PROGRAM_NAME}: backup is overdue', email],
+                    stdin=dedent(f'''
+                        {msg}
+                        config = {settings.config_name}
+                        source host = {hostname}
+                        source directories = {', '.join(str(d) for d in settings.src_dirs)}
+                        destination = {settings.repository}
+                    ''').lstrip(),
+                    modes='soeW'
+                )
+        else:
+            def report(msg):
+                output(msg)
 
         # Get date of last backup and warn user if it is overdue
         date_file = settings.date_file
@@ -438,13 +457,15 @@ class Due(Command):
             days = since_last_backup.total_seconds()/86400
             try:
                 if days > float(cmdline['--days']):
-                    output(gen_message(backup_date))
+                    report(gen_message(backup_date))
+                    if not email:
+                        return 1
             except ValueError:
                 raise Error('expected a number for --days.')
             return
 
         # Otherwise, simply report age of backups
-        output(gen_message(backup_date))
+        report(gen_message(backup_date))
 
 
 # Extract command {{{1
