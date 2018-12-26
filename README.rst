@@ -281,12 +281,30 @@ found at `borgbackup on readthedocs <https://borgbackup.readthedocs.io/en/stable
 Commands
 ========
 
+BreakLock
+---------
+
+This command breaks the repository and cache locks. Please use carefully and 
+only while no borg process (on any machine) is trying to access the Cache or the 
+Repository.
+
+::
+
+    emborg break-lock
+    emborg breaklock
+
+Before creating your first archive, you must use the *init* command to 
+initialize your repository.
+
+
 Create
 ------
 
 This creates an archive in an existing repository. An archive is a snapshot of 
 your files as they currently exist.  Borg is a de-duplicating backup program, so 
 only the changes from the already existing archives are saved.
+
+::
 
     emborg create
 
@@ -355,16 +373,16 @@ a glob pattern.
 
 If you do not specify an archive or date, the most recent archive is used.  You 
 can extract the version of a file or directory that existed on a particular date 
-using:
+using::
 
     emborg extract --date 2015-04-01 home/ken/bin
 
-Or, you can extract the version from a particular archive using:
+Or, you can extract the version from a particular archive using::
 
     emborg extract --archive kundert-2018-12-05T12:54:26 home/ken/bin
 
 The extracted files are placed in the current working directory within their 
-original hierarchy. Thus, the above commands create the file:
+original hierarchy. Thus, the above commands create the file::
 
     ./home/ken/bin
 
@@ -372,15 +390,15 @@ original hierarchy. Thus, the above commands create the file:
 Help
 ----
 
-Show information about Emborg
+Show information about Emborg::
 
    emborg help
 
-You can ask for help on a specific command or topic with:
+You can ask for help on a specific command or topic with::
 
    emborg help <topic>
 
-For example:
+For example::
 
    emborg help extract
 
@@ -389,6 +407,8 @@ Info
 ----
 
 This command prints out the locations of important files and directories.
+
+::
 
    emborg info
 
@@ -399,6 +419,8 @@ Init
 Initializes a Borg repository. This must be done before you create your first 
 archive.
 
+::
+
    emborg init
 
 
@@ -406,6 +428,8 @@ List
 ----
 
 List available archives.
+
+::
 
    emborg list
 
@@ -434,6 +458,8 @@ Mount
 
 Once a backup has been performed, you can mount it and then look around as you 
 would a normal read-only filesystem.
+
+::
 
    emborg mount backups
 
@@ -488,5 +514,7 @@ Version
 -------
 
 Prints the *emborg* version.
+
+::
 
    emborg version

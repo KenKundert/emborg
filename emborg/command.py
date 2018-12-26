@@ -190,6 +190,34 @@ class Command(object):
         )
 
 
+# BreakLock command {{{1
+class BreakLock(Command):
+    NAMES = 'breaklock break-lock'.split()
+    DESCRIPTION = 'breaks the repository and cache locks.'
+    USAGE = dedent("""
+        Usage:
+            emborg breaklock
+            emborg break-lock
+    """).strip()
+    REQUIRES_EXCLUSIVITY = True
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+
+        # run borg
+        cmd = (
+            'borg break-lock'.split()
+            + settings.borg_options('break-lock', options)
+            + [settings.destination()]
+        )
+        borg = run_borg(cmd, settings, options)
+        out = borg.stdout
+        if out:
+            output(out.rstrip())
+
+
 # Create command {{{1
 class Create(Command):
     NAMES = 'create backup'.split()
