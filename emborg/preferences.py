@@ -129,6 +129,11 @@ BORG_SETTINGS = dict(
         cmds = 'create',
         desc = 'stay in the same file system and do not store mount points of other file systems'
     ),
+    remote_path = dict(
+        cmds = 'all',
+        arg = 'CMD',
+        desc = 'name of borg executable on remote platform',
+    ),
     remote_ratelimit = dict(
         cmds = 'all',
         arg = 'RATE',
