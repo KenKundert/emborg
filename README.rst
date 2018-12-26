@@ -42,6 +42,10 @@ commands (they will need to be adjusted for to get the latest version)::
 
 Download and install *Emborg* as follows::
 
+    pip3 install --user emborg
+
+Or, if you want the development version, use::
+
     git clone https://github.com/KenKundert/emborg.git
     pip3 install --user ./emborg
 
