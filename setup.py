@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name = 'emborg',
-    version = '0.2.1',
+    version = '0.3.0',
     author = 'Ken Kundert',
     author_email = 'emborg@nurdletech.com',
     description = 'Borg front end.',
@@ -17,4 +17,5 @@ setup(
     packages = 'emborg'.split(),
     entry_points = {'console_scripts': ['emborg=emborg.main:main']},
     install_requires = 'appdirs arrow docopt inform>=1.14 shlib>=0.8'.split(),
+        # inform wants to be >=1.15, but 1.15 is not available yet
 )
