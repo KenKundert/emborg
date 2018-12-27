@@ -833,7 +833,7 @@ class Mount(Command):
 
             emborg mount --archive kundert-2018-12-05T12:54:26 backups
 
-        You should use the umount command when you are done.
+        You should use `emborg umount` when you are done.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
 
