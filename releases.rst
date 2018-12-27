@@ -8,7 +8,7 @@ Releases
     - initial public release.
 
 **Latest development release**:
-    | Version: 0.3.0
-    | Released: 2018-12-25
+    | Version: 0.3.1
+    | Released: 2018-12-26
 
     - added *remote_path* setting.
