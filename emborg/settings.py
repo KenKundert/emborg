@@ -310,9 +310,9 @@ class Settings:
         self.date_file = to_path(config_dir, date_file)
 
         # perform locking
+        lockfile = self.lockfile = to_path(config_dir, self.resolve(LOCK_FILE))
         if self.requires_exclusivity:
             # check for existance of lockfile
-            lockfile = self.lockfile = to_path(config_dir, self.resolve(LOCK_FILE))
             if lockfile.exists():
                 raise Error(f'currently running (see {lockfile} for details).')
 

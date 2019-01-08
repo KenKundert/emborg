@@ -32,7 +32,7 @@ from inform import (
     render, warn,
 )
 from docopt import docopt
-from shlib import mkdir, to_path, Run, set_prefs, render_command
+from shlib import mkdir, rm, to_path, Run, set_prefs, render_command
 set_prefs(use_inform=True, log_cmd=True)
 from textwrap import dedent, fill
 import arrow
@@ -199,7 +199,7 @@ class BreakLock(Command):
             emborg breaklock
             emborg break-lock
     """).strip()
-    REQUIRES_EXCLUSIVITY = True
+    REQUIRES_EXCLUSIVITY = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -216,6 +216,7 @@ class BreakLock(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+        rm(settings.lockfile)
 
 
 # Create command {{{1
