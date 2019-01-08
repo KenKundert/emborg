@@ -297,9 +297,6 @@ Repository.
     emborg break-lock
     emborg breaklock
 
-Before creating your first archive, you must use the *init* command to 
-initialize your repository.
-
 
 Create
 ------
