@@ -21,7 +21,7 @@
 # Imports {{{1
 from .command import Command
 from .utilities import pager, two_columns
-from inform import error, output
+from inform import error, output, Error
 from textwrap import dedent
 
 # HelpMessage base class {{{1
@@ -44,17 +44,25 @@ class HelpMessage(object):
 
     # show {{{2
     @classmethod
-    def show(cls, name=None, desc=None):
+    def show(cls, name=None):
         if name:
-            command, _ = Command.find(name)
-            if command:
-                return pager(command.help())
+            # search commands
+            try:
+                command, _ = Command.find(name)
+                if command:
+                    return pager(command.help())
+            except Error:
+                pass
+
+            # search topics
             for topic in cls.topics():
                 if name == topic.get_name():
                     return pager(topic.help())
+
             error('topic not found.', culprit=name)
         else:
-            cls.help(desc)
+            from .main import synopsis
+            cls.help(synopsis)
 
     # summarize {{{2
     @classmethod
@@ -84,12 +92,21 @@ class Overview(HelpMessage):
     @staticmethod
     def help():
         text = dedent("""
-            Emborg is a simple command line utility to orchestrate backups. It
-            is built on Bort, which is a powerful and fast de-duplicating backup utility for
-            managing encrypted backups, however it can be rather clumsy to use directly.
-            With emborg, you specify all the details about your
-            backups once in advance, and then use a very simple command line
-            interface for your day-to-day activities.
+            Emborg is a simple command line utility to orchestrate backups.  It
+            is built on Borg, which is a powerful and fast de-duplicating backup
+            utility for managing encrypted backups, however it can be rather
+            clumsy to use directly.  With Emborg, you specify all the details
+            about your backups once in advance, and then use a very simple
+            command line interface for your day-to-day activities.  The details
+            are contained in ~/.config/emborg.  That directory will contain a
+            file (settings) that contains shared settings, and then another file
+            for each of your backup configurations.
+
+            Use of Emborg does not preclude the use of Borg directly on the same
+            repository.  The philosophy of Emborg is to provide commands that
+            you would use often and in an interactive manner with the
+            expectation that you would use Borg directly for the remaining
+            commands.
         """).strip()
         return text
 
@@ -105,6 +122,10 @@ class Precautions(HelpMessage):
             passphrase in a safe place.  This is very important. If the only
             copy of the passphrase is on the disk being backed up and that disk
             were to fail you would not be able to access your backups.
+            I recommend the use of sparekeys (https://github.com/kalekundert/sparekeys)
+            as a way of assuring that you always have access to the essential
+            information, such as your Borg passphrase and keys, that you would
+            need to get started after a catastrophic loss of your disk.
 
             If you keep the passphrase in a settings file, you should set
             its permissions so that it is not readable by others:

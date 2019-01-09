@@ -164,7 +164,7 @@ class Command(object):
 
     @classmethod
     def execute(cls, name, args, settings, options):
-        narrate('{}:'.format(name))
+        narrate('running {} command'.format(name))
         return cls.run(name, args if args else [], settings, options)
 
     @classmethod
@@ -225,8 +225,11 @@ class Create(Command):
     DESCRIPTION = 'create an archive of the current files'
     USAGE = dedent("""
         Usage:
-            emborg create
-            emborg backup
+            emborg create [options]
+            emborg backup [options]
+
+        Options:
+            -f, --fast    skip pruning and checking for a faster backup on a slow network
     """).strip()
     REQUIRES_EXCLUSIVITY = True
 
@@ -245,6 +248,7 @@ class Create(Command):
                 )
 
         # run prerequisites
+        narrate('running pre-backup scripts')
         for each in settings.values('run_before_backup'):
             narrate('running:', each)
             try:
@@ -266,12 +270,16 @@ class Create(Command):
                 e.reraise(
                     codicil = "Run 'emborg init' to initialize the repository."
                 )
+            else:
+                raise
 
         # update the date files
+        narrate('update date file')
         now = arrow.now()
         settings.date_file.write_text(str(now))
 
         # run any scripts specified to be run after a backup
+        narrate('running post-backup scripts')
         for each in settings.values('run_after_backup'):
             narrate('running:', each)
             try:
@@ -279,15 +287,28 @@ class Create(Command):
             except Error as e:
                 e.reraise(culprit='run_after_backup')
 
-        # prune the archives if requested
-        if settings.prune_after_create:
-            prune = Prune()
-            prune.run('prune', [], settings, options)
+        if cmdline['--fast']:
+            return
 
-        # check the archives if requested
-        if settings.check_after_create:
-            check = Check()
-            check.run('check', [], settings, options)
+        # prune the archives if requested
+        try:
+            # check the archives if requested
+            activity = 'checking'
+            if settings.check_after_create:
+                narrate('checking archive')
+                check = Check()
+                check.run('check', [], settings, options)
+
+            activity = 'pruning'
+            if settings.prune_after_create:
+                narrate('pruning archives')
+                prune = Prune()
+                prune.run('prune', [], settings, options)
+        except Error as e:
+            e.reraise(codicil=(
+                f'This error occurred while {activity} the archives.',
+                'No error was reported while creating the archive.'
+            ))
 
 
 # Check command {{{1
@@ -596,17 +617,6 @@ class Help(Command):
             emborg help [<topic>]
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    EMBORG_DESCRIPTION = dedent("""
-        Emborg is a simple command line utility to orchestrate backups. It is
-        built on Duplicity, which is a powerful and flexible utility for
-        managing encrypted backups, however it has a rather heavy user
-        interface. With Emborg, you specify all the details about your backups
-        once in advance, and then use a very simple command line interface for
-        your day-to-day activities.  The details are contained in
-        ~/.config/emborg.  That directory will contains a file (settings) that
-        contains shared settings, and then another file for each backup
-        configuration you have.
-    """)
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -614,7 +624,7 @@ class Help(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         from .help import HelpMessage
-        HelpMessage.show(cmdline['<topic>'], cls.EMBORG_DESCRIPTION)
+        HelpMessage.show(cmdline['<topic>'])
 
 
 # Info command {{{1

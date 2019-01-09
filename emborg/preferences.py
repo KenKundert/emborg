@@ -29,7 +29,7 @@ CONFIG_DIR = user_config_dir(PROGRAM_NAME)
 
 SETTINGS_FILE = 'settings'
 LOG_FILE = '{config_name}.log'
-PREV_LOG_FILE = '.{config_name}.log.prev'
+PREV_LOG_FILE = '{config_name}.log.prev'
 LOCK_FILE = '{config_name}.lock'
 DATE_FILE = '{config_name}.lastbackup'
 

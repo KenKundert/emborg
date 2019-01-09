@@ -2,7 +2,7 @@
 """
 Embalm Backups
 
-Backs up the contents of a file hierarchy.  A front end for Duplicity's
+Backs up the contents of a file hierarchy.  A front end for Borg's
 encrypted incremental backup utility.
 
 Usage:
@@ -15,7 +15,9 @@ Options:
     -t, --trial-run                   Run Borg in dry run mode.
     -v, --verbose                     Make Borg more verbose.
     --no-log                          Do not create log file.
+"""
 
+commands = """
 Commands:
 {commands}
 
@@ -43,15 +45,19 @@ from .command import Command
 from .settings import Settings
 from inform import Inform, Error, cull, fatal, display, terminate, os_error
 from docopt import docopt
+from . import __version__, __released__
 
+# Globals {{{1
+synopsis = __doc__
+expanded_synopsis = synopsis + commands.format(commands=Command.summarize())
+version = f'{__version__} ({__released__})'
+
+from .command import Command
 # Main {{{1
 def main():
     with Inform(error_status=2) as inform:
         # read command line
-        cmdline = docopt(
-            __doc__.format(commands=Command.summarize()),
-            options_first=True
-        )
+        cmdline = docopt(expanded_synopsis, options_first=True, version=version)
         config = cmdline['--config']
         command = cmdline['<command>']
         args = cmdline['<args>']
@@ -76,6 +82,7 @@ def main():
 
         except KeyboardInterrupt:
             display('Terminated by user.')
+            exit_status = 0
         except Error as e:
             e.terminate()
         except OSError as e:
