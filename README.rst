@@ -1,7 +1,7 @@
 emborg -- Encrypted Backups to a Remote Server
 ==============================================
 
-| Version: 0.3.3
+| Version: 1.0.0
 | Released: 2019-01-09
 |
 
