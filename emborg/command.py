@@ -28,73 +28,23 @@ from .utilities import two_columns, render_path_list, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
-    codicil, conjoin, cull, full_stop, indent, narrate, os_error, output,
+    codicil, conjoin, cull, full_stop, narrate, os_error, output,
     render, warn,
 )
 from docopt import docopt
-from shlib import mkdir, rm, to_path, Run, set_prefs, render_command
+from shlib import mkdir, rm, to_path, Run, set_prefs
 set_prefs(use_inform=True, log_cmd=True)
 from textwrap import dedent, fill
 import arrow
 import json
 import re
-import os
 import sys
 
 
 # Utilities {{{1
-# borg_options_args {{{2
-borg_options_args = {
-    'borg': 1,
-    '--exclude': 1,
-    '--encryption': 1,
-}
-for name, attrs in BORG_SETTINGS.items():
-    if 'arg' in attrs and attrs['arg']:
-        borg_options_args[convert_name_to_option(name)] = 1
-
 # title() {{{2
 def title(text):
     return full_stop(text.capitalize())
-
-# publish_passcode() {{{2
-def publish_passcode(settings):
-    passcode = settings.passphrase
-    if not passcode and settings.avendesora_account:
-        narrate('running avendesora to access passphrase.')
-        try:
-            from avendesora import PasswordGenerator, PasswordError
-            pw = PasswordGenerator()
-            account = pw.get_account(settings.value('avendesora_account'))
-            passcode = str(account.get_value('passcode'))
-        except ImportError:
-            raise Error(
-                'Avendesora is not available',
-                'you must specify passphrase in settings.',
-                sep = ', '
-            )
-    if not passcode:
-        narrate('no passphrase available, encryption disabled.')
-        return {}
-
-    narrate('passphrase is set.')
-    return dict(BORG_PASSPHRASE = passcode)
-
-# run_borg() {{{2
-def run_borg(cmd, settings, options=None):
-    os.environ.update(publish_passcode(settings))
-    os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
-    if settings.needs_ssh_agent:
-        for ssh_var in 'SSH_AGENT_PID SSH_AUTH_SOCK'.split():
-            if ssh_var not in os.environ:
-                warn(
-                    'environment variable not found, is ssh-agent running?',
-                    culprit=ssh_var
-                )
-    narrating = options and ('verbose' in options or 'narrate' in options)
-    narrate('running:\n{}'.format(indent(render_command(cmd, borg_options_args))))
-    modes = 'soeW' if narrating else 'sOEW'
-    return Run(cmd, modes=modes, env=os.environ, log=False)
 
 # get_available_archives() {{{2
 def get_available_archives(settings):
@@ -103,7 +53,7 @@ def get_available_archives(settings):
         'borg list --json'.split()
         + [settings.destination()]
     )
-    borg = run_borg(cmd, settings)
+    borg = settings.run_borg(cmd)
     try:
         data = json.loads(borg.stdout)
         return data['archives']
@@ -128,7 +78,7 @@ def get_available_files(settings, archive):
         'borg list --json-lines'.split()
         + [settings.destination(archive)]
     )
-    borg = run_borg(cmd, settings)
+    borg = settings.run_borg(cmd)
     try:
         files = []
         for line in borg.stdout.splitlines():
@@ -212,7 +162,7 @@ class BreakLock(Command):
             + settings.borg_options('break-lock', options)
             + [settings.destination()]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -264,7 +214,7 @@ class Create(Command):
             + render_path_list(settings.src_dirs)
         )
         try:
-            run_borg(cmd, settings, options)
+            settings.run_borg(cmd, options)
         except Error as e:
             if e.stderr and 'is not a valid repository' in e.stderr:
                 e.reraise(
@@ -337,7 +287,7 @@ class Check(Command):
             + verify
             + [settings.destination()]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -387,7 +337,7 @@ class Delete(Command):
             + settings.borg_options('delete', options)
             + [settings.destination(archive)]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -417,7 +367,7 @@ class Diff(Command):
             + [settings.destination(archive1)]
             + [archive2]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -602,7 +552,7 @@ class Extract(Command):
             + [settings.destination(archive)]
             + paths
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -661,7 +611,7 @@ class Info(Command):
             + settings.borg_options('info', options)
             + [settings.destination()]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output()
@@ -689,7 +639,7 @@ class Initialize(Command):
             + settings.borg_options('init', options)
             + [settings.destination()]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -718,7 +668,7 @@ class List(Command):
             + settings.borg_options('list', options)
             + [settings.destination()]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -808,7 +758,7 @@ class Manifest(Command):
             + list_opts
             + [settings.destination(archive)]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -875,7 +825,7 @@ class Mount(Command):
             + [settings.destination(archive)]
             + [mount_point]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -912,7 +862,7 @@ class Prune(Command):
             + settings.borg_options('prune', options)
             + [settings.destination()]
         )
-        borg = run_borg(cmd, settings, options)
+        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -980,7 +930,7 @@ class Umount(Command):
             + [mount_point]
         )
         try:
-            borg = run_borg(cmd, settings, options)
+            borg = settings.run_borg(cmd, options)
         except Error as e:
             if 'busy' in str(e):
                 e.reraise(

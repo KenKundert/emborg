@@ -34,10 +34,10 @@ from .preferences import (
 )
 from .python import PythonFile
 from .utilities import gethostname, getusername, render_path_list
-from shlib import cd, mkdir, mv, rm, Run, to_path
+from shlib import cd, mkdir, mv, rm, Run, to_path, render_command
 from inform import (
     Error,
-    conjoin, full_stop, get_informer, is_str, narrate, warn,
+    conjoin, full_stop, get_informer, indent, is_str, narrate, warn,
 )
 from textwrap import dedent
 from appdirs import user_config_dir
@@ -48,6 +48,17 @@ import os
 # Utilities {{{1
 hostname = gethostname()
 username = getusername()
+
+# borg_options_args {{{2
+borg_options_args = {
+    'borg': 1,
+    '--exclude': 1,
+    '--encryption': 1,
+}
+for name, attrs in BORG_SETTINGS.items():
+    if 'arg' in attrs and attrs['arg']:
+        borg_options_args[convert_name_to_option(name)] = 1
+
 
 # Settings class {{{1
 class Settings:
@@ -263,6 +274,45 @@ class Settings:
                     else:
                         args.extend([opt])
         return args
+
+    # publish_passcode() {{{2
+    def publish_passcode(self):
+        passcode = self.passphrase
+        if not passcode and self.avendesora_account:
+            narrate('running avendesora to access passphrase.')
+            try:
+                from avendesora import PasswordGenerator, PasswordError
+                pw = PasswordGenerator()
+                account = pw.get_account(self.value('avendesora_account'))
+                passcode = str(account.get_value('passcode'))
+            except ImportError:
+                raise Error(
+                    'Avendesora is not available',
+                    'you must specify passphrase in settings.',
+                    sep = ', '
+                )
+        if not passcode:
+            narrate('no passphrase available, encryption disabled.')
+            return {}
+
+        narrate('passphrase is set.')
+        return dict(BORG_PASSPHRASE = passcode)
+
+    # run_borg() {{{2
+    def run_borg(self, cmd, options=None):
+        os.environ.update(self.publish_passcode())
+        os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
+        if self.needs_ssh_agent:
+            for ssh_var in 'SSH_AGENT_PID SSH_AUTH_SOCK'.split():
+                if ssh_var not in os.environ:
+                    warn(
+                        'environment variable not found, is ssh-agent running?',
+                        culprit=ssh_var
+                    )
+        narrating = options and ('verbose' in options or 'narrate' in options)
+        narrate('running:\n{}'.format(indent(render_command(cmd, borg_options_args))))
+        modes = 'soeW' if narrating else 'sOEW'
+        return Run(cmd, modes=modes, env=os.environ, log=False)
 
     # destination() {{{2
     def destination(self, archive=None):

@@ -523,3 +523,46 @@ Prints the *emborg* version.
 ::
 
    emborg version
+
+
+API
+===
+
+Emborg has a simple API that allows you to run borg commands. Here is an example 
+taken from `sparekeys <https://github.com/kalekundert/sparekeys>`_ that exports 
+the keys from your *Borg* repository so then can be backed up separately::
+
+    from emborg import Emborg
+
+    with Emborg() as emborg:
+        cmd = 'borg key export'.split() + [
+                emborg.borg_options('key export'),
+                emborg.repository,
+                archive / '.config/borg.repokey',
+        ]                                                                                                          emborg.run_borg(cmd)
+        borg = emborg.run_borg(cmd)
+        if borg.stdout:
+            print(borg.stdout.rstrip())
+
+*Emborg* takes the config name as an argument, if not given the default config 
+is used. It provides the following useful methods and attributes:
+
+    repository:
+
+        The path to the repository.
+
+    destination(archive):
+
+        Returns the full path to the archive. If Archive is False or None, then 
+        the path to the repository it returned. If Archive is True, then the 
+        default archive name as taken from settings file is used. This is 
+        appropriate when creating new repositories.
+
+    borg_options(cmd, options):
+
+        returns a list of options that consists of any options that are both 
+        derived from *Emborg* settings and are appropriate for the specified 
+        command, and any additional options you pass in.
+
+You can examine the emborg/command.py file for inspiration and examples on how 
+to use the *Emborg* API.
