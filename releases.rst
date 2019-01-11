@@ -14,3 +14,5 @@ Releases
     | Version: 1.0.1
     | Released: 2019-01-09
 
+    - Improved and documented API.
+

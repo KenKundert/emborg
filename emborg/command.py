@@ -200,7 +200,6 @@ class Create(Command):
         # run prerequisites
         narrate('running pre-backup scripts')
         for each in settings.values('run_before_backup'):
-            narrate('running:', each)
             try:
                 Run(each, 'SoeW')
             except Error as e:
@@ -231,7 +230,6 @@ class Create(Command):
         # run any scripts specified to be run after a backup
         narrate('running post-backup scripts')
         for each in settings.values('run_after_backup'):
-            narrate('running:', each)
             try:
                 Run(each, 'SoeW')
             except Error as e:

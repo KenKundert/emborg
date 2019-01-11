@@ -55,7 +55,7 @@ version = f'{__version__} ({__released__})'
 from .command import Command
 # Main {{{1
 def main():
-    with Inform(error_status=2) as inform:
+    with Inform(error_status=2, flush=True, version=version) as inform:
         # read command line
         cmdline = docopt(expanded_synopsis, options_first=True, version=version)
         config = cmdline['--config']
