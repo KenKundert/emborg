@@ -176,7 +176,7 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
 
     # basic settings
     # specify notify if batch and notifier if interactive
-    notify = "<<your-email-address>>"        # who to notify when things go wrong
+    notify = '<<your-email-address>>'        # who to notify when things go wrong
     notifier = 'notify-send -u normal {prog_name} "{msg}"'
                                              # interactive notifier program
     needs_ssh_agent = True
@@ -195,7 +195,7 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
 
     # filter settings
     exclude_if_present = '.nobackup'
-    one_file_system = True
+    one_file_system = False
     exclude_caches = True
 
     # prune settings
