@@ -213,7 +213,6 @@ INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
     excludes = '''
         /dev
         /home/*/.cache
-        /lost+found
         /mnt
         /proc
         /root/.cache
