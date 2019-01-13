@@ -11,7 +11,7 @@ Releases
     - added *remote_path* setting.
 
 **Latest development release**:
-    | Version: 1.0.3
+    | Version: 1.0.4
     | Released: 2019-01-12
 
     - Improved and documented API.
