@@ -181,6 +181,8 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
                                              # interactive notifier program
     needs_ssh_agent = True
     remote_ratelimit = 2000                  # bandwidth limit in kbps
+    prune_after_create = True                # automatically run prune after a backup
+    check_after_create = False               # automatically run check after a backup
 
     # repository settings
     compression = 'lz4'
