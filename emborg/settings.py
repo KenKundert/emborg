@@ -26,6 +26,9 @@ from .preferences import (
     DATE_FILE,
     DEFAULT_CONFIG_SETTING,
     INCLUDE_SETTING,
+    INITIAL_SETTINGS_FILE_CONTENTS,
+    INITIAL_ROOT_CONFIG_FILE_CONTENTS,
+    INITIAL_HOME_CONFIG_FILE_CONTENTS,
     LOCK_FILE,
     LOG_FILE,
     PREV_LOG_FILE,
@@ -36,8 +39,8 @@ from .python import PythonFile
 from .utilities import gethostname, getusername, render_path_list
 from shlib import cd, mkdir, mv, rm, Run, to_path, render_command
 from inform import (
-    Error,
-    conjoin, full_stop, get_informer, indent, is_str, narrate, warn,
+    Error, conjoin, done, full_stop, get_informer, indent, is_str, narrate,
+    output, warn,
 )
 from textwrap import dedent
 from appdirs import user_config_dir
@@ -85,12 +88,35 @@ class Settings:
         """
 
         if path:
+            vvv(path)
             settings = PythonFile(path).run()
             parent = path.parent
             includes = Collection(settings.get(INCLUDE_SETTING))
         else:
             # this is generic settings file
-            parent = CONFIG_DIR
+            parent = to_path(CONFIG_DIR)
+            vvv(parent)
+            if not parent.exists():
+                ppp('parent exists')
+                # config dir does not exist, create and populate it
+                parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+                for name, contents in [
+                    (SETTINGS_FILE, INITIAL_SETTINGS_FILE_CONTENTS),
+                    ('root', INITIAL_ROOT_CONFIG_FILE_CONTENTS),
+                    ('home', INITIAL_HOME_CONFIG_FILE_CONTENTS),
+                ]:
+                    path = parent / name
+                    path.write_text(contents)
+                output(
+                    f'Configuration directory created: {parent!s}.',
+                    'Includes example settings files. Edit them to suit your needs.',
+                    'Search for and replace any fields delimited with << and >>.',
+                    'Delete any configurations you do not need.',
+                    'Generally you will use either home or root, but not both.',
+                    sep = '\n'
+                )
+                done()
+
             pf = PythonFile(parent, SETTINGS_FILE)
             settings_filename = pf.path
             settings = pf.run()

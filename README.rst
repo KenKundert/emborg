@@ -51,12 +51,19 @@ Or, if you want the development version, use::
 
 Then you will need to create your *Emborg* settings directory (~/.config/emborg) 
 and create a shared settings file 'settings' and then one or more files, one for 
-each configuration you want.  Normally people have just two files, the shared 
-settings file and one configuration file, perhaps named 'home' because it used 
-to back up your home directory. However, you may wish to have a second 
-configuration dedicated to creating snapshots of your files every 15 minutes or 
-so. These snapshots may be kept locally and only for a day or so while your 
-primary backups are kept remotely and kept long term.
+each configuration you want.  If you run 'emborg' without creating the settings 
+directory, it will create it for you and populate it with starter files you must 
+edit to use.  Specifically it creates a shared settings file, and then a *home* 
+and *root* configuration. You generally only need one. Start from *home* if you 
+are backing up your home directory, and start from *root* if you are backing up 
+the root file system.  Delete the one you do not need.
+
+Normally people have just two files, the shared settings file and one 
+configuration file, perhaps named 'home' because it used to back up your home 
+directory. However, you may wish to have a second configuration dedicated to 
+creating snapshots of your files every 15 minutes or so. These snapshots may be 
+kept locally and only for a day or so while your primary backups are kept 
+remotely and kept long term.
 
 Settings may be placed in either the shared settings file or the configuration 
 specific file. The ones placed in the configuration specific file dominate.

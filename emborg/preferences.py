@@ -18,6 +18,7 @@
 
 # Imports {{{1
 from appdirs import user_config_dir, user_data_dir
+from textwrap import dedent
 
 # Preferences {{{1
 PROGRAM_NAME = 'emborg'
@@ -153,3 +154,70 @@ for opt, attrs in BORG_SETTINGS.items():
 # utility function that converts setting names to borg option names
 def convert_name_to_option(name):
     return '--' + name.replace('_', '-')
+
+INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
+    # These settings are common to all configurations
+
+    # configurations
+    configurations = '<<list your configurations here>>'
+    default_configuration = '<<default-config>>'
+
+    # passcode
+    # specify either passphrase or avendesora_account
+    passphrase = '<<passcode>>'              # passphrase for encryption key
+    avendesora_account = '<<account-name>>'  # avendesora account holding encryption key
+
+    # basic settings
+    # specify notify if batch and notifier if interactive
+    notify = "<<your-email-address>>"        # who to notify when things go wrong
+    notifier = 'notify-send -u normal {prog_name} "{msg}"'
+                                             # interactive notifier program
+    needs_ssh_agent = True
+    remote_ratelimit = 2000                  # bandwidth limit in kbps
+
+    # filter settings
+    exclude_if_present = '.nobackup'
+    one_file_system = True
+    exclude_caches = True
+
+    # repository settings
+    compression = 'lz4'
+    repository = '<<host>>:<<path>>/{host_name}-{user_name}-{config_name}'
+    archive = '{host_name}-{{now}}'
+        # These may contain {<name>} where name is any of host_name, user_name,
+        # prog_name config_name, or any of the user specified settings.
+        # Double up the braces to specify parameters that should be interpreted
+        # by borg.
+""").lstrip()
+
+INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
+    # Settings for root configuration
+    src_dirs = '/'.split()   # absolute path to directory to be backed up
+    excludes = '''
+        /dev
+        /home/*/.cache
+        /lost+found
+        /mnt
+        /proc
+        /root/.cache
+        /run
+        /sys
+        /tmp
+        /var/cache
+        /var/lock
+        /var/log
+        /var/run
+        /var/spool
+        /var/tmp
+    '''.split()              # list of files or directories to skip
+""").lstrip()
+
+INITIAL_HOME_CONFIG_FILE_CONTENTS = dedent("""
+    src_dirs = '~'.split()   # absolute path to directory to be backed up
+    excludes = '''
+        ~/**/__pycache__
+        ~/**/*.pyc
+        ~/**/.*.swp
+        ~/**/.*.swo
+    '''.split()
+""").lstrip()
