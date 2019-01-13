@@ -88,16 +88,13 @@ class Settings:
         """
 
         if path:
-            vvv(path)
             settings = PythonFile(path).run()
             parent = path.parent
             includes = Collection(settings.get(INCLUDE_SETTING))
         else:
             # this is generic settings file
             parent = to_path(CONFIG_DIR)
-            vvv(parent)
             if not parent.exists():
-                ppp('parent exists')
                 # config dir does not exist, create and populate it
                 parent.mkdir(mode=0o700, parents=True, exist_ok=True)
                 for name, contents in [
