@@ -166,6 +166,13 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
     # specify either passphrase or avendesora_account
     passphrase = '<<passcode>>'              # passphrase for encryption key
     avendesora_account = '<<account-name>>'  # avendesora account holding encryption key
+    encryption = '<<encryption>>'            # borg encryption method
+        # Common choices are 'repokey' and 'keyfile'.
+        # With 'repokey' the encryption key is copied into repository, use this
+        # only if the remote repository is owned by you and is secure.
+        # With 'keyfile' the encryption key is only stored locally. Be sure to
+        # export it and save a copy in a safe place, otherwise you may not be
+        # able to access your backups if you lose your disk.
 
     # basic settings
     # specify notify if batch and notifier if interactive
