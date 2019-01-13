@@ -175,11 +175,6 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
     needs_ssh_agent = True
     remote_ratelimit = 2000                  # bandwidth limit in kbps
 
-    # filter settings
-    exclude_if_present = '.nobackup'
-    one_file_system = True
-    exclude_caches = True
-
     # repository settings
     compression = 'lz4'
     repository = '<<host>>:<<path>>/{host_name}-{user_name}-{config_name}'
@@ -188,6 +183,19 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
         # prog_name config_name, or any of the user specified settings.
         # Double up the braces to specify parameters that should be interpreted
         # by borg.
+
+    # filter settings
+    exclude_if_present = '.nobackup'
+    one_file_system = True
+    exclude_caches = True
+
+    # prune settings
+    keep_within = 1d                         # keep all archives created in interval
+    keep_hourly = 24                         # number of hourly archives to keep
+    keep_daily = 7                           # number of daily archives to keep
+    keep_weekly = 4                          # number of weekly archives to keep
+    keep_monthly = 12                        # number of monthly archives to keep
+    keep_yearly = 1                          # number of yearly archives to keep
 """).lstrip()
 
 INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
