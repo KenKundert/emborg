@@ -192,7 +192,7 @@ class Settings:
         try:
             if self.notify:
                 Run(
-                    ['mail', '-s', f'{PROGRAM_NAME}: {msg}', self.notify],
+                    ['mail', '-s', f'{PROGRAM_NAME}: {msg}'] + self.notify.split(),
                     stdin=dedent(f'''
                         {msg}
                         {comment}
