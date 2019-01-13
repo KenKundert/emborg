@@ -21,17 +21,17 @@ from pipes import quote
 import hashlib
 import os
 import shlex
+import socket
+import pwd
 
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
-import socket
 def gethostname():
     return socket.gethostname().split('.')[0]
 
 # getusername {{{1
-import getpass
 def getusername():
-    return getpass.getuser()
+    return pwd.getpwuid(os.getuid()).pw_name
 
 # pager {{{1
 def pager(text):

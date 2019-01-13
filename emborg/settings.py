@@ -192,12 +192,12 @@ class Settings:
         try:
             if self.notify:
                 Run(
-                    ['mail', '-s', f'{PROGRAM_NAME}: {msg}'] + self.notify.split(),
+                    ['mail', '-s', f'{PROGRAM_NAME} on {hostname}: {msg}'] + self.notify.split(),
                     stdin=dedent(f'''
                         {msg}
                         {comment}
                         config = {self.config_name}
-                        source = {hostname}:{', '.join(str(d) for d in self.src_dirs)}
+                        source = {username}@{hostname}:{', '.join(str(d) for d in self.src_dirs)}
                         destination = {self.repository}
                     ''').lstrip(),
                     modes='soeW'
