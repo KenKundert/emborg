@@ -197,7 +197,7 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
     exclude_caches = True
 
     # prune settings
-    keep_within = 1d                         # keep all archives created in interval
+    keep_within = '1d'                       # keep all archives created in interval
     keep_hourly = 24                         # number of hourly archives to keep
     keep_daily = 7                           # number of daily archives to keep
     keep_weekly = 4                          # number of weekly archives to keep
