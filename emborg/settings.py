@@ -315,7 +315,7 @@ class Settings:
                 pw = PasswordGenerator()
                 account = pw.get_account(self.value('avendesora_account'))
                 field = self.value('avendesora_field', None)
-                passcode = str(account.get_value(field)
+                passcode = str(account.get_value(field))
             except ImportError:
                 raise Error(
                     'Avendesora is not available',
