@@ -206,10 +206,10 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
 
     # prune settings
     keep_within = '1d'                       # keep all archives created in interval
-    keep_hourly = 24                         # number of hourly archives to keep
-    keep_daily = 7                           # number of daily archives to keep
-    keep_weekly = 4                          # number of weekly archives to keep
-    keep_monthly = 12                        # number of monthly archives to keep
+    keep_hourly = 48                         # number of hourly archives to keep
+    keep_daily = 14                          # number of daily archives to keep
+    keep_weekly = 8                          # number of weekly archives to keep
+    keep_monthly = 24                        # number of monthly archives to keep
     keep_yearly = 1                          # number of yearly archives to keep
 """).lstrip()
 
