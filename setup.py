@@ -18,4 +18,16 @@ setup(
     entry_points = {'console_scripts': ['emborg=emborg.main:main']},
     install_requires = 'appdirs arrow docopt inform>=1.14 shlib>=1.0'.split(),
         # inform wants to be >=1.15, but 1.15 is not available yet
+
+    keywords='emborg borg borgify backups'.split(),
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'Natural Language :: English',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Topic :: Utilities',
+    ],
 )
