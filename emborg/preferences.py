@@ -21,6 +21,7 @@ from appdirs import user_config_dir, user_data_dir
 from textwrap import dedent
 
 # Preferences {{{1
+# Constants {{{2
 PROGRAM_NAME = 'emborg'
 DEFAULT_COMMAND = 'create'
 ENCODING = 'utf-8'
@@ -38,9 +39,11 @@ CONFIGS_SETTING = 'configurations'
 DEFAULT_CONFIG_SETTING = 'default_configuration'
 INCLUDE_SETTING = 'include'
 
+# Emborg settings {{{2
 EMBORG_SETTINGS = dict(
     archive = 'template Borg should use when creating archive names',
     avendesora_account = 'account name that holds passphrase for encryption key in Avendesora',
+    avendesora_field = 'name of field in Avendesora that holds the passphrase',
     check_after_create = 'run check as the last step of an archive creation',
     config_name = 'name of active configuration (set by program)',
     configurations = 'available emborg configurations',
@@ -62,6 +65,7 @@ EMBORG_SETTINGS = dict(
     # EMBORG_SETTINGS or BORG_SETTINGS is highlighted as a unknown setting by
     # the settings command.
 
+# Borg settings {{{2
 BORG_SETTINGS = dict(
     append_only = dict(
         cmds = 'init',
@@ -147,6 +151,7 @@ BORG_SETTINGS = dict(
     ),
 )
 
+# Utilities {{{2
 # convert args to lists
 for opt, attrs in BORG_SETTINGS.items():
     attrs['cmds'] = attrs['cmds'].split()
@@ -155,6 +160,7 @@ for opt, attrs in BORG_SETTINGS.items():
 def convert_name_to_option(name):
     return '--' + name.replace('_', '-')
 
+# Initial contents of files {{{2
 INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
     # These settings are common to all configurations
 
@@ -165,7 +171,7 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
     # passcode
     # specify either passphrase or avendesora_account
     passphrase = '<<passcode>>'              # passphrase for encryption key
-    avendesora_account = '<<account-name>>'  # avendesora account holding encryption key
+    avendesora_account = '<<account-name>>'  # avendesora account holding passphrase
     encryption = '<<encryption>>'            # borg encryption method
         # Common choices are 'repokey' and 'keyfile'.
         # With 'repokey' the encryption key is copied into repository, use this

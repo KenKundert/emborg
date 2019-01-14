@@ -104,6 +104,7 @@ class Settings:
                 ]:
                     path = parent / name
                     path.write_text(contents)
+                    path.chmod(0o600)
                 output(
                     f'Configuration directory created: {parent!s}.',
                     'Includes example settings files. Edit them to suit your needs.',
@@ -313,7 +314,8 @@ class Settings:
                 from avendesora import PasswordGenerator, PasswordError
                 pw = PasswordGenerator()
                 account = pw.get_account(self.value('avendesora_account'))
-                passcode = str(account.get_value('passcode'))
+                field = self.value('avendesora_field', None)
+                passcode = str(account.get_value(field)
             except ImportError:
                 raise Error(
                     'Avendesora is not available',
@@ -341,7 +343,7 @@ class Settings:
         narrating = options and ('verbose' in options or 'narrate' in options)
         narrate('running:\n{}'.format(indent(render_command(cmd, borg_options_args))))
         modes = 'soeW' if narrating else 'sOEW'
-        return Run(cmd, modes=modes, env=os.environ, log=False)
+        return Run(cmd, modes=modes, stdin='', env=os.environ, log=False)
 
     # destination() {{{2
     def destination(self, archive=None):
