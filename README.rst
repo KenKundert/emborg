@@ -1,6 +1,12 @@
 emborg -- Encrypted Backups to a Remote Server
 ==============================================
 
+.. image:: https://img.shields.io/pypi/v/emborg.svg
+    :target: https://pypi.python.org/pypi/emborg
+
+.. image:: https://img.shields.io/pypi/pyversions/emborg.svg
+    :target: https://pypi.python.org/pypi/emborg/
+
 | Version: 1.1.2
 | Released: 2019-01-14
 |
