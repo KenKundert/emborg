@@ -572,22 +572,22 @@ the keys from your *Borg* repository so then can be backed up separately::
 *Emborg* takes the config name as an argument, if not given the default config 
 is used. It provides the following useful methods and attributes:
 
-    repository:
+repository:
 
-        The path to the repository.
+    The path to the repository.
 
-    destination(archive):
+destination(archive):
 
-        Returns the full path to the archive. If Archive is False or None, then 
-        the path to the repository it returned. If Archive is True, then the 
-        default archive name as taken from settings file is used. This is 
-        appropriate when creating new repositories.
+    Returns the full path to the archive. If Archive is False or None, then 
+    the path to the repository it returned. If Archive is True, then the 
+    default archive name as taken from settings file is used. This is 
+    appropriate when creating new repositories.
 
-    borg_options(cmd, options):
+borg_options(cmd, options):
 
-        returns a list of options that consists of any options that are both 
-        derived from *Emborg* settings and are appropriate for the specified 
-        command, and any additional options you pass in.
+    returns a list of options that consists of any options that are both 
+    derived from *Emborg* settings and are appropriate for the specified 
+    command, and any additional options you pass in.
 
 You can examine the emborg/command.py file for inspiration and examples on how 
 to use the *Emborg* API.
