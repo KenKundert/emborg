@@ -37,10 +37,10 @@ from .preferences import (
 )
 from .python import PythonFile
 from .utilities import gethostname, getusername, render_path_list
-from shlib import cd, mkdir, mv, rm, Run, to_path, render_command
+from shlib import cd, getmod, mkdir, mv, rm, Run, to_path, render_command
 from inform import (
-    Error, conjoin, done, full_stop, get_informer, indent, is_str, narrate,
-    output, warn,
+    Error, codicil, conjoin, done, full_stop, get_informer, indent, is_str,
+    narrate, output, warn,
 )
 from textwrap import dedent
 from appdirs import user_config_dir
@@ -114,9 +114,10 @@ class Settings:
                 )
                 done()
 
-            pf = PythonFile(parent, SETTINGS_FILE)
-            settings_filename = pf.path
-            settings = pf.run()
+            path = PythonFile(parent, SETTINGS_FILE)
+            settings_filename = path.path
+            settings = path.run()
+
             configs = Collection(settings.get(CONFIGS_SETTING, ''))
             default = settings.get(DEFAULT_CONFIG_SETTING)
             if not name:
@@ -140,6 +141,11 @@ class Settings:
             self.config_name = config
             includes = Collection(settings.get(INCLUDE_SETTING))
             includes = [config] + list(includes.values())
+
+        if settings.get('passphrase'):
+            if getmod(path) & 0o077:
+                warn("file permissions are too loose.", culprit=path)
+                codicil(f"Recommend running 'chmod 600 {path!s}'.")
 
         self.settings.update(settings)
 

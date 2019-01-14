@@ -1,8 +1,8 @@
 emborg -- Encrypted Backups to a Remote Server
 ==============================================
 
-| Version: 1.0.5
-| Released: 2019-01-13
+| Version: 1.0.4
+| Released: 2019-01-12
 |
 
 Emborg is a simple command line utility to orchestrate backups. It is built as 
@@ -309,21 +309,6 @@ Repository.
     emborg breaklock
 
 
-Create
-------
-
-This creates an archive in an existing repository. An archive is a snapshot of 
-your files as they currently exist.  Borg is a de-duplicating backup program, so 
-only the changes from the already existing archives are saved.
-
-::
-
-    emborg create
-
-Before creating your first archive, you must use the *init* command to 
-initialize your repository.
-
-
 Check
 -----
 
@@ -344,6 +329,27 @@ To run a command on a specific configuration, add --config=<cfg> or -c cfg
 before the command. For example::
 
     emborg -c home create
+
+
+Create
+------
+
+This creates an archive in an existing repository. An archive is a snapshot of 
+your files as they currently exist.  Borg is a de-duplicating backup program, so 
+only the changes from the already existing archives are saved.
+
+::
+
+    emborg create
+
+Before creating your first archive, you must use the *init* command to 
+initialize your repository.
+
+
+Delete
+------
+
+Delete an archive currently contained in the repository. 
 
 
 Diff
@@ -444,6 +450,12 @@ List available archives.
 ::
 
    emborg list
+
+
+Log
+---
+
+Show the logfile from the previous run.
 
 
 Manifest
