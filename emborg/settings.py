@@ -19,6 +19,7 @@
 # Imports {{{1
 from .collection import Collection
 from .preferences import (
+    BORG,
     BORG_SETTINGS,
     CONFIG_DIR,
     CONFIGS_SETTING,
@@ -36,7 +37,7 @@ from .preferences import (
     SETTINGS_FILE,
 )
 from .python import PythonFile
-from .utilities import gethostname, getusername, render_path_list
+from .utilities import gethostname, getusername, render_paths
 from shlib import cd, getmod, mkdir, mv, rm, Run, to_path, render_command
 from inform import (
     Error, codicil, conjoin, done, full_stop, get_informer, indent, is_str,
@@ -52,15 +53,17 @@ import os
 hostname = gethostname()
 username = getusername()
 
-# borg_options_args {{{2
-borg_options_args = {
+# borg_options_arg_count {{{2
+borg_options_arg_count = {
     'borg': 1,
     '--exclude': 1,
     '--encryption': 1,
 }
 for name, attrs in BORG_SETTINGS.items():
     if 'arg' in attrs and attrs['arg']:
-        borg_options_args[convert_name_to_option(name)] = 1
+        borg_options_arg_count[convert_name_to_option(name)] = 1
+
+commands_with_dryrun = 'create extract delete prune upgrade recreate'.split()
 
 
 # Settings class {{{1
@@ -250,23 +253,17 @@ class Settings:
     # borg_options() {{{2
     def borg_options(self, cmd, options):
         # handle special cases first {{{3
+        args = []
         if 'verbose' in options:
-            if 'trial-run' in options:
-                args = '--debug --dry-run'.split()
-            else:
-                args = '--debug'.split()
-        else:
-            if 'trial-run' in options:
-                args = '--dry-run'.split()
-            else:
-                args = ''.split()
-
+            args.append('--verbose')
+        if 'trial-run' in options and cmd in commands_with_dryrun:
+            args.append('--dry-run')
         if cmd == 'create':
             if 'verbose' in options:
                 args.append('--list')
                 if 'trial-run' not in options:
                     args.append('--stats')
-            for path in render_path_list(self.values('excludes')):
+            for path in render_paths(self.values('excludes')):
                 args.extend(['--exclude', path])
 
         if cmd == 'extract':
@@ -307,7 +304,16 @@ class Settings:
 
     # publish_passcode() {{{2
     def publish_passcode(self):
+        passcommand = self.passcommand
         passcode = self.passphrase
+
+        # process passcomand
+        if passcommand:
+            if passcode:
+                warn('passphrase unneeded.', culprit='passcommand')
+                return dict(BORG_PASSCOMMAND = passcommand)
+
+        # get passphrase from avendesora
         if not passcode and self.avendesora_account:
             narrate('running avendesora to access passphrase.')
             try:
@@ -322,17 +328,33 @@ class Settings:
                     'you must specify passphrase in settings.',
                     sep = ', '
                 )
-        if not passcode:
-            narrate('no passphrase available, encryption disabled.')
-            return {}
 
-        narrate('passphrase is set.')
-        return dict(BORG_PASSPHRASE = passcode)
+        if passcode:
+            return dict(BORG_PASSPHRASE = passcode)
+
+        if self.encryption == 'none':
+            narrate('passphrase is not available, encryption disabled.')
+            return {}
+        raise Error('Cannot determine the encryption passphrase.')
+
 
     # run_borg() {{{2
-    def run_borg(self, cmd, options=None):
+    def run_borg(self, cmd, args='', borg_opts=None, emborg_opts=()):
+
+        # prepare the command
         os.environ.update(self.publish_passcode())
         os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
+        executable = self.value('borg_executable', BORG)
+        if borg_opts is None:
+            borg_opts = self.borg_options(cmd, emborg_opts)
+        command = (
+            [executable]
+            + cmd.split()
+            + borg_opts
+            + (args.split() if is_str(args) else args)
+        )
+
+        # check if ssh agent is present
         if self.needs_ssh_agent:
             for ssh_var in 'SSH_AGENT_PID SSH_AUTH_SOCK'.split():
                 if ssh_var not in os.environ:
@@ -340,10 +362,14 @@ class Settings:
                         'environment variable not found, is ssh-agent running?',
                         culprit=ssh_var
                     )
-        narrating = options and ('verbose' in options or 'narrate' in options)
-        narrate('running:\n{}'.format(indent(render_command(cmd, borg_options_args))))
+
+        # run the command
+        narrate('running:\n{}'.format(
+            indent(render_command(command, borg_options_arg_count))
+        ))
+        narrating = 'verbose' in emborg_opts or 'narrate' in emborg_opts
         modes = 'soeW' if narrating else 'sOEW'
-        return Run(cmd, modes=modes, stdin='', env=os.environ, log=False)
+        return Run(command, modes=modes, stdin='', env=os.environ, log=False)
 
     # destination() {{{2
     def destination(self, archive=None):

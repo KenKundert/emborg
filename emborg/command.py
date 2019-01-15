@@ -24,7 +24,7 @@ from .preferences import (
     PROGRAM_NAME,
     convert_name_to_option,
 )
-from .utilities import two_columns, render_path_list, gethostname
+from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
@@ -49,11 +49,10 @@ def title(text):
 # get_available_archives() {{{2
 def get_available_archives(settings):
     # run borg
-    cmd = (
-        'borg list --json'.split()
-        + [settings.destination()]
+    borg = settings.run_borg(
+        cmd = 'list',
+        args = ['--json', settings.destination()],
     )
-    borg = settings.run_borg(cmd)
     try:
         data = json.loads(borg.stdout)
         return data['archives']
@@ -74,11 +73,10 @@ def get_nearest_archive(settings, date):
 # get_available_files() {{{2
 def get_available_files(settings, archive):
     # run borg
-    cmd = (
-        'borg list --json-lines'.split()
-        + [settings.destination(archive)]
+    borg = settings.run_borg(
+        cmd = 'list',
+        args = ['--json-lines', settings.destination(archive)],
     )
-    borg = settings.run_borg(cmd)
     try:
         files = []
         for line in borg.stdout.splitlines():
@@ -157,12 +155,11 @@ class BreakLock(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run borg
-        cmd = (
-            'borg break-lock'.split()
-            + settings.borg_options('break-lock', options)
-            + [settings.destination()]
+        borg = settings.run_borg(
+            cmd = 'break-lock',
+            args = [settings.destination()],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -206,14 +203,12 @@ class Create(Command):
                 e.reraise(culprit='run_before_backup')
 
         # run borg
-        cmd = (
-            'borg create'.split()
-            + settings.borg_options('create', options)
-            + [settings.destination(True)]
-            + render_path_list(settings.src_dirs)
-        )
         try:
-            settings.run_borg(cmd, options)
+            settings.run_borg(
+                cmd = 'create',
+                args = [settings.destination(True)] + render_paths(settings.src_dirs),
+                emborg_opts = options,
+            )
         except Error as e:
             if e.stderr and 'is not a valid repository' in e.stderr:
                 e.reraise(
@@ -279,13 +274,11 @@ class Check(Command):
         verify = ['--verify-data'] if cmdline['--verify-data'] else []
 
         # run borg
-        cmd = (
-            'borg check'.split()
-            + settings.borg_options('check', options)
-            + verify
-            + [settings.destination()]
+        borg = settings.run_borg(
+            cmd = 'check',
+            args = verify + [settings.destination()],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -330,12 +323,11 @@ class Delete(Command):
         archive = cmdline['<archive>']
 
         # run borg
-        cmd = (
-            'borg delete'.split()
-            + settings.borg_options('delete', options)
-            + [settings.destination(archive)]
+        borg = settings.run_borg(
+            cmd = 'delete',
+            args = [settings.destination(archive)],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -359,13 +351,11 @@ class Diff(Command):
         archive2 = cmdline['<archive2>']
 
         # run borg
-        cmd = (
-            'borg diff'.split()
-            + settings.borg_options('diff', options)
-            + [settings.destination(archive1)]
-            + [archive2]
+        borg = settings.run_borg(
+            cmd = 'diff',
+            args = [settings.destination(archive1), archive2],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -544,13 +534,11 @@ class Extract(Command):
         output('Archive:', archive)
 
         # run borg
-        cmd = (
-            'borg extract'.split()
-            + settings.borg_options('extract', options)
-            + [settings.destination(archive)]
-            + paths
+        borg = settings.run_borg(
+            cmd = 'extract',
+            args = [settings.destination(archive)] + paths,
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -604,12 +592,11 @@ class Info(Command):
             narrate(e, culprit=settings.date_file)
 
         # now output the info from our borg repository
-        cmd = (
-            'borg info'.split()
-            + settings.borg_options('info', options)
-            + [settings.destination()]
+        borg = settings.run_borg(
+            cmd = 'info',
+            args = [settings.destination()],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output()
@@ -632,12 +619,11 @@ class Initialize(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run borg
-        cmd = (
-            'borg init'.split()
-            + settings.borg_options('init', options)
-            + [settings.destination()]
+        borg = settings.run_borg(
+            cmd = 'init',
+            args = [settings.destination()],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -661,12 +647,11 @@ class List(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
         # run borg
-        cmd = (
-            'borg list --short'.split()
-            + settings.borg_options('list', options)
-            + [settings.destination()]
+        borg = settings.run_borg(
+            cmd = 'list',
+            args = ['--short', settings.destination()],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -750,13 +735,11 @@ class Manifest(Command):
 
         # run borg
         list_opts = ['--short'] if filenames_only else []
-        cmd = (
-            'borg list'.split()
-            + settings.borg_options('list', options)
-            + list_opts
-            + [settings.destination(archive)]
+        borg = settings.run_borg(
+            cmd = 'list',
+            args = list_opts + [settings.destination(archive)],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -817,13 +800,11 @@ class Mount(Command):
             raise Error(os_error(e))
 
         # run borg
-        cmd = (
-            'borg mount'.split()
-            + settings.borg_options('mount', options)
-            + [settings.destination(archive)]
-            + [mount_point]
+        borg = settings.run_borg(
+            cmd = 'mount',
+            args = [settings.destination(archive), mount_point],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -855,12 +836,11 @@ class Prune(Command):
             )
 
         # run borg
-        cmd = (
-            'borg prune'.split()
-            + settings.borg_options('prune', options)
-            + [settings.destination()]
+        borg = settings.run_borg(
+            cmd = 'prune',
+            args = [settings.destination()],
+            emborg_opts = options,
         )
-        borg = settings.run_borg(cmd, options)
         out = borg.stdout
         if out:
             output(out.rstrip())
@@ -922,13 +902,12 @@ class Umount(Command):
         mount_point = cmdline['<mount_point>']
 
         # run borg
-        cmd = (
-            'borg umount'.split()
-            + settings.borg_options('umount', options)
-            + [mount_point]
-        )
         try:
-            borg = settings.run_borg(cmd, options)
+            borg = settings.run_borg(
+                cmd = 'umount',
+                args = [mount_point],
+                emborg_opts = options,
+            )
         except Error as e:
             if 'busy' in str(e):
                 e.reraise(

@@ -111,7 +111,7 @@ def render_command(cmd, option_args=True):
 def render_path(path):
     return str(to_path(path))
 
-# render_path_list() {{{1
-def render_path_list(path_list):
+# render_paths() {{{1
+def render_paths(path_list):
     return [render_path(path) for path in path_list]
 

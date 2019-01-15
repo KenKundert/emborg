@@ -26,6 +26,7 @@ PROGRAM_NAME = 'emborg'
 DEFAULT_COMMAND = 'create'
 ENCODING = 'utf-8'
 INDENT = '    '
+BORG = 'borg'
 
 CONFIG_DIR = user_config_dir(PROGRAM_NAME)
 
@@ -44,6 +45,7 @@ EMBORG_SETTINGS = dict(
     archive = 'template Borg should use when creating archive names',
     avendesora_account = 'account name that holds passphrase for encryption key in Avendesora',
     avendesora_field = 'name of field in Avendesora that holds the passphrase',
+    borg_executable = 'path to borg',
     check_after_create = 'run check as the last step of an archive creation',
     config_name = 'name of active configuration (set by program)',
     configurations = 'available emborg configurations',
@@ -54,6 +56,7 @@ EMBORG_SETTINGS = dict(
     needs_ssh_agent = 'if set, emborg will complain if ssh_agent is not available',
     notifier = 'notification program',
     notify = 'email address to notify when things go wrong',
+    passcommand = 'command used by Borg to acquire the passphrase',
     passphrase = 'passphrase for encryption key (if specified, Avendesora is not used)',
     prune_after_create = 'run prune as the last step of an archive creation',
     repository = 'path to remote directory that contains repository',

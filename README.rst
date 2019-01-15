@@ -120,12 +120,21 @@ passphrase:
     alternative to *avendesora_account*.  Be sure to make the file that contains 
     it unreadable by others.
 
+passcommand:
+
+    An alternate to *passphrase*. *Borg* uses this command to access your 
+    passphrase.
+
 avendesora_account:
 
-    The name of the Avendesora account used to hold the passphrase for the 
-    encryption key. Use this as an alternative to *passphrase*.  This keeps your 
-    passphrase out of your settings file, but requires that GPG agent be 
-    available and loaded with your private key.
+    Another alternative to *passphrase*. The name of the Avendesora account used 
+    to hold the passphrase for the encryption key. Use this as an alternative to 
+    *passphrase*.  This keeps your passphrase out of your settings file, but 
+    requires that GPG agent be available and loaded with your private key.  This 
+    is normal when running interactively. When running batch, say from *cron*, 
+    you can use the Linux *keychain* command to retain your GPG credentials for 
+    you.
+
 
 src_dirs:
 
@@ -560,12 +569,10 @@ the keys from your *Borg* repository so then can be backed up separately::
     from emborg import Emborg
 
     with Emborg() as emborg:
-        cmd = 'borg key export'.split() + [
-                emborg.borg_options('key export'),
-                emborg.repository,
-                archive / '.config/borg.repokey',
-        ]                                                                                                          emborg.run_borg(cmd)
-        borg = emborg.run_borg(cmd)
+        borg = emborg.run_borg(
+            cmd = 'key export',
+            args = [archive / '.config/borg.repokey', emborg.destination()],
+        )
         if borg.stdout:
             print(borg.stdout.rstrip())
 
@@ -580,14 +587,34 @@ destination(archive):
 
     Returns the full path to the archive. If Archive is False or None, then 
     the path to the repository it returned. If Archive is True, then the 
-    default archive name as taken from settings file is used. This is 
+    default archive name as taken from settings file is used. This is only 
     appropriate when creating new repositories.
 
-borg_options(cmd, options):
+run_borg(cmd, args, borg_opts, emborg_opts):
 
-    returns a list of options that consists of any options that are both 
-    derived from *Emborg* settings and are appropriate for the specified 
-    command, and any additional options you pass in.
+    Runs a *Borg* command. *cmd* is the desired *Borg* command (ex: 'create', 
+    'prune', etc.).  By default, command line options derived from *Emborg* 
+    settings are automatically added to the command line. *args* contains the 
+    command line arguments (such as the repository or archive). It may also 
+    contain any additional command line options not provided in borg_opts.  It 
+    may be a list or a string. If it is a string, it is split at white space.
+    *borg_opts* are the command line options needed by *Borg*. If not given, it 
+    is created for you by *Emborg* based upon your configuration settings.
+    Finally, *emborg_opts* is a list that may contain any of the following 
+    options: 'verbose', 'narrate', 'trial-run', or 'no-log'.
+
+    This function runs the *Borg* command and returns a process object that 
+    allows you access to stdout via the *stdout* attribute.
+
+borg_options(cmd, emborg_opts):
+
+    This function returns the default *Borg* command line options, those that 
+    would be used in *run_borg* if *borg_opts* is not set. It can be used when 
+    constructing a custom *borg_opts*.
+
+value(name, default=''):
+    Returns the value of a setting from an *Emborg* configuration. If not set, 
+    *default* is returned.
 
 You can examine the emborg/command.py file for inspiration and examples on how 
 to use the *Emborg* API.
