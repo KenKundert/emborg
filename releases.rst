@@ -18,5 +18,5 @@ Releases
     - Added warning if settings file is world readable and contains a passphrase.
 
 **Latest development release**:
-    | Version: 1.1.3
+    | Version: 1.2.0
     | Released: 2019-01-15
