@@ -881,6 +881,8 @@ class Settings(Command):
         for k, v in settings:
             is_known = k in EMBORG_SETTINGS or k in BORG_SETTINGS
             key = known(k) if is_known else unknown(k)
+            if k == 'passphrase':
+                v = '<set>'
             output(f'{key:>33}: {render(v, level=6)}')
 
 
