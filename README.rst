@@ -571,7 +571,7 @@ the keys from your *Borg* repository so then can be backed up separately::
     with Emborg() as emborg:
         borg = emborg.run_borg(
             cmd = 'key export',
-            args = [archive / '.config/borg.repokey', emborg.destination()],
+            args = [emborg.destination(), archive / '.config/borg.repokey']
         )
         if borg.stdout:
             print(borg.stdout.rstrip())
