@@ -7,9 +7,9 @@ emborg -- Encrypted Backups to a Remote Server
 .. image:: https://img.shields.io/pypi/pyversions/emborg.svg
     :target: https://pypi.python.org/pypi/emborg/
 
-| Version: 1.2.0
-| Released: 2019-01-15
-|
+:Author: Ken Kundert
+:Version: 1.2.0
+:Released: 2019-01-15
 
 Emborg is a simple command line utility to orchestrate backups. It is built as 
 a front-end to Borg, a powerful and fast deduplicating backup program.  With 
