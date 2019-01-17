@@ -16,8 +16,7 @@ setup(
     license = 'GPLv3+',
     packages = 'emborg'.split(),
     entry_points = {'console_scripts': ['emborg=emborg.main:main']},
-    install_requires = 'appdirs arrow docopt inform>=1.14 shlib>=1.0'.split(),
-        # inform wants to be >=1.15, but 1.15 is not available yet
+    install_requires = 'appdirs arrow docopt inform>=1.15 shlib>=1.0'.split(),
 
     keywords='emborg borg borgify backups'.split(),
     classifiers=[
