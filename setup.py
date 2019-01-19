@@ -12,6 +12,7 @@ setup(
     author_email = 'emborg@nurdletech.com',
     description = 'Borg front end.',
     long_description = readme,
+    url = 'https://github.com/kenkundert/emborg',
     download_url = 'https://github.com/kenkundert/emborg/tarball/master',
     license = 'GPLv3+',
     packages = 'emborg'.split(),
