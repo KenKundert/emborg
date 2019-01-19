@@ -19,7 +19,7 @@ setup(
     entry_points = {'console_scripts': ['emborg=emborg.main:main']},
     install_requires = 'appdirs arrow docopt inform>=1.15 shlib>=1.0'.split(),
 
-    keywords='emborg borg borgify backups'.split(),
+    keywords='emborg borg borgmatic backups'.split(),
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
