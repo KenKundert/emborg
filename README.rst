@@ -304,27 +304,21 @@ disk.
 If you keep the passphrase in the emborg file, you should set its permissions so 
 that it is not readable by others::
 
-   chmod 700 settings
+   chmod 600 settings
 
-specifying 
-
-Better is to simply not store the passphrase in the emborg script. This can be 
-arranged if you are using `Avendesora <https://avendesora.readthedocs.io>`, 
-which is a flexible password management system. The interface to Avendesora is 
-already built in to *Emborg*, but its use is optional (it need not be 
-installed).  However, be sure to keep a copy of your *Borg* passphrase in a safe 
-place, preferably with the exported encryption key. Remember, that if you lose 
-all of your files, you need your *Borg* password before you will be able to 
-recover your Avendesora files.  Alternatively, you can backup your Avendesora 
-files outside of Borg.
+Better is to simply not store the passphrase in the emborg script. You can use 
+the *passcommand* setting for this, or you use
+`Avendesora <https://avendesora.readthedocs.io>`_, which is a flexible password 
+management system. The interface to Avendesora is already built in to *Emborg*, 
+but its use is optional (it need not be installed).
 
 It is also best, if it can be arranged, to keep your backups at a remote site so 
 that your backups do not get destroyed in the same disaster, such as a fire or 
 flood, that claims your original files. One option is `rsync.net 
 <https://www.rsync.net/products/attic.html>`_.
 
-Also, it is a good idea to practice a recovery. Pretend that you have lost all 
-your files and then see if you can do a restore from backup. Doing this and 
+Finally, it is a good idea to practice a recovery. Pretend that you have lost 
+all your files and then see if you can do a restore from backup. Doing this and 
 working out the kinks before you lose your files can save you if you ever do 
 lose your files.
 
@@ -333,8 +327,9 @@ Borg
 ====
 
 *Borg* has considerably more power than what is exposed with *emborg*.  You may 
-use it directly when you need that power. More information about *Borg* can be 
-found at `borgbackup on readthedocs <https://borgbackup.readthedocs.io/en/stable/index.html>`_.
+use it directly or through the *Emborg* *borg* command when you need that power.  
+More information about *Borg* can be found at `borgbackup on readthedocs 
+<https://borgbackup.readthedocs.io/en/stable/index.html>`_.
 
 
 Commands
