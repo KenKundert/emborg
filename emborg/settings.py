@@ -337,7 +337,6 @@ class Settings:
             return {}
         raise Error('Cannot determine the encryption passphrase.')
 
-
     # run_borg() {{{2
     def run_borg(self, cmd, args='', borg_opts=None, emborg_opts=()):
 
@@ -370,6 +369,25 @@ class Settings:
         narrating = 'verbose' in emborg_opts or 'narrate' in emborg_opts
         modes = 'soeW' if narrating else 'sOEW'
         return Run(command, modes=modes, stdin='', env=os.environ, log=False)
+
+    # run_borg_raw() {{{2
+    def run_borg_raw(self, args):
+
+        # prepare the command
+        os.environ.update(self.publish_passcode())
+        os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
+        executable = self.value('borg_executable', BORG)
+        repository = self.value('repository')
+        command = (
+            [executable] +
+            [(repository if a == '@repo' else a) for a in args]
+        )
+
+        # run the command
+        narrate('running:\n{}'.format(
+            indent(render_command(command, borg_options_arg_count))
+        ))
+        return Run(command, modes='soeW', env=os.environ, log=False)
 
     # destination() {{{2
     def destination(self, archive=None):

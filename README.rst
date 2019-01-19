@@ -173,11 +173,38 @@ Once you have done that you can create your first backup using:
 Then you can run any of the commands documented below.
 
 
+Commands
+========
+
+Here is are the available commands:
+
+    :borg:       run a raw borg command.
+    :breaklock:  breaks the repository and cache locks.
+    :check:      checks the repository and its archives
+    :configs:    list available backup configurations
+    :create:     create an archive of the current files
+    :delete:     delete an archive currently contained in the repository
+    :diff:       show the differences between two archives
+    :due:        days since last backup
+    :extract:    recover file or files from archive
+    :help:       give information about commands or other topics
+    :info:       print information about a backup
+    :init:       initialize the repository
+    :list:       list the archives currently contained in the repository
+    :log:        print logfile for the last emborg run
+    :manifest:   list the files contained in an archive
+    :mount:      mount a repository or archive
+    :prune:      list the archives currently contained in the repository
+    :settings:   list settings of chosen configuration
+    :umount:     un-mount a previously mounted repository or archive
+    :version:    display emborg version
+
+
 Configuration
 =============
 
 Shared settings go in ~/.config/emborg/settings. This is a Python file that 
-contains values needed by Emborg. It might look like the following::
+contains values needed by Emborg.
 
 Shared Settings
 ---------------
@@ -279,15 +306,17 @@ that it is not readable by others::
 
    chmod 700 settings
 
+specifying 
+
 Better is to simply not store the passphrase in the emborg script. This can be 
-arranged if you are using `Avendesora 
-<https://github.com/KenKundert/avendesora>`_, which is a flexible password 
-management system. The interface to Avendesora is already built in to *Emborg*, 
-but its use is optional (it need not be installed).  However, be sure to keep 
-a copy of your *Borg* passphrase in a safe place, preferably with the exported 
-encryption key. Remember, that if you lose all of your files, you need your 
-*Borg* password before you will be able to recover your Avendesora files.  
-Alternatively, you can backup your Avendesora files outside of Borg.
+arranged if you are using `Avendesora <https://avendesora.readthedocs.io>`, 
+which is a flexible password management system. The interface to Avendesora is 
+already built in to *Emborg*, but its use is optional (it need not be 
+installed).  However, be sure to keep a copy of your *Borg* passphrase in a safe 
+place, preferably with the exported encryption key. Remember, that if you lose 
+all of your files, you need your *Borg* password before you will be able to 
+recover your Avendesora files.  Alternatively, you can backup your Avendesora 
+files outside of Borg.
 
 It is also best, if it can be arranged, to keep your backups at a remote site so 
 that your backups do not get destroyed in the same disaster, such as a fire or 

@@ -138,6 +138,29 @@ class Command(object):
         )
 
 
+# Borg command {{{1
+class Borg(Command):
+    NAMES = 'borg'.split()
+    DESCRIPTION = 'run a raw borg command.'
+    USAGE = dedent("""
+        Usage:
+            emborg borg <borg_args>...
+
+        An argument that is precisely '@repo' is replaced with the path to the
+        repository.  The passphrase is set before the command is run.
+    """).strip()
+    REQUIRES_EXCLUSIVITY = True
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args, options_first=True)
+        borg_args = cmdline['<borg_args>']
+
+        # run borg
+        borg = settings.run_borg_raw(args)
+
+
 # BreakLock command {{{1
 class BreakLock(Command):
     NAMES = 'breaklock break-lock'.split()
@@ -146,6 +169,9 @@ class BreakLock(Command):
         Usage:
             emborg breaklock
             emborg break-lock
+
+        Breaks both the local and the repository locks. Be sure Borg is no longer
+        running before using this command.
     """).strip()
     REQUIRES_EXCLUSIVITY = False
 
@@ -177,6 +203,9 @@ class Create(Command):
 
         Options:
             -f, --fast    skip pruning and checking for a faster backup on a slow network
+
+        To see the files listed as they are backed up, use the Emborg -v option.
+        This can help you debug slow create operations.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
 
