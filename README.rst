@@ -150,7 +150,7 @@ src_dirs:
 
 excludes:
 
-    A list of files to exclude from the backups.  typical value might be::
+    A list of files to exclude from the backups.  Typical value might be::
 
         excludes = '''
             ~/tmp
@@ -402,7 +402,17 @@ only the changes from the already existing archives are saved.
     emborg create
 
 Before creating your first archive, you must use the *init* command to 
-initialize your repository.
+initialize your repository.  *create* is the default command, so you can create 
+an archive with simply::
+
+    emborg
+
+If the backup seems to be taking a long time for no obvious reason, run the 
+backup in verbose mode::
+
+    emborg -v create
+
+This can help you understand what is happening.
 
 
 Delete
