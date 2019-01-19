@@ -179,8 +179,8 @@ Once you have done that you can create your first backup using:
 Then you can run any of the commands documented below.
 
 
-Commands
-========
+Command Summary
+===============
 
 Here is are the available commands:
 
@@ -204,6 +204,8 @@ Here is are the available commands:
     :settings:   list settings of chosen configuration
     :umount:     un-mount a previously mounted repository or archive
     :version:    display emborg version
+
+These commands are described in more detail below.
 
 
 Configuration
@@ -340,6 +342,18 @@ More information about *Borg* can be found at `borgbackup on readthedocs
 
 Commands
 ========
+
+Borg
+----
+
+Runs raw *Borg* commands. Before running the passphrase or passcommand is set.  
+Also, if ``@repo*`` is found on the command line, it is replaced by the path to 
+the repository.
+
+::
+
+    emborg borg key export @repo key.borg
+
 
 BreakLock
 ---------
@@ -635,6 +649,11 @@ run_borg(cmd, args, borg_opts, emborg_opts):
 
     This function runs the *Borg* command and returns a process object that 
     allows you access to stdout via the *stdout* attribute.
+
+run_borg_raw(args):
+
+    Runs a raw *Borg* command without interpretation except for replacing 
+    a '@repo' argument with the path to the repository.
 
 borg_options(cmd, emborg_opts):
 
