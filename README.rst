@@ -24,6 +24,8 @@ The philosophy of Emborg is to provide commands that you would use often and in
 an interactive manner with the expectation that you would use Borg directly for 
 the remaining commands.
 
+An alternative to *Emborg* is
+`Borgmatic <https://github.com/witten/borgmatic>`_.
 
 Getting Started
 ===============
