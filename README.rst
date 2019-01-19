@@ -25,7 +25,11 @@ an interactive manner with the expectation that you would use Borg directly for
 the remaining commands.
 
 An alternative to *Emborg* is
-`Borgmatic <https://github.com/witten/borgmatic>`_.
+`Borgmatic <https://github.com/witten/borgmatic>`_.  It seems largely focused on 
+the archive creation process and offers little for the other management tasks 
+such as monitoring (*due*, *list*, *manifest*), restoration (*extract*, 
+*mount*), and maintenence (*check*, *prune*).
+
 
 Getting Started
 ===============
