@@ -646,14 +646,18 @@ destination(archive):
 
 run_borg(cmd, args, borg_opts, emborg_opts):
 
-    Runs a *Borg* command. *cmd* is the desired *Borg* command (ex: 'create', 
-    'prune', etc.).  By default, command line options derived from *Emborg* 
-    settings are automatically added to the command line. *args* contains the 
-    command line arguments (such as the repository or archive). It may also 
-    contain any additional command line options not provided in borg_opts.  It 
-    may be a list or a string. If it is a string, it is split at white space.
+    Runs a *Borg* command.
+
+    *cmd* is the desired *Borg* command (ex: 'create', 'prune', etc.).
+
+    *args* contains the command line arguments (such as the repository or 
+    archive). It may also contain any additional command line options not 
+    automatically provided.  It may be a list or a string. If it is a string, it 
+    is split at white space.
+
     *borg_opts* are the command line options needed by *Borg*. If not given, it 
     is created for you by *Emborg* based upon your configuration settings.
+
     Finally, *emborg_opts* is a list that may contain any of the following 
     options: 'verbose', 'narrate', 'trial-run', or 'no-log'.
 
@@ -664,6 +668,9 @@ run_borg_raw(args):
 
     Runs a raw *Borg* command without interpretation except for replacing 
     a '@repo' argument with the path to the repository.
+
+    *args* contains all command line options and arguments except the path to 
+    the executable.
 
 borg_options(cmd, emborg_opts):
 
