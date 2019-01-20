@@ -347,7 +347,7 @@ Borg
 ----
 
 Runs raw *Borg* commands. Before running the passphrase or passcommand is set.  
-Also, if ``@repo*`` is found on the command line, it is replaced by the path to 
+Also, if ``@repo`` is found on the command line, it is replaced by the path to 
 the repository.
 
 ::
@@ -667,7 +667,7 @@ run_borg(cmd, args, borg_opts, emborg_opts):
 run_borg_raw(args):
 
     Runs a raw *Borg* command without interpretation except for replacing 
-    a '@repo' argument with the path to the repository.
+    a ``@repo`` argument with the path to the repository.
 
     *args* contains all command line options and arguments except the path to 
     the executable.
