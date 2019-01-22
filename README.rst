@@ -323,7 +323,9 @@ but its use is optional (it need not be installed).
 It is also best, if it can be arranged, to keep your backups at a remote site so 
 that your backups do not get destroyed in the same disaster, such as a fire or 
 flood, that claims your original files. One option is `rsync.net 
-<https://www.rsync.net/products/attic.html>`_.
+<https://www.rsync.net/products/attic.html>`_. Another is `BorgBase 
+<https://www.borgbase.com>`_. I have not tried either, and so offer no 
+recommendation.
 
 Finally, it is a good idea to practice a recovery. Pretend that you have lost 
 all your files and then see if you can do a restore from backup. Doing this and 

@@ -417,7 +417,7 @@ class Due(Command):
 
         Examples:
             > emborg due
-            The latest archive was create 19 hours ago.
+            The latest complete archive was create 19 hours ago.
 
             > emborg due -d0.5 -m "It has been {days:.1f} days since the last backup."
             It has been 0.8 days since the last backup.
@@ -442,7 +442,7 @@ class Due(Command):
                     days=days, elapsed=elapsed
                 )
             else:
-                return f'The latest archive was created {date.humanize()}.'
+                return f'The latest complete archive was created {date.humanize()}.'
 
         if email:
             def report(msg):
