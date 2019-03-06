@@ -52,7 +52,7 @@ commands (they will need to be adjusted for to get the latest version)::
     rm borg-linux64.asc
     chmod 755 borg-linux64
 
-Download and install *Emborg* as follows::
+Download and install *Emborg* as follows (requires Python3.6 or better)::
 
     pip3 install --user emborg
 

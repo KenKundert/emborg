@@ -18,6 +18,7 @@ setup(
     packages = 'emborg'.split(),
     entry_points = {'console_scripts': ['emborg=emborg.main:main']},
     install_requires = 'appdirs arrow docopt inform>=1.15 shlib>=1.0'.split(),
+    python_requires='>=3.6',
 
     keywords='emborg borg borgmatic backups'.split(),
     classifiers=[
