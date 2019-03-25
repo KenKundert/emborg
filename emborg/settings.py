@@ -41,7 +41,7 @@ from .utilities import gethostname, getusername, render_paths
 from shlib import cd, getmod, mkdir, mv, rm, Run, to_path, render_command
 from inform import (
     Error, codicil, conjoin, done, full_stop, get_informer, indent, is_str,
-    narrate, output, warn,
+    narrate, output, render, warn,
 )
 from textwrap import dedent
 from appdirs import user_config_dir
@@ -149,13 +149,16 @@ class Settings:
         if settings.get('passphrase'):
             if getmod(path) & 0o077:
                 warn("file permissions are too loose.", culprit=path)
-                codicil(f"Recommend running 'chmod 600 {path!s}'.")
+                codicil(f"Recommend running: chmod 600 {path!s}")
 
         self.settings.update(settings)
 
         for include in includes:
             path = to_path(parent, include)
             self.read(path=path)
+
+        if not self.settings.get('src_dirs'):
+            self.settings['src_dirs'] = []
 
     # check() {{{2
     def check(self):
@@ -164,14 +167,13 @@ class Settings:
 
         # complain about required settings that are missing
         missing = []
-        for each in 'repository archive src_dirs'.split():
+        required_settings = 'repository'.split()
+        for each in required_settings:
             if not self.settings.get(each):
                 missing.append(each)
         if missing:
             missing = conjoin(missing)
-            warn(f'{missing}: no value given.')
-            if 'src_dirs' in missing:
-                self.settings['src_dirs'] = []
+            raise Error(f'{missing}: no value given for setting.')
 
     # resolve {{{2
     def resolve(self, value):
@@ -343,6 +345,8 @@ class Settings:
         # prepare the command
         os.environ.update(self.publish_passcode())
         os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
+        if self.ssh_command:
+            os.environ['BORG_RSH'] = self.ssh_command
         executable = self.value('borg_executable', BORG)
         if borg_opts is None:
             borg_opts = self.borg_options(cmd, emborg_opts)
@@ -352,6 +356,10 @@ class Settings:
             + borg_opts
             + (args.split() if is_str(args) else args)
         )
+        environ = {k:v for k, v in os.environ.items() if k.startswith('BORG_')}
+        if 'BORG_PASSPHRASE' in environ:
+            environ['BORG_PASSPHRASE'] = '<redacted>'
+        narrate('setting environment variables:', render(environ))
 
         # check if ssh agent is present
         if self.needs_ssh_agent:
@@ -394,6 +402,8 @@ class Settings:
         repository = self.value('repository')
         if archive is True:
             archive = self.value('archive')
+            if not archive:
+                raise Error('archive: setting value not given.')
         if archive:
             return f'{repository}::{archive}'
         else:

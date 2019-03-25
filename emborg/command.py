@@ -214,6 +214,11 @@ class Create(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
 
+        # check for required settings
+        src_dirs = render_paths(settings.src_dirs)
+        if not src_dirs:
+            raise Error('src_dirs: setting has no value.')
+
         # check the dependencies are available
         for each in settings.values('must_exist'):
             path = to_path(each)

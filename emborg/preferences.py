@@ -63,6 +63,7 @@ EMBORG_SETTINGS = dict(
     run_after_backup = 'command to run after archive has been created',
     run_before_backup = 'command to run before archive is to be created',
     src_dirs = 'the directories to archive',
+    ssh_command = 'command to use for ssh, can be used to specify ssh options',
 )
     # Any setting found in the users settings files that is not found in
     # EMBORG_SETTINGS or BORG_SETTINGS is highlighted as a unknown setting by

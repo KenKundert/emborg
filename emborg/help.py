@@ -127,6 +127,19 @@ class Precautions(HelpMessage):
             information, such as your Borg passphrase and keys, that you would
             need to get started after a catastrophic loss of your disk.
 
+            In addition it is important to understand the your backup data is
+            not encrypted with your passphrase, rather your passphrase encrypts
+            a key, and your backup data is encrypted with the key.  Thus, your
+            backup files cannot be decrypted without both the passphrase and the
+            key.  If you choose encryption=repokey then Borg copies your key to
+            the remote repository, so you do not need to keep a copy yourself.
+            Using repokey is appropriate if you control the server that holds
+            the remote repository.  If you choose encryption=keyfile, which is
+            appropriate if you do not control the resository's server, then it
+            does not copy the key to the repository, so it is essential
+            that you export and keep a copy of the key in a safe place.
+            Sparekeys can do this for you.
+
             If you keep the passphrase in a settings file, you should set
             its permissions so that it is not readable by others:
 
@@ -136,13 +149,19 @@ class Precautions(HelpMessage):
             arranged if you are using Avendesora
             (https://github.com/KenKundert/avendesora), which is a flexible
             password management system. The interface to Avendesora is already
-            built in to emborg, but its use is optional (it need not be
+            built in to Emborg, but its use is optional (it need not be
             installed).
 
             It is also best, if it can be arranged, to keep your backups at a
             remote site so that your backups do not get destroyed in the same
             disaster, such as a fire or flood, that claims your original files.
-            If you do not have, or do not wish to use, your own server,
+            One option is rsync.net (https://www.rsync.net/products/attic.html).
+            Another is `BorgBase (https://www.borgbase.com).
+
+            Finally, it is a good idea to practice a recovery. Pretend that you
+            have lost all your files and then see if you can do a restore from
+            backup. Doing this and working out the kinks before you lose your
+            files can save you if you ever do lose your files.
         """).strip()
         return text
 
