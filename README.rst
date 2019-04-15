@@ -705,10 +705,10 @@ to use the *Emborg* API.
 Overdue
 =======
 
-*Emborg* contains an additional executable that can be run on the destination 
-server to determine whether the backups have been performed recently.  It reads 
-its own settings file in ~/.config/emborg/overdue.conf that is also a Python 
-file and may contain the following settings::
+*Emborg* contains an additional executable, *emborg-overdue*, that can be run on 
+the destination server to determine whether the backups have been performed 
+recently.  It reads its own settings file in ~/.config/emborg/overdue.conf that 
+is also a Python file and may contain the following settings::
 
     default_maintainer (email address)
     default_max_age (hours)
