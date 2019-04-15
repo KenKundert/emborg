@@ -24,6 +24,7 @@ from .utilities import pager, two_columns
 from inform import error, output, Error
 from textwrap import dedent
 
+
 # HelpMessage base class {{{1
 class HelpMessage(object):
     # get_name() {{{2
@@ -164,5 +165,3 @@ class Precautions(HelpMessage):
             files can save you if you ever do lose your files.
         """).strip()
         return text
-
-

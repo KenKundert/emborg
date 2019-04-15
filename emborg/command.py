@@ -22,22 +22,20 @@ from .preferences import (
     DEFAULT_COMMAND,
     EMBORG_SETTINGS,
     PROGRAM_NAME,
-    convert_name_to_option,
 )
 from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
-    codicil, conjoin, cull, full_stop, narrate, os_error, output,
+    codicil, conjoin, full_stop, narrate, os_error, output,
     render, warn,
 )
 from docopt import docopt
 from shlib import mkdir, rm, to_path, Run, set_prefs
 set_prefs(use_inform=True, log_cmd=True)
-from textwrap import dedent, fill
+from textwrap import dedent
 import arrow
 import json
-import re
 import sys
 
 
@@ -158,7 +156,7 @@ class Borg(Command):
         borg_args = cmdline['<borg_args>']
 
         # run borg
-        borg = settings.run_borg_raw(args)
+        settings.run_borg_raw(borg_args)
 
 
 # BreakLock command {{{1
@@ -178,7 +176,7 @@ class BreakLock(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         # run borg
         borg = settings.run_borg(
@@ -331,7 +329,7 @@ class Configs(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         configurations = Collection(settings.configurations)
         if configurations:
@@ -473,7 +471,7 @@ class Due(Command):
         except FileNotFoundError:
             backup_date = arrow.get('19560105', 'YYYYMMDD')
         except arrow.parser.ParserError:
-            fatal('date not given in iso format.', culprit=date_file)
+            raise Error('date not given in iso format.', culprit=date_file)
         if cmdline.get('--days'):
             since_last_backup = arrow.now() - backup_date
             days = since_last_backup.total_seconds()/86400
@@ -603,7 +601,10 @@ class Info(Command):
     DESCRIPTION = 'print information about a backup'
     USAGE = dedent("""
         Usage:
-            emborg info
+            emborg [options] info
+
+        Options:
+            -f, --fast            only report local information
     """).strip()
     REQUIRES_EXCLUSIVITY = True
 
@@ -611,10 +612,11 @@ class Info(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        fast = cmdline['--fast']
         src_dirs = (str(d) for d in settings.src_dirs)
         output(f'              config: {settings.config_name}')
         output(f'              source: {", ".join(src_dirs)}')
-        output(f'         destination: {settings.destination(True)}')
+        output(f'         destination: {settings.destination()}')
         output(f'  settings directory: {settings.config_dir}')
         output(f'              logile: {settings.logfile}')
         try:
@@ -624,6 +626,8 @@ class Info(Command):
             narrate(os_error(e))
         except arrow.parser.ParserError as e:
             narrate(e, culprit=settings.date_file)
+        if fast:
+            return
 
         # now output the info from our borg repository
         borg = settings.run_borg(
@@ -650,7 +654,7 @@ class Initialize(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         # run borg
         borg = settings.run_borg(
@@ -678,7 +682,7 @@ class List(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         # run borg
         borg = settings.run_borg(
@@ -704,7 +708,7 @@ class Log(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         try:
             prev_log = settings.prev_logfile.read_text()
@@ -728,7 +732,7 @@ class Manifest(Command):
             -a <archive>, --archive <archive>   name of the archive to use
             -n, --name                          output only the filename
 
-        Once a backup has been performed, you can list the files available in 
+        Once a backup has been performed, you can list the files available in
         your archive using:
 
             emborg manifest
@@ -857,7 +861,7 @@ class Prune(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         # checking the settings
         intervals = 'within last minutely hourly daily weekly monthly yearly'
@@ -939,7 +943,7 @@ class Umount(Command):
 
         # run borg
         try:
-            borg = settings.run_borg(
+            settings.run_borg(
                 cmd = 'umount',
                 args = [mount_point],
                 emborg_opts = options,
@@ -964,7 +968,7 @@ class Version(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        docopt(cls.USAGE, argv=[command] + args)
 
         # get the Python version
         python = 'Python %s.%s.%s' % (

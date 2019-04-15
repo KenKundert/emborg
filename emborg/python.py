@@ -27,7 +27,7 @@ from inform import display, Error, narrate, os_error, full_stop
 
 # PythonFile class {{{1
 class PythonFile:
-    ActivePythonFile= None
+    ActivePythonFile = None
 
     @classmethod
     def get_active_python_file(cls):
@@ -103,7 +103,7 @@ class PythonFile:
         try:
             if path.exists():
                 # file creation (init) requested, but file already exists
-                # don't overwrite the file, instead read it so the information 
+                # don't overwrite the file, instead read it so the information
                 # can be used to create any remaining files.
                 display("%s: already exists." % path)
                 return

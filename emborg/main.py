@@ -1,6 +1,6 @@
 # Usage {{{1
 """
-Embalm Backups
+Emborg Backups
 
 Backs up the contents of a file hierarchy.  A front end for Borg's
 encrypted incremental backup utility.
@@ -9,10 +9,10 @@ Usage:
     emborg [options] [<command> [<args>...]]
 
 Options:
-    -h, --help                        Output basic usage information.
     -c <cfgname>, --config <cfgname>  Specifies the configuration to use.
-    -n, --narrate                     Send emborg and Borg narration to stdout.
+    -h, --help                        Output basic usage information.
     -m, --mute                        Suppress all output.
+    -n, --narrate                     Send emborg and Borg narration to stdout.
     -t, --trial-run                   Run Borg in dry run mode.
     -v, --verbose                     Make Borg more verbose.
     --no-log                          Do not create log file.
@@ -42,11 +42,11 @@ Use 'emborg help' for list of available help topics.
 
 
 # Imports {{{1
+from . import __version__, __released__
 from .command import Command
 from .settings import Settings
 from inform import Inform, Error, cull, fatal, display, terminate, os_error
 from docopt import docopt
-from . import __version__, __released__
 
 # Globals {{{1
 synopsis = __doc__

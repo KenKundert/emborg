@@ -18,7 +18,6 @@
 from shlib import Run, to_path
 from inform import is_str
 from pipes import quote
-import hashlib
 import os
 import shlex
 import socket
@@ -46,7 +45,7 @@ def two_columns(col1, col2, width=16, indent=True):
             indent, col1, indent, '  '+width*' ', col2
         )
     else:
-        return '%s%-*s  %s' % (indent, width, col1, col2) 
+        return '%s%-*s  %s' % (indent, width, col1, col2)
 
 # error_source {{{1
 def error_source():
@@ -114,4 +113,3 @@ def render_path(path):
 # render_paths() {{{1
 def render_paths(path_list):
     return [render_path(path) for path in path_list]
-

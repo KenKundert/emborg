@@ -16,7 +16,10 @@ setup(
     download_url = 'https://github.com/kenkundert/emborg/tarball/master',
     license = 'GPLv3+',
     packages = 'emborg'.split(),
-    entry_points = {'console_scripts': ['emborg=emborg.main:main']},
+    entry_points = {'console_scripts': [
+        'emborg=emborg.main:main',
+        'emborg-overdue=emborg.overdue:main',
+    ]},
     install_requires = 'appdirs arrow docopt inform>=1.15 shlib>=1.0'.split(),
     python_requires='>=3.6',
 

@@ -38,13 +38,12 @@ from .preferences import (
 )
 from .python import PythonFile
 from .utilities import gethostname, getusername, render_paths
-from shlib import cd, getmod, mkdir, mv, rm, Run, to_path, render_command
+from shlib import getmod, mv, rm, Run, to_path, render_command
 from inform import (
     Error, codicil, conjoin, done, full_stop, get_informer, indent, is_str,
     narrate, output, render, warn,
 )
 from textwrap import dedent
-from appdirs import user_config_dir
 import arrow
 import os
 
@@ -214,7 +213,7 @@ class Settings:
                     ''').lstrip(),
                     modes='soeW'
                 )
-        except Error as e:
+        except Error:
             pass
         try:
             if self.notifier:
@@ -225,7 +224,7 @@ class Settings:
                     ),
                     modes='soeW'
                 )
-        except Error as e:
+        except Error:
             pass
         except KeyError as e:
             warn('unknown key.', culprit=(self.settings_file, 'notifier', e))
@@ -241,16 +240,6 @@ class Settings:
         """Iterate though fully resolved values of a collection setting."""
         for value in Collection(self.settings.get(name)):
             yield self.resolve(value)
-
-    def convert_to_options(self, names):
-        def convert(name):
-            return '--' + name.replace('_', '-')
-
-        names = names.split() if is_str(names) else names
-        args = []
-        for name in setting_names:
-            args.extend([convert(name), settings.value(name)])
-        return args
 
     # borg_options() {{{2
     def borg_options(self, cmd, options):
@@ -319,7 +308,7 @@ class Settings:
         if not passcode and self.avendesora_account:
             narrate('running avendesora to access passphrase.')
             try:
-                from avendesora import PasswordGenerator, PasswordError
+                from avendesora import PasswordGenerator
                 pw = PasswordGenerator()
                 account = pw.get_account(self.value('avendesora_account'))
                 field = self.value('avendesora_field', None)
@@ -352,9 +341,9 @@ class Settings:
             borg_opts = self.borg_options(cmd, emborg_opts)
         command = (
             [executable]
-            + cmd.split()
-            + borg_opts
-            + (args.split() if is_str(args) else args)
+          + cmd.split()
+          + borg_opts
+          + (args.split() if is_str(args) else args)
         )
         environ = {k:v for k, v in os.environ.items() if k.startswith('BORG_')}
         if 'BORG_PASSPHRASE' in environ:
@@ -387,8 +376,9 @@ class Settings:
         executable = self.value('borg_executable', BORG)
         repository = self.value('repository')
         command = (
-            [executable] +
-            [(repository if a == '@repo' else a) for a in args]
+            [executable] + [
+                (repository if a == '@repo' else a) for a in args
+            ]
         )
 
         # run the command
@@ -470,4 +460,3 @@ class Settings:
         # delete lockfile
         if self.requires_exclusivity:
             self.lockfile.unlink()
-
