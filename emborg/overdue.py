@@ -141,7 +141,7 @@ def main():
                         last modified: {mtime}
                         since last change: {age:0.1f} hours
                         maximum age: {max_age} hours
-                        reported: {report}
+                        overdue: {report}
                 """))
 
                 if report:
