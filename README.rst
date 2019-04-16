@@ -45,8 +45,8 @@ Alternately, you can download a precompiled version from `Borg Github Releases
 commands (they will need to be adjusted for to get the latest version)::
 
     cd ~/bin
-    wget https://github.com/borgbackup/borg/releases/download/1.1.8/borg-linux64
-    wget https://github.com/borgbackup/borg/releases/download/1.1.8/borg-linux64.asc
+    wget https://github.com/borgbackup/borg/releases/download/1.1.9/borg-linux64
+    wget https://github.com/borgbackup/borg/releases/download/1.1.9/borg-linux64.asc
     gpg --recv-keys "FAF7B393"
     gpg --verify borg-linux64.asc
     rm borg-linux64.asc
