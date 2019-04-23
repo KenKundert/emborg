@@ -27,7 +27,7 @@ from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
-    codicil, conjoin, full_stop, narrate, os_error, output,
+    codicil, conjoin, full_stop, is_str, narrate, os_error, output,
     render, warn,
 )
 from docopt import docopt
@@ -227,12 +227,15 @@ class Create(Command):
                 )
 
         # run prerequisites
-        for each in settings.values('run_before_backup'):
-            narrate('running pre-backup script:', each)
+        cmds = settings.value('run_before_backup')
+        if is_str(cmds):
+            cmds = [cmds]
+        for cmd in cmds:
+            narrate('running pre-backup script:', cmd)
             try:
-                Run(each, 'SoeW')
+                Run(cmd, 'SoEW')
             except Error as e:
-                e.reraise(culprit='run_before_backup')
+                e.reraise(culprit=('run_before_backup', cmd.split()[0]))
 
         # run borg
         try:
@@ -255,12 +258,15 @@ class Create(Command):
         settings.date_file.write_text(str(now))
 
         # run any scripts specified to be run after a backup
-        for each in settings.values('run_after_backup'):
-            narrate('running post-backup script:', each)
+        cmds = settings.value('run_after_backup')
+        if is_str(cmds):
+            cmds = [cmds]
+        for cmd in cmds:
+            narrate('running post-backup script:', cmd)
             try:
-                Run(each, 'SoeW')
+                Run(cmd, 'SoEW')
             except Error as e:
-                e.reraise(culprit='run_after_backup')
+                e.reraise(culprit=('run_after_backup', cmd.split()[0]))
 
         if cmdline['--fast']:
             return
