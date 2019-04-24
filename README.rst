@@ -735,12 +735,14 @@ Here is an example config file::
     ]
 
 The dictionaries in *repositories* can contain the following fields: *host*, 
-*path*, *maintainer*, *max_age*. *host* is a description of the host. In this 
-case the *host* contains the host name and the source directory.  *path* is 
-either the archive name or a full absolute path to the archive. *maintainer* is 
-an email address, an email is sent to this address if there is an issue.  
-*max_age* is the number of hours that may pass before an archive is considered 
-overdue.
+*path*, *maintainer*, *max_age*. *host* is a description of the host. It is 
+included in the email that is sent when problems occur to identify the backup.  
+It is a good idea for it to contain both the host name and the source directory 
+being backed up.  *path* is either the archive name or a full absolute path to 
+the archive.  If *path* is an absolute path, it is used, otherwise it is added 
+to the end of *root*.  *maintainer* is an email address, an email is sent to 
+this address if there is an issue.  *max_age* is the number of hours that may 
+pass before an archive is considered overdue.
 
 *repositories* can also be specified as a list of dictionaries as follows::
 
@@ -761,5 +763,4 @@ If *repositories* is a string, it is first split on newlines, anything beyond
 a # is considered a comment and is ignored, and the finally the lines are split 
 on '|' and the 4 values are expected to be given in order.  If the *maintainer* 
 is not given, the *default_maintainer* is used. If *max_age* is not given, the 
-*default_max_age* is used.  If *path* is an absolute path, it is used, otherwise 
-it is added to the end of *root*.
+*default_max_age* is used.
