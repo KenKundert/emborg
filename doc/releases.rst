@@ -4,6 +4,7 @@ Releases
 **Latest development release**:
     | Version: 1.4.0
     | Released: 2019-04-24
+    - Added documentation.
 
 **1.4 (2019-04-24)**:
     - Added *ssh_command* setting
