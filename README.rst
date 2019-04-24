@@ -718,7 +718,8 @@ is also a Python file and may contain the following settings::
 
 Here is an example config file::
 
-    default_maintainer = 'root@nifty.com'
+    default_maintainer = 'root@continuum.com'
+    dumper = 'dumper@continuum.com'
     default_max_age = 12 # hours
     root = '/mnt/borg-backups/repositories'
     repositories = """
