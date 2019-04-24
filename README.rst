@@ -722,6 +722,28 @@ Here is an example config file::
     dumper = 'dumper@continuum.com'
     default_max_age = 12 # hours
     root = '/mnt/borg-backups/repositories'
+    repositories = [
+        dict(host='mercury (/)', path='mercury-root-root'),
+        dict(host='venus (/)', path='venus-root-root'),
+        dict(host='earth (/)', path='earth-root-root'),
+        dict(host='mars (/)', path='mars-root-root'),
+        dict(host='jupiter (/)', path='jupiter-root-root'),
+        dict(host='saturn (/)', path='saturn-root-root'),
+        dict(host='uranus (/)', path='uranus-root-root'),
+        dict(host='neptune (/)', path='neptune-root-root'),
+        dict(host='pluto (/)', path='pluto-root-root'),
+    ]
+
+The dictionaries in *repositories* can contain the following fields: *host*, 
+*path*, *maintainer*, *max_age*. *host* is a description of the host. In this 
+case the *host* contains the host name and the source directory.  *path* is 
+either the archive name or a full absolute path to the archive. *maintainer* is 
+an email address, an email is sent to this address if there is an issue.  
+*max_age* is the number of hours that may pass before an archive is considered 
+overdue.
+
+*repositories* can also be specified as a list of dictionaries as follows::
+
     repositories = """
         HOST        | NAME or PATH      | MAINTAINER           | MAXIMUM AGE (hours)
         mercury (/) | mercury-root-root |                      |
@@ -734,28 +756,6 @@ Here is an example config file::
         neptune (/) | neptune-root-root |                      |
         pluto (/)   | pluto-root-root   |                      |
     """
-
-*repositories* can also be specified as a list of dictionaries as follows::
-
-    repositories = [
-        dict(host='mercury (/)', path='mercury-root-root'),
-        dict(host='venus (/)', path='venus-root-root'),
-        dict(host='earth (/)', path=' earth-root-root'),
-        dict(host='mars (/)', path=' mars-root-root'),
-        dict(host='jupiter (/)', path=' jupiter-root-root'),
-        dict(host='saturn (/)', path=' saturn-root-root'),
-        dict(host='uranus (/)', path=' uranus-root-root'),
-        dict(host='neptune (/)', path=' neptune-root-root'),
-        dict(host='pluto (/)', path=' pluto-root-root'),
-    ]
-
-The dictionaries in *repositories* can contain the following fields: *host*, 
-*path*, *maintainer*, *max_age*. *host* is a description of the host. In this 
-case the *host* contains the host name and the source directory.  *path* is 
-either the archive name or a full absolute path to the archive. *maintainer* is 
-an email address, an email is sent to this address if there is an issue.  
-*max_age* is the number of hours that may pass before an archive is considered 
-overdue.
 
 If *repositories* is a string, it is first split on newlines, anything beyond 
 a # is considered a comment and is ignored, and the finally the lines are split 
