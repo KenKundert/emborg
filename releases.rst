@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.3.4
-    | Released: 2019-04-23
+    | Version: 1.4.0
+    | Released: 2019-04-24
 
 **1.4 (2019-04-24)**:
     - Added *ssh_command* setting
