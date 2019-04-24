@@ -716,7 +716,7 @@ is also a Python file and may contain the following settings::
     root (default directory for repositories)
     repositories (string or array of dicts)
 
-Here is an example config file:
+Here is an example config file::
 
     default_maintainer = 'root@nifty.com'
     default_max_age = 12 # hours
