@@ -2,7 +2,7 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.4.0
+    | Version: 1.4.1
     | Released: 2019-04-24
     - Added documentation.
 
