@@ -245,6 +245,7 @@ Contents
    installing
    commands
    configuring
+   examples
    api
    utilities
    releases
