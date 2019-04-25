@@ -119,6 +119,10 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
     exclude_if_present = '.nobackup'
     exclude_caches = True
 
+
+Home
+^^^^
+
 Here is the contents of the *home* configuration file: ~/.config/emborg/home::
 
     repository = 'backups:/mnt/borg-backups/repositories/{host_name}-{user_name}-{config_name}'
@@ -182,6 +186,10 @@ reminder, or you can configure cron to check every hour and notify you if they
 are overdue::
 
     0 * * * * emborg --mute due --days 1 || notify-send 'Backups are overdue'
+
+
+Cache
+^^^^^
 
 And finally, here is the contents of the *cache* configuration file: 
 ~/.config/emborg/cache::
