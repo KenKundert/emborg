@@ -40,11 +40,11 @@ Well, everyone needs to backup their files. So perhaps the questions should be
 'Why not Duplicity?'. `Duplicity <http://duplicity.nongnu.org>`_ has been the 
 standard way to do backups on Unix systems for many years.
 
-*Duplicity* supports full and incremental backups. During a full backup makes 
-complete copies of the files. In incremental backups it just saves the 
-differences that have accumulated since the previous backup. Thus, to retrieve 
-a file from the backup, *Duplicity* must first get the original version of the 
-file, and then apply each change. That approach results in the following issues:
+*Duplicity* provides full and incremental backups. A full backup makes complete 
+copies of each file. With an incremental backup, only the difference between the 
+current and previous versions of the file are saved.  Thus, to retrieve a file 
+from the backup, *Duplicity* must first get the original version of the file, 
+and then apply each change. That approach results in the following issues:
 
 #. The recovery process is slow because the desired file is reconstructed from 
    possibly a large number of change sets, each of which must be downloaded from 
@@ -55,8 +55,8 @@ file, and then apply each change. That approach results in the following issues:
 
 #. Because the recovery process requires so many steps, it can be fragile.  
    Apparently it keeps all the change sets open during the recovery process, and 
-   so the recovery process often fails because the operating system limits how 
-   many files you can open at any one time.
+   so the recovery process can fail because the operating system limits how many 
+   files you can open at any one time.
 
 #. Generally, when there are problems, you only find them when you try to 
    recover a file.  At that point it is too late.
@@ -70,8 +70,8 @@ increases the space you need to hold your backups.
 
 *Borg* works in a very different way. When *Borg* encounters a file, it first 
 determines whether it is new or not. If it is new it copies it into the 
-repository. Then, either way, it associates a pointer to the file contents with 
-the filepath. This makes it naturally de-duplicating. When it comes time to 
+repository. Then, either way, it associates a pointer to the file's contents 
+with the filepath. This makes it naturally de-duplicating. When it comes time to 
 recover a file, it simply uses the file path to find the contents. In this way, 
 it only retrieves the data it needs. There is no complicated and fragile process 
 needed to reconstruct the file from a long string of differences.
@@ -99,6 +99,7 @@ your backups.
     This is a snapshot of the files that existed when a particular backup was 
     run.  Basically, it is a collection of file paths along with pointers to the 
     contents of those files.
+
 
 Quick Tour
 ----------
@@ -154,8 +155,8 @@ extracts a file from the most recent archive.
     emborg mount restore
 
 creates a directory 'restore' and then mounts the repository on this directory.  
-This allows you to move into the repository and copy files as if it were a file 
-system.
+This allows you to move into the repository, navigating and retrieve files as if 
+it were a file system.
 
 ::
 
