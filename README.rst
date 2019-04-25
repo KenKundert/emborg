@@ -33,7 +33,7 @@ for the Borg extract command.
 
 
 Getting Help
-============
+------------
 
 You can find the documentation on `ReadTheDocs <https://emborg.readthedocs.io>`_.
 
