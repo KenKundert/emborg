@@ -3,9 +3,10 @@
 Examples
 ========
 
-When you first run, it creates the settings directory and populates it with two 
-configurations that you can use as starting points. Those two configurations 
+When first run, *Emborg* creates the settings directory and populates it with 
+two configurations that you can use as starting points. Those two configurations 
 make up our first two examples.
+
 
 Root
 ----
@@ -51,7 +52,7 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
 
 In this case we are assuming that *backups* (used in *repository*) is an entry 
 in your SSH config file that points to the server that stores your repository.  
-To be able to run this configuration autonomously from cront, *backups* must be 
+To be able to run this configuration autonomously from cron, *backups* must be 
 configured to use a private key that does not have a passphrase.
 
 And here is the contents of the *root* configuration file: /root/.config/emborg/root::
@@ -153,11 +154,19 @@ Here is the contents of the *home* configuration file: ~/.config/emborg/home::
     keep_monthly = 24                         # number of monthly archives to keep
     keep_yearly = 24                          # number of yearly archives to keep
 
-In this case the passphrase is kept in `Avendesora 
+In this case we are assuming that *backups* (used in *repository*) is an entry 
+in your SSH config file that points to the server that stores your repository.  
+Since you are running this configuration interactively, *backups* should be 
+configured to use a private key and that key should be preloaded into your SSH 
+agent.
+
+This configuration keeps the passphrase is kept in `Avendesora 
 <https://avendesora.readthedocs.io>`_, and the encryption method is *keyfile*.  
 As such, it is critical that you extract the keyfile from *Borg* and copy it and 
 your *Avendesora* files to a safe place so that both the keyfile and passphrase 
-are available if you lose your disk.  To extract the keyfile, use::
+are available if you lose your disk. You can use `SpareKeys 
+<https://github.com/kalekundert/sparekeys>`_ to do this for you. Otherwise 
+extract the keyfile using::
 
     emborg borg key export @repo key.borg
 
@@ -202,10 +211,7 @@ And finally, here is the contents of the *cache* configuration file:
     prune_after_create = True
     check_after_create = False
 
-Adding the following entry to your crontab file using 'crontab -e'::
+To run this configuration every 15 minutes, add the following entry to your 
+crontab file using 'crontab -e'::
 
     0,15,30,45 * * * * emborg --config cache create
-
-causes this configuration to be run every 15 minutes.
-
-
