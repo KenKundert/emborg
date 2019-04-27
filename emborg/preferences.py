@@ -190,7 +190,6 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
     notify = '<<your-email-address>>'        # who to notify when things go wrong
     notifier = 'notify-send -u normal {prog_name} "{msg}"'
                                              # interactive notifier program
-    needs_ssh_agent = True
     remote_ratelimit = 2000                  # bandwidth limit in kbps
     prune_after_create = True                # automatically run prune after a backup
     check_after_create = False               # automatically run check after a backup

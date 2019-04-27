@@ -206,7 +206,7 @@ You should assure you have a backup copy of the encryption key and its
 passphrase in a safe place (run 'borg key export' to extract the encryption
 keys).  This is very important.  If the only copy of the encryption credentials
 are on the disk being backed up, then if that disk were to fail you would not be
-able to access your backups. I recommend the use of `sparekeys
+able to access your backups. I recommend the use of `SpareKeys
 <https://github.com/kalekundert/sparekeys>`_ as a way of assuring that you
 always have access to the essential information, such as your Borg passphrase
 and keys, that you would need to get started after a catastrophic loss of your
