@@ -236,6 +236,13 @@ working out the kinks before you lose your files can save you if you ever do
 lose your files.
 
 
+Issues
+------
+
+Please ask questions or report problems on
+`Github <https://github.com/KenKundert/emborg/issues>`_.
+
+
 Contents
 --------
 
