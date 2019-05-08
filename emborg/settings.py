@@ -271,8 +271,8 @@ class Settings:
                     warn(
                         "you should use 'borg export key' to export the",
                         "encryption key, and then keep that key in a safe",
-                        "place.  If you loose the key you will loose access to",
-                        "your back ups.",
+                        "place.  If you lose the key you will lose access to",
+                        "your backups.",
                         wrap=True
                     )
             else:
