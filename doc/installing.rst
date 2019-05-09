@@ -66,7 +66,9 @@ The destination for the backups. A typical value might be::
 where in this example 'archives' is the hostname and /mnt/backups is the 
 absolute path to the directory that is to contain your Borg repositories, 
 and {host_name}-{user_name}-{config_name} is the directory to contain this 
-repository.
+repository.  For a local repository you would use something like this::
+
+    repository = '/mnt/backups/{host_name}-{user_name}-{config_name}'
 
 
 **archive**
@@ -101,18 +103,17 @@ unreadable by others.
 
 **passcommand**
 
-An alternate to *passphrase*. *Borg* uses this command to access your 
-passphrase.
+An alternate to *passphrase*. *Borg* runs this command to get your passphrase.
 
 
 **avendesora_account**
 
-Another alternative to *passphrase*. The name of the Avendesora account used to 
-hold the passphrase for the encryption key. Use this as an alternative to 
-*passphrase*.  This keeps your passphrase out of your settings file, but 
-requires that GPG agent be available and loaded with your private key.  This is 
-normal when running interactively. When running batch, say from *cron*, you can 
-use the Linux *keychain* command to retain your GPG credentials for you.
+Another alternative to *passphrase*. The name of the *Avendesora* account used 
+to hold the passphrase for the encryption key. Using *Avendesora* keeps your 
+passphrase out of your settings file, but requires that GPG agent be available 
+and loaded with your private key.  This is normal when running interactively.  
+When running batch, say from *cron*, you can use the Linux *keychain* command to 
+retain your GPG credentials for you.
 
 
 **src_dirs**
