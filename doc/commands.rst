@@ -21,7 +21,7 @@ Here are the available commands:
     :log:        :ref:`print logfile for the last emborg run <log>`
     :manifest:   :ref:`list the files contained in an archive <manifest>`
     :mount:      :ref:`mount a repository or archive <mount>`
-    :prune:      :ref:`list the archives currently contained in the repository <prune>`
+    :prune:      :ref:`prune the repository of excess archives <prune>`
     :settings:   :ref:`list settings of chosen configuration <settings>`
     :umount:     :ref:`un-mount a previously mounted repository or archive <umount>`
     :version:    :ref:`display emborg version <version>`

@@ -857,7 +857,7 @@ class Mount(Command):
 # Prune command {{{1
 class Prune(Command):
     NAMES = 'prune'.split()
-    DESCRIPTION = 'list the archives currently contained in the repository'
+    DESCRIPTION = 'prune the repository of excess archives'
     USAGE = dedent("""
         Usage:
             emborg prune
