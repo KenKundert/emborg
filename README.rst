@@ -1,4 +1,4 @@
-Emborg -- Front-End to Borg Backup
+Emborg — Front-End to Borg Backup
 ==================================
 
 .. image:: https://img.shields.io/pypi/v/emborg.svg
