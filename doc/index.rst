@@ -1,7 +1,7 @@
 .. Emborg documentation master file
 
-Emborg -- Front-End to Borg Backup
-==================================
+Emborg — Front-End to Borg Backup
+=================================
 
 | Version: 1.4.1
 | Released: 2019-04-24

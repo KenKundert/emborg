@@ -46,7 +46,7 @@ to the end of *root*.  *maintainer* is an email address, an email is sent to
 this address if there is an issue.  *max_age* is the number of hours that may 
 pass before an archive is considered overdue.
 
-*repositories* can also be specified as a list of dictionaries as follows::
+*repositories* can also be specified as multi-line string::
 
     repositories = """
         HOST        | NAME or PATH      | MAINTAINER           | MAXIMUM AGE (hours)
@@ -66,3 +66,28 @@ a # is considered a comment and is ignored, and the finally the lines are split
 on '|' and the 4 values are expected to be given in order.  If the *maintainer* 
 is not given, the *default_maintainer* is used. If *max_age* is not given, the 
 *default_max_age* is used.
+
+To run the program interactively, just make sure *emborg-overdue* has been 
+installed and is on your path. Then type::
+
+    emborg-overdue
+
+It is also common to run *emborg-overdue* on a fixed schedule from cron. To do 
+so, run::
+
+    crontab -e
+
+and add something like the following::
+
+    4 5 * * * ~/dumper/.local/bin/emborg-overdue --mail > ~/dumper/emborg-overdue.out 2>&
+
+or
+
+    4 5 * * * ~/dumper/.local/bin/emborg-overdue --quiet --mail
+
+The first example runs emborg-overdue at 5:04 AM every day while saving the 
+output into a file.  The use of the ``--mail`` option causes *emborg-overdue* to 
+send mail to the maintainer when backups are found to be overdue.
+
+The second example is similar except the output suppressed rather than being 
+saved to a file.
