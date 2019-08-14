@@ -48,7 +48,7 @@ and then apply each change. That approach results in the following issues:
 
 #. The recovery process is slow because the desired file is reconstructed from 
    possibly a large number of change sets, each of which must be downloaded from 
-   a remote repository before it can be applied. The change set are large, so 
+   a remote repository before it can be applied. The change sets are large, so 
    the recovery of even small files can require downloading a large amount of 
    data.  It is common that the recovery of a single small file could require 
    many hours.
@@ -148,7 +148,7 @@ shows you the difference between two archives.
 
     emborg extract home/seven/bin/vu
 
-extracts a file from the most recent archive.
+extracts a file or directory from the most recent archive.
 
 ::
 
@@ -220,8 +220,8 @@ the permissions for that file so that it is not readable by others::
 Better is to simply not store the passphrase in *Emborg* configuration files.
 You can use the *passcommand* setting for this, or you use
 `Avendesora <https://avendesora.readthedocs.io>`_, which is a flexible password
-management system. The interface to *Avendesora*is already built in to *Emborg*,
-but its use is optional (it need not be installed).
+management system. The interface to *Avendesora* is already built in to 
+*Emborg,* but its use is optional (it need not be installed).
 
 It is also best, if it can be arranged, to keep your backups at a remote site so
 that your backups do not get destroyed in the same disaster, such as a fire or
