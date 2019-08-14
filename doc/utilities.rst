@@ -81,9 +81,11 @@ and add something like the following::
 
     4 5 * * * ~/dumper/.local/bin/emborg-overdue --mail > ~/dumper/emborg-overdue.out 2>&
 
-or
+or::
 
     4 5 * * * ~/dumper/.local/bin/emborg-overdue --quiet --mail
+
+to your crontab.
 
 The first example runs emborg-overdue at 5:04 AM every day while saving the 
 output into a file.  The use of the ``--mail`` option causes *emborg-overdue* to 
