@@ -91,5 +91,5 @@ The first example runs emborg-overdue at 5:04 AM every day while saving the
 output into a file.  The use of the ``--mail`` option causes *emborg-overdue* to 
 send mail to the maintainer when backups are found to be overdue.
 
-The second example is similar except the output suppressed rather than being 
+The second example is similar except the output is suppressed rather than being 
 saved to a file.
