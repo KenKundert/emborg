@@ -90,8 +90,8 @@ key.  Thus, to restore your files you will need both the key and the passphrase.
 With *repokey* your key is copied to the repository, so it can be used with 
 trusted repositories. Use *keyfile* if the remote repository is not trusted. It 
 does not copy the key to the repository, meaning that it is extremely important 
-for you export the key using 'borg key export' and keep a copy along with the 
-passphrase.
+for you export the key using 'borg key export' and keep a copy in a safe place 
+along with the passphrase.
 
 
 **passphrase**

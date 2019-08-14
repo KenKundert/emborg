@@ -49,7 +49,7 @@ pass before an archive is considered overdue.
 *repositories* can also be specified as multi-line string::
 
     repositories = """
-        HOST        | NAME or PATH      | MAINTAINER           | MAXIMUM AGE (hours)
+        # HOST      | NAME or PATH      | MAINTAINER           | MAXIMUM AGE (hours)
         mercury (/) | mercury-root-root |                      |
         venus (/)   | venus-root-root   |                      |
         earth (/)   | earth-root-root   |                      |

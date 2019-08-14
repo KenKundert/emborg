@@ -116,7 +116,9 @@ This can help you understand what is happening.
 Delete
 ------
 
-Delete an archive currently contained in the repository.
+Delete an archive currently contained in the repository::
+
+    > emborg delete continuum-2018-12-05T19:23:09
 
 
 .. _diff:
@@ -157,10 +159,10 @@ You extract a file or directory from an archive using::
    emborg extract home/ken/bin
 
 Use manifest to determine what path you should specify to identify the desired 
-file or directory (they will paths relative to /).  Thus, the paths should look 
-like absolute paths with the leading slash removed.  The paths may point to 
-directories, in which case the entire directory is extracted. It may also be 
-a glob pattern.
+file or directory.  You can specify more than one path. They will be paths that 
+are relative to /, thus the paths should look like absolute paths with the 
+leading slash removed.  The paths may point to directories, in which case the 
+entire directory is extracted.  It may also be a glob pattern.
 
 If you do not specify an archive or date, the most recent archive is used.  You 
 can extract the version of a file or directory that existed on a particular date 
@@ -240,6 +242,10 @@ Log
 
 Show the logfile from the previous run.
 
+::
+
+   emborg log
+
 
 .. _manifest:
 
@@ -274,7 +280,7 @@ would a normal read-only filesystem.
 
    emborg mount backups
 
-In this example, backups acts as a mount point. If it exists, it must be 
+In this example, *backups* acts as a mount point. If it exists, it must be 
 a directory. If it does not exist, it is created.
 
 If you do not specify an archive, as above, all archives are mounted.
@@ -310,6 +316,11 @@ Settings
 --------
 
 This command displays all the settings that affect a backup configuration.
+
+::
+
+   emborg settings
+
 Add '-a' option to list out all available settings and their descriptions rather 
 than the specified settings and their values.
 
