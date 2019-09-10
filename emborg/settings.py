@@ -22,6 +22,7 @@ from .preferences import (
     BORG,
     BORG_SETTINGS,
     CONFIG_DIR,
+    DATA_DIR,
     CONFIGS_SETTING,
     convert_name_to_option,
     DATE_FILE,
@@ -418,24 +419,28 @@ class Settings:
         self.archive = self.resolve(self.archive)
 
         # resolve other files and directories
-        config_dir = self.resolve(CONFIG_DIR)
-        self.config_dir = to_path(config_dir, config_dir)
+        data_dir = self.resolve(DATA_DIR)
+        self.data_dir = to_path(data_dir, data_dir)
+
+        if not self.data_dir.exists():
+            # config dir does not exist, create and populate it
+            self.data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
 
         logfile = self.resolve(LOG_FILE)
-        self.logfile = to_path(config_dir, logfile)
+        self.logfile = to_path(data_dir, logfile)
 
         if 'no-log' not in self.options:
             prev_logfile = self.resolve(PREV_LOG_FILE)
-            self.prev_logfile = to_path(config_dir, prev_logfile)
+            self.prev_logfile = to_path(data_dir, prev_logfile)
             rm(self.prev_logfile)
             if self.logfile.exists():
                 mv(self.logfile, self.prev_logfile)
 
         date_file = self.resolve(DATE_FILE)
-        self.date_file = to_path(config_dir, date_file)
+        self.date_file = to_path(data_dir, date_file)
 
         # perform locking
-        lockfile = self.lockfile = to_path(config_dir, self.resolve(LOCK_FILE))
+        lockfile = self.lockfile = to_path(data_dir, self.resolve(LOCK_FILE))
         if self.requires_exclusivity:
             # check for existance of lockfile
             if lockfile.exists():

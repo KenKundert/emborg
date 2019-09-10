@@ -17,7 +17,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from appdirs import user_config_dir
+from appdirs import user_config_dir, user_data_dir
 from textwrap import dedent
 
 # Preferences {{{1
@@ -29,9 +29,11 @@ INDENT = '    '
 BORG = 'borg'
 
 CONFIG_DIR = user_config_dir(PROGRAM_NAME)
+DATA_DIR = user_data_dir(PROGRAM_NAME)
 
 SETTINGS_FILE = 'settings'
 OVERDUE_FILE = 'overdue.conf'
+
 LOG_FILE = '{config_name}.log'
 PREV_LOG_FILE = '{config_name}.log.prev'
 LOCK_FILE = '{config_name}.lock'
