@@ -148,13 +148,18 @@ BORG_SETTINGS = dict(
     remote_ratelimit = dict(
         cmds = 'all',
         arg = 'RATE',
-        desc = 'set remote network upload rate limit in kiB/s (deefault: 0=unlimited)'
+        desc = 'set remote network upload rate limit in kiB/s (default: 0=unlimited)'
     ),
     umask = dict(
         cmds = 'all',
         arg = 'M',
         desc = 'set umask to M (local and remote, default: 0077)'
     ),
+    prefix = dict(
+        cmds = 'prune',
+        arg = 'PREFIX',
+        desc = 'only consider archive names starting with this prefix'
+    ),    
 )
 
 # Utilities {{{2
