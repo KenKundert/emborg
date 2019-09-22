@@ -72,40 +72,6 @@ def error_source():
         line = tb.tb_next.tb_lineno
     return filename, 'line %s' % line
 
-# render_command {{{1
-def render_command(cmd, option_args=True):
-    if is_str(cmd):
-        cmd = shlex.split(cmd)
-    else:
-        cmd = [str(c) for c in cmd]
-            # Cannot use to_str() because it can change some arguments when not intended.
-            # This is particularly problematic the duplicify arguments in emborg.
-
-    if option_args is True:
-        duplicity_option_args = {
-            '--gpg-binary': 1,
-            '--log-file': 1,
-            '--archive-dir': 1,
-            '--name': 1,
-            '--sftp-command': 1,
-            '--file-to-restore': 1,
-            '--ssh-backend': 1,
-            '--exclude': 1,
-            '--time': 1,
-        }
-        option_args = duplicity_option_args
-
-    cmd.reverse()
-    lines = []
-    while cmd:
-        opt = cmd.pop()
-        num_args = option_args.get(opt, 0)
-        argument = [opt]
-        for i in range(num_args):
-            argument.append(quote(cmd.pop()))
-        lines.append(' '.join(argument))
-    return ' \\\n    '.join(lines)
-
 # render_path() {{{1
 def render_path(path):
     return str(to_path(path))
@@ -113,3 +79,9 @@ def render_path(path):
 # render_paths() {{{1
 def render_paths(path_list):
     return [render_path(path) for path in path_list]
+
+# render_cmdline_opts() {{{1
+def render_cmdline_opts(opts):
+    opts = list(opts)
+    w = max(len(opt[0]) for opt in opts)
+    return '\n'.join('    {:<{}}  {}'.format(n,w,d) for n, d in opts)

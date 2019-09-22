@@ -23,7 +23,8 @@ from .preferences import (
     EMBORG_SETTINGS,
     PROGRAM_NAME,
 )
-from .utilities import two_columns, render_paths, gethostname
+from .settings import Settings
+from .utilities import two_columns, render_paths, gethostname, render_cmdline_opts
 hostname = gethostname()
 from inform import (
     Color, Error,
@@ -126,18 +127,29 @@ class Command(object):
 
     @classmethod
     def help(cls):
+        borg_opts = Settings.borg_option_descriptions(cls.NAMES[0])
+        if borg_opts:
+            extra = dedent("""
+
+                The following Borg options are accepted by this command:
+                {}
+            """).rstrip().format(render_cmdline_opts(borg_opts))
+        else:
+            extra = ''
+
         text = dedent("""
             {title}
 
             {usage}
-        """).strip()
+        """).strip() + extra
+
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
         )
 
 
-# Borg command {{{1
-class Borg(Command):
+# BorgCommand command {{{1
+class BorgCommand(Command):
     NAMES = 'borg'.split()
     DESCRIPTION = 'run a raw borg command.'
     USAGE = dedent("""
@@ -159,8 +171,8 @@ class Borg(Command):
         settings.run_borg_raw(borg_args)
 
 
-# BreakLock command {{{1
-class BreakLock(Command):
+# BreakLockCommand command {{{1
+class BreakLockCommand(Command):
     NAMES = 'breaklock break-lock'.split()
     DESCRIPTION = 'breaks the repository and cache locks.'
     USAGE = dedent("""
@@ -190,8 +202,8 @@ class BreakLock(Command):
         rm(settings.lockfile)
 
 
-# Create command {{{1
-class Create(Command):
+# CreateCommand command {{{1
+class CreateCommand(Command):
     NAMES = 'create backup'.split()
     DESCRIPTION = 'create an archive of the current files'
     USAGE = dedent("""
@@ -277,13 +289,13 @@ class Create(Command):
             activity = 'checking'
             if settings.check_after_create:
                 narrate('checking archive')
-                check = Check()
+                check = CheckCommand()
                 check.run('check', [], settings, options)
 
             activity = 'pruning'
             if settings.prune_after_create:
                 narrate('pruning archives')
-                prune = Prune()
+                prune = PruneCommand()
                 prune.run('prune', [], settings, options)
         except Error as e:
             e.reraise(codicil=(
@@ -292,8 +304,8 @@ class Create(Command):
             ))
 
 
-# Check command {{{1
-class Check(Command):
+# CheckCommand command {{{1
+class CheckCommand(Command):
     NAMES = 'check'.split()
     DESCRIPTION = 'checks the repository and its archives'
     USAGE = dedent("""
@@ -322,8 +334,8 @@ class Check(Command):
             output(out.rstrip())
 
 
-# Configs command {{{1
-class Configs(Command):
+# ConfigsCommand command {{{1
+class ConfigsCommand(Command):
     NAMES = 'configs'.split()
     DESCRIPTION = 'list available backup configurations'
     USAGE = dedent("""
@@ -344,8 +356,8 @@ class Configs(Command):
             output('No configurations available.')
 
 
-# Delete command {{{1
-class Delete(Command):
+# DeleteCommand command {{{1
+class DeleteCommand(Command):
     NAMES = 'delete'.split()
     DESCRIPTION = 'delete an archive currently contained in the repository'
     USAGE = dedent("""
@@ -371,8 +383,8 @@ class Delete(Command):
             output(out.rstrip())
 
 
-# Diff command {{{1
-class Diff(Command):
+# DiffCommand command {{{1
+class DiffCommand(Command):
     NAMES = 'diff'.split()
     DESCRIPTION = 'show the differences between two archives'
     USAGE = dedent("""
@@ -399,8 +411,8 @@ class Diff(Command):
             output(out.rstrip())
 
 
-# Due command {{{1
-class Due(Command):
+# DueCommand command {{{1
+class DueCommand(Command):
     NAMES = 'due'.split()
     DESCRIPTION = 'days since last backup'
     USAGE = dedent("""
@@ -494,8 +506,8 @@ class Due(Command):
         report(gen_message(backup_date))
 
 
-# Extract command {{{1
-class Extract(Command):
+# ExtractCommand command {{{1
+class ExtractCommand(Command):
     NAMES = 'extract'.split()
     DESCRIPTION = 'recover file or files from archive'
     USAGE = dedent("""
@@ -582,8 +594,8 @@ class Extract(Command):
             output(out.rstrip())
 
 
-# Help {{{1
-class Help(Command):
+# HelpCommand {{{1
+class HelpCommand(Command):
     NAMES = 'help'.split()
     DESCRIPTION = 'give information about commands or other topics'
     USAGE = dedent("""
@@ -601,8 +613,8 @@ class Help(Command):
         HelpMessage.show(cmdline['<topic>'])
 
 
-# Info command {{{1
-class Info(Command):
+# InfoCommand command {{{1
+class InfoCommand(Command):
     NAMES = 'info'.split()
     DESCRIPTION = 'print information about a backup'
     USAGE = dedent("""
@@ -647,8 +659,8 @@ class Info(Command):
             output(out.rstrip())
 
 
-# Initialize command {{{1
-class Initialize(Command):
+# InitializeCommand command {{{1
+class InitializeCommand(Command):
     NAMES = 'init'.split()
     DESCRIPTION = 'initialize the repository'
     USAGE = dedent("""
@@ -673,8 +685,8 @@ class Initialize(Command):
             output(out.rstrip())
 
 
-# List command {{{1
-class List(Command):
+# ListCommand command {{{1
+class ListCommand(Command):
     NAMES = 'list lr archives'.split()
     DESCRIPTION = 'list the archives currently contained in the repository'
     USAGE = dedent("""
@@ -701,8 +713,8 @@ class List(Command):
             output(out.rstrip())
 
 
-# Log command {{{1
-class Log(Command):
+# LogCommand command {{{1
+class LogCommand(Command):
     NAMES = 'log'.split()
     DESCRIPTION = 'print logfile for the last emborg run'
     USAGE = dedent("""
@@ -723,8 +735,8 @@ class Log(Command):
             narrate(os_error(e))
 
 
-# Manifest command {{{1
-class Manifest(Command):
+# ManifestCommand command {{{1
+class ManifestCommand(Command):
     NAMES = 'manifest m la'.split()
     DESCRIPTION = 'list the files contained in an archive'
     USAGE = dedent("""
@@ -789,8 +801,8 @@ class Manifest(Command):
             output(out.rstrip())
 
 
-# Mount command {{{1
-class Mount(Command):
+# MountCommand command {{{1
+class MountCommand(Command):
     NAMES = 'mount'.split()
     DESCRIPTION = 'mount a repository or archive'
     USAGE = dedent("""
@@ -854,8 +866,8 @@ class Mount(Command):
             output(out.rstrip())
 
 
-# Prune command {{{1
-class Prune(Command):
+# PruneCommand command {{{1
+class PruneCommand(Command):
     NAMES = 'prune'.split()
     DESCRIPTION = 'prune the repository of excess archives'
     USAGE = dedent("""
@@ -890,8 +902,8 @@ class Prune(Command):
             output(out.rstrip())
 
 
-# Settings command {{{1
-class Settings(Command):
+# SettingsCommand command {{{1
+class SettingsCommand(Command):
     NAMES = 'settings'.split()
     DESCRIPTION = 'list settings of chosen configuration'
     USAGE = dedent("""
@@ -930,8 +942,8 @@ class Settings(Command):
             output(f'{key:>33}: {render(v, level=6)}')
 
 
-# Umount command {{{1
-class Umount(Command):
+# UmountCommand command {{{1
+class UmountCommand(Command):
     NAMES = 'umount unmount'.split()
     DESCRIPTION = 'un-mount a previously mounted repository or archive'
     USAGE = dedent("""
@@ -961,8 +973,8 @@ class Umount(Command):
                 )
 
 
-# Version {{{1
-class Version(Command):
+# VersionCommand {{{1
+class VersionCommand(Command):
     NAMES = 'version',
     DESCRIPTION = 'display emborg version'
     USAGE = dedent("""

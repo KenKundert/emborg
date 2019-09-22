@@ -39,7 +39,7 @@ from .preferences import (
 )
 from .python import PythonFile
 from .utilities import gethostname, getusername, render_paths
-from shlib import getmod, mv, rm, Run, to_path, render_command
+from shlib import getmod, mv, rm, Run, to_path, render_command, to_path
 from inform import (
     Error, codicil, conjoin, done, full_stop, get_informer, indent, is_str,
     narrate, output, render, warn,
@@ -75,6 +75,7 @@ class Settings:
         self.options = options
         self.read(name)
         self.check()
+        self.config_dir = to_path(CONFIG_DIR)
 
     # read() {{{2
     def read(self, name=None, path=None):
@@ -257,6 +258,12 @@ class Settings:
                     args.append('--stats')
             for path in render_paths(self.values('excludes')):
                 args.extend(['--exclude', path])
+            exclude_from = self.value('exclude_from')
+            if exclude_from:
+                path = to_path(self.config_dir, exclude_from)
+                if not path.exists():
+                    raise Error('--exclude-from file does not exist.', culprit=path)
+                args.extend(['--exclude-from', str(path)])
 
         if cmd == 'extract':
             if 'verbose' in options:
@@ -293,6 +300,15 @@ class Settings:
                     else:
                         args.extend([opt])
         return args
+
+    # borg_option_descriptions() {{{2
+    @staticmethod
+    def borg_option_descriptions(cmd):
+        for name, attrs in BORG_SETTINGS.items():
+            if cmd in attrs['cmds'] or 'all' in attrs['cmds']:
+                opt = convert_name_to_option(name)
+                desc = attrs['desc']
+                yield opt, desc
 
     # publish_passcode() {{{2
     def publish_passcode(self):

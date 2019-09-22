@@ -86,6 +86,11 @@ BORG_SETTINGS = dict(
         cmds = 'create',
         desc = 'exclude directories that contain a CACHEDIR.TAG file'
     ),
+    exclude_from = dict(
+        cmds = 'create',
+        arg = 'FILE',
+        desc = 'file that contains exclude patterns',
+    ),
     exclude_if_present = dict(
         cmds = 'create',
         arg = 'NAME',
@@ -159,7 +164,7 @@ BORG_SETTINGS = dict(
         cmds = 'prune',
         arg = 'PREFIX',
         desc = 'only consider archive names starting with this prefix'
-    ),    
+    ),
 )
 
 # Utilities {{{2

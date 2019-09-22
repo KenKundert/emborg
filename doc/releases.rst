@@ -8,6 +8,9 @@ Releases
     - Moved log files to ~/.local/share/emborg (run 'mv 
       ~/.config/emborg/*.{log,lastbackup}* ~/.local/share/emborg' before using 
       this version).
+    - Added support for Borg --exclude-from option to create command.
+    - Added support for Borg --prefix option to prune command.
+    - Show available Borg command line options to help messages.
 
 **1.4 (2019-04-24)**:
     - Added *ssh_command* setting
