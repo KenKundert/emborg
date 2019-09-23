@@ -5,7 +5,7 @@ Releases
     | Version: 1.4.4
     | Released: 2019-09-23
 
-    - Added documentation.
+    - Added composite configurations.
     - Moved log files to ~/.local/share/emborg (run 'mv 
       ~/.config/emborg/*.{log,lastbackup}* ~/.local/share/emborg' before using 
       this version).
