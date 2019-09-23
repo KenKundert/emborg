@@ -110,9 +110,9 @@ that.
 Includes
 --------
 
-Any setting may include the contents of another file by using an *include*. You 
-may either specify a single include file as a string or a collection as a list 
-of strings::
+Any settings file may include the contents of another file by using an 
+*include*.  You may either specify a single include file as a string or 
+a collection as a list of strings::
 
     include = 'file-to-include'
 
@@ -131,15 +131,16 @@ for example, from different prune schedules.
 As an example, consider having three configurations that you would like to run 
 all at once. You can specify these configurations as follows::
 
-    configurations = 'root home lamp all=root,home,lamp'
+    configurations = 'home lamp data all=home,lamp,data'
 
-In this case *root*, *home* and *lamp* are simple configurations and *all* is 
-a composite configuration.  *root*, *home*, and *lamp* would have configuration 
-files whereas *all* would not.
+In this case *home*, *lamp*, and *data* are simple configurations and *all* is 
+a composite configuration.  *home*, *lamp*, and *data* would have configuration 
+files whereas *all* would not.  The composite configuration should be specified 
+without spaces.
 
 You can run a specific configuration with:
 
-    emborg -c root extract ~/bin
+    emborg -c home extract ~/bin
 
 You can run all three configurations with:
 
