@@ -98,22 +98,6 @@ or Emborg's program name ('prog_name'). An example of this is shown in both
 In this way you gain access to *Borg* settings. *archive* shows and example of 
 that.
 
-It is generally better to specify *prefix* rather than *archive*, though you can 
-specify both if you wish.  If *archive* is not specified and *prefix* is, then 
-*archive* is created by adding '{{now}}' to *prefix*. If *archive* is specified 
-but *prefix* is not, then *archive* is used as given and *prefix* is not passed 
-to the *prune* command. In this case you should not have multiple configurations 
-backup into the same repository.
-
-For example, if *prefix* is '{config_name}-' and *archive* is not given then 
-*archive* becomes '{config_name}-{{now}}'.  If neither *archive* or *prefix* is 
-specified, then '{config_name}-{{now}}' is used for *archive* and 
-'{config_name}-' is used for *prefix*.  One would specify both *archive* and 
-*prefix* when you wanted to use a different format for *now*. For example::
-
-    archive = '{config_name}-{{now:%Y%m%d}}'
-    prefix = '{config_name}-'
-
 
 Includes
 --------

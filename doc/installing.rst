@@ -70,13 +70,63 @@ repository.  For a local repository you would use something like this::
 
     repository = '/mnt/backups/{host_name}-{user_name}-{config_name}'
 
+This assumes that */mnt/backups* contains many independent respositories.
+Borg allows you to make a single repository the target of multiple backup 
+configurations, and in this way you can further benefit from its ability to 
+de-duplicate files.  In this case you might want to use a less granular name for 
+you respository.
 
-**archive**
+**archive** and **prefix**
 
-A template that is used when creating the archive name. A typical value might 
-be::
+*archive* is a template that specifies the name of each archive.  A typical 
+value might be::
 
-    archive = '{host_name}-{{now}}'
+    archive = '{config_name}-{{now}}'
+
+This template consists of a leading part that is fixed ('{config_name}-') and 
+a trailing part that varies on each archive ('{{now}}', which is replaced by 
+a datestamp). The leading fixed part is referred to as the *prefix* and can be 
+given separately::
+
+    archive = '{config_name}-{{now}}'
+    prefix = '{config_name}-'
+
+This is helpful when multiple configurations backup to the same repository. In 
+this case *prefix* is assumed to be unique between the configurations. It allows 
+certain commands to filter out archives that belong to other configurations.  
+Specifically the *check*, *delete*, *info*, *list*, *mount*, and *prune* 
+commands all use *prefix*.
+
+When sharing a repository between multiple backup configurations, it is 
+important that all prefixes be unique. Be careful of one prefix that is a prefix 
+of another. For example, prefixes of *root* and *root2* would be bad because 
+*root* is a prefix of *root2*.  In the examples given, *prefix* ends with '-' to 
+reduce the risk that one prefix could be a prefix of another.
+
+If you do not specify either *archive* or *prefix*, they you get the following 
+defaults::
+
+    archive = '{config_name}-{{now}}'
+    prefix = '{config_name}-'
+
+If you only specify *prefix*, then *archive* becomes::
+
+    archive = '<prefix>{{now}}'
+
+If you only specify *archive*, then *prefix* remains unset. This is only 
+suitable when there is only one backup configuration using a repository.
+
+If you want *prefix* and want to customize *now*, you should give both *prefix* 
+and *archive*. For example, you can reduce the length of the timestamp using::
+
+    archive = '{host_name}-{{now:%Y%m%d}}'
+    prefix = '{host_name}-'
+
+In this example the host name was used as the prefix rather than the 
+configuration name. When specifying both the *prefix* and the *archive*, the 
+leading part of *archive* should match *prefix*.  Be aware that by including 
+only the date in the archive name rather than the full timestamp, you are 
+limiting yourself to one archive per day.
 
 
 **encryption**

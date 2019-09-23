@@ -158,7 +158,7 @@ BORG_SETTINGS = dict(
         desc = 'set umask to M (local and remote, default: 0077)'
     ),
     prefix = dict(
-        cmds = 'prune',
+        cmds = 'check delete info list mount prune',
         arg = 'PREFIX',
         desc = 'only consider archive names starting with this prefix'
     ),
