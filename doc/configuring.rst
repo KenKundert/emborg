@@ -37,6 +37,15 @@ following::
                                           # notification program
     remote_ratelimit = 2000               # bandwidth limit in kbps
     umask = '077'                         # umask to use when creating the archives
+    repository = 'archives:/mnt/backups/{host_name}/{user_name}/{config_name}'
+                                          # remote directory for repository
+    archive = '{host_name}-{{now}}'       # naming pattern used for the archives
+        # May contain {<name>} where <name> may be any of host_name, user_name, 
+        # prog_name config_name, or any of the user specified settings.
+        # Double up the braces to specify parameters that should be interpreted 
+        # by borg rather than by emborg.
+    exclude_caches = True                 # do not backup cache directories
+    exclude_if_present = '.no-backup'     # do not backup directories containing this file
     keep_within = '1d'                    # keep all archives within this time interval
     keep_hourly = '48'                    # number of hourly archives to keep
     keep_daily = '7'                      # number of daily archives to keep
@@ -50,6 +59,13 @@ readable by others (chmod 600 settings).  Alternatively, you can use `Avendesora
 <https://avendesora.readthedocs.io>`_ to securely hold your key by specifying 
 the Avendesora account name of the key to *avendesora_account*.
 
+This example assumes that there is one backup configuration per repository. You 
+can instead have all of your configurations share a single repository replacing 
+*repository* and *archive* with::
+
+    repository = 'archives:/mnt/backups/{host_name}/{user_name}'
+    prefix = '{config_name}-'
+
 
 Configurations
 --------------
@@ -58,14 +74,7 @@ Each backup configuration must have a settings file in ~/.config/emborg. The
 name of the file is the name of the backup configuration.  It might look like 
 the following::
 
-    repository = 'archives:/mnt/backups/{host_name}/{config_name}'
-                                          # remote directory for repository
-    archive = '{host_name}-{{now}}'       # naming pattern used for the archives
-        # May contain {<name>} where <name> may be any of host_name, user_name, 
-        # prog_name config_name, or any of the user specified settings.
-        # Double up the braces to specify parameters that should be interpreted 
-        # by borg rather than by emborg.
-    src_dirs = ['~', '/etc']              # absolute path to directory to be backed up
+    src_dirs = ['~', '/etc']              # absolute path to directories to be backed up
     excludes = '''
         ~/tmp
         ~/**/.hg
@@ -73,9 +82,8 @@ the following::
         ~/**/*.pyc
         ~/**/.*.swp
         ~/**/.*.swo
-    '''.split()                            # list of glob strings of files or directories to skip
-    one_file_system = False
-    exclude_caches = True
+    '''.split()                           # list of glob strings of files or directories to skip
+    one_file_system = False               # okay to traverse filesystems
 
     # commands to be run before and after backups (run from working directory)
     run_before_backup = [
