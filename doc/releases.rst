@@ -4,6 +4,7 @@ Releases
 **Latest development release**:
     | Version: 1.4.1
     | Released: 2019-04-24
+
     - Added documentation.
     - Moved log files to ~/.local/share/emborg (run 'mv 
       ~/.config/emborg/*.{log,lastbackup}* ~/.local/share/emborg' before using 

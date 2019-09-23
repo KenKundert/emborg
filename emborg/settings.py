@@ -158,8 +158,15 @@ class Settings:
             path = to_path(parent, include)
             self.read(path=path)
 
+        # default src_dirs if not given
         if not self.settings.get('src_dirs'):
             self.settings['src_dirs'] = []
+
+        # default archive if not given
+        if 'archive' not in self.settings:
+            if not 'prefix' in self.settings:
+                self.settings['prefix'] = '{config_name}-'
+            self.settings['archive'] = self.settings['prefix'] + '{{now}}'
 
     # check() {{{2
     def check(self):
@@ -293,22 +300,13 @@ class Settings:
         for name, attrs in BORG_SETTINGS.items():
             if cmd in attrs['cmds'] or 'all' in attrs['cmds']:
                 opt = convert_name_to_option(name)
-                val = self.settings.get(name)
+                val = self.value(name)
                 if val:
                     if 'arg' in attrs and attrs['arg']:
                         args.extend([opt, str(val)])
                     else:
                         args.extend([opt])
         return args
-
-    # borg_option_descriptions() {{{2
-    @staticmethod
-    def borg_option_descriptions(cmd):
-        for name, attrs in BORG_SETTINGS.items():
-            if cmd in attrs['cmds'] or 'all' in attrs['cmds']:
-                opt = convert_name_to_option(name)
-                desc = attrs['desc']
-                yield opt, desc
 
     # publish_passcode() {{{2
     def publish_passcode(self):

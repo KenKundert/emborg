@@ -93,3 +93,25 @@ or Emborg's program name ('prog_name'). An example of this is shown in both
 *repository* and *archive* above.  Doubling up the braces acts to escape them.  
 In this way you gain access to *Borg* settings. *archive* shows and example of 
 that.
+
+It is generally better to specify *prefix* rather than *archive*, though you can 
+specify both if you wish.  If *archive* is not specified and *prefix* is, then 
+*archive* is created by adding '{{now}}' to *prefix*. For example, if *prefix* 
+is '{host_name}-' and *archive* is not given then *archive* becomes 
+'{config_name}-{{now}}'.  If neither *archive* or *prefix* is specified, then 
+'{config_name}-{{now}}' is used for *archive* and '{config_name}-' is used for 
+*prefix*.
+
+
+Includes
+--------
+
+Any setting may include the contents of another file by using an *include*. You 
+may either specify a single include file as a string or a collection as a list 
+of strings::
+
+    include = 'file-to-include'
+
+or::
+
+    include = ['first-file-to-include', 'second-file-to-include']

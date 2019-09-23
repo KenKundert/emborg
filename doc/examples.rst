@@ -35,7 +35,6 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
 
     # repository settings
     repository = 'backups:/mnt/backups/{host_name}-{user_name}-{config_name}'
-    archive = '{host_name}-{{now}}'
     compression = 'lz4'
 
     # shared filter settings
@@ -126,7 +125,6 @@ Home
 Here is the contents of the *home* configuration file: ~/.config/emborg/home::
 
     repository = 'backups:/mnt/borg-backups/repositories/{host_name}-{user_name}-{config_name}'
-    archive = '{host_name}-{{now}}'
     encryption = 'keyfile'
     avendesora_account = 'laptop-borg'
     needs_ssh_agent = True
@@ -195,7 +193,6 @@ And finally, here is the contents of the *cache* configuration file:
 ~/.config/emborg/cache::
 
     repository = '/home/ken/.cache/backups/{user_name}'
-    archive = '{config_name}-{{now}}'
     encryption = 'none'
 
     src_dirs = '~'.split()   # absolute path to directory to be backed up

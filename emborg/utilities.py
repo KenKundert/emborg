@@ -80,8 +80,3 @@ def render_path(path):
 def render_paths(path_list):
     return [render_path(path) for path in path_list]
 
-# render_cmdline_opts() {{{1
-def render_cmdline_opts(opts):
-    opts = list(opts)
-    w = max(len(opt[0]) for opt in opts)
-    return '\n'.join('    {:<{}}  {}'.format(n,w,d) for n, d in opts)

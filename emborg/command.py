@@ -24,7 +24,7 @@ from .preferences import (
     PROGRAM_NAME,
 )
 from .settings import Settings
-from .utilities import two_columns, render_paths, gethostname, render_cmdline_opts
+from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
@@ -127,21 +127,11 @@ class Command(object):
 
     @classmethod
     def help(cls):
-        borg_opts = Settings.borg_option_descriptions(cls.NAMES[0])
-        if borg_opts:
-            extra = dedent("""
-
-                The following Borg options are accepted by this command:
-                {}
-            """).rstrip().format(render_cmdline_opts(borg_opts))
-        else:
-            extra = ''
-
         text = dedent("""
             {title}
 
             {usage}
-        """).strip() + extra
+        """).strip()
 
         return text.format(
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
