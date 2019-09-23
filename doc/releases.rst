@@ -9,8 +9,7 @@ Releases
     - Moved log files to ~/.local/share/emborg (run 'mv 
       ~/.config/emborg/*.{log,lastbackup}* ~/.local/share/emborg' before using 
       this version).
-    - Added *exclude_from* setting.
-    - Added *prefix* setting
+    - Added *prefix*, *exclude_from*, and *verbose* settings.
     - Provide defaults for *archive* setting.
 
 **1.4 (2019-04-24)**:

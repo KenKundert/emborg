@@ -256,6 +256,8 @@ class Settings:
         args = []
         if 'verbose' in options:
             args.append('--verbose')
+        elif self.value('verbose'):
+            args.append('--verbose')
         if 'trial-run' in options and cmd in commands_with_dryrun:
             args.append('--dry-run')
         if cmd == 'create':

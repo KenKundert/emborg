@@ -66,6 +66,7 @@ EMBORG_SETTINGS = dict(
     run_before_backup = 'command to run before archive is to be created',
     src_dirs = 'the directories to archive',
     ssh_command = 'command to use for ssh, can be used to specify ssh options',
+    verbose = 'make Borg more verbose',
 )
     # Any setting found in the users settings files that is not found in
     # EMBORG_SETTINGS or BORG_SETTINGS is highlighted as a unknown setting by

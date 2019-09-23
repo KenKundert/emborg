@@ -9,6 +9,10 @@ one file for each repository you need.  Except for *configurations* and
 repository specific file.  If a setting shows in both files, the version on the 
 configuration specific file dominates.
 
+You can get a complete list of available configuration settings by running::
+
+    emborg settings --available
+
 
 Shared Settings
 ---------------
@@ -47,8 +51,8 @@ readable by others (chmod 600 settings).  Alternatively, you can use `Avendesora
 the Avendesora account name of the key to *avendesora_account*.
 
 
-Configuration Settings
-----------------------
+Configurations
+--------------
 
 Each backup configuration must have a settings file in ~/.config/emborg. The 
 name of the file is the name of the backup configuration.  It might look like 
