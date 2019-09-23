@@ -293,6 +293,10 @@ Or you can mount the files that existed on a particular date using::
 
    emborg mount --date 2015-04-01 backups
 
+Or you can mount the latest available archive::
+
+   emborg mount --latest backups
+
 You will need to un-mount the repository or archive when you are done with it.  
 To do so, use the *umount* command.
 

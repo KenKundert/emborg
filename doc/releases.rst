@@ -11,6 +11,7 @@ Releases
       this version).
     - Added *prefix*, *exclude_from*, and *verbose* settings.
     - Provide defaults for *archive* setting.
+    - Add --latest command line option to *mount* command.
 
 **1.4 (2019-04-24)**:
     - Added *ssh_command* setting

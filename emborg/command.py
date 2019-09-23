@@ -58,7 +58,15 @@ def get_available_archives(settings):
     except json.decoder.JSONDecodeError as e:
         raise Error('Could not decode output of Borg list command.', codicil=e)
 
-def get_nearest_archive(settings, date):
+# get_name_of_latest_archive() {{{2
+def get_name_of_latest_archive(settings):
+    archives = get_available_archives(settings)
+    if not archives:
+        raise Error('no archives are available.')
+    if archives:
+        return archives[-1]['name']
+
+def get_name_of_nearest_archive(settings, date):
     archives = get_available_archives(settings)
     try:
         date = arrow.get(date)
@@ -66,8 +74,8 @@ def get_nearest_archive(settings, date):
         raise Error('invalid date specification.', culprit=date)
     for archive in archives:
         if arrow.get(archive['time']) >= date:
-            return archive['archive']
-    return None
+            return archive['name']
+    raise Error('archive not available.', culprit=date)
 
 # get_available_files() {{{2
 def get_available_files(settings, archive):
@@ -505,8 +513,8 @@ class ExtractCommand(Command):
             emborg [options] extract <path>...
 
         Options:
-            -d <date>, --date <date>            date of the desired version of paths
             -a <archive>, --archive <archive>   name of the archive to use
+            -d <date>, --date <date>            date of the desired version of paths
 
         You extract a file or directory using:
 
@@ -563,14 +571,9 @@ class ExtractCommand(Command):
 
         # get the desired archive
         if date and not archive:
-            archive = get_nearest_archive(settings, date)
-            if not archive:
-                raise Error('archive not available.', culprit=date)
+            archive = get_name_of_nearest_archive(settings, date)
         if not archive:
-            archives = get_available_archives(settings)
-            if not archives:
-                raise Error('no archives are available.')
-            archive = archives[-1]['name']
+            archive = get_name_of_latest_archive(settings)
         output('Archive:', archive)
 
         # run borg
@@ -736,8 +739,8 @@ class ManifestCommand(Command):
             emborg [options] la
 
         Options:
-            -d <date>, --date <date>            date of the desired version of paths
             -a <archive>, --archive <archive>   name of the archive to use
+            -d <date>, --date <date>            date of the desired archive
             -n, --name                          output only the filename
 
         Once a backup has been performed, you can list the files available in
@@ -769,14 +772,9 @@ class ManifestCommand(Command):
 
         # get the desired archive
         if date and not archive:
-            archive = get_nearest_archive(settings, date)
-            if not archive:
-                raise Error('archive not available.', culprit=date)
+            archive = get_name_of_nearest_archive(settings, date)
         if not archive:
-            archives = get_available_archives(settings)
-            if not archives:
-                raise Error('no archives are available.')
-            archive = archives[-1]['name']
+            archive = get_name_of_latest_archive(settings)
         output('Archive:', archive)
 
         # run borg
@@ -800,8 +798,9 @@ class MountCommand(Command):
             emborg [options] mount <mount_point>
 
         Options:
-            -d <date>, --date <date>            date of the desired version of paths
             -a <archive>, --archive <archive>   name of the archive to use
+            -d <date>, --date <date>            date of the desired version of paths
+            -l, --latest                        mount latest available archive
 
         You can mount a repository or archive using:
 
@@ -812,6 +811,10 @@ class MountCommand(Command):
         created.
 
         If you do not specify an archive or date, all archives are mounted.
+
+        You can mount the latest archive using:
+
+            emborg mount --latest backups
 
         You can mount an archive that existed on a particular date using:
 
@@ -832,12 +835,14 @@ class MountCommand(Command):
         mount_point = cmdline['<mount_point>']
         archive = cmdline['--archive']
         date = cmdline['--date']
+        latest = cmdline['--latest']
 
         # get the desired archive
-        if date and not archive:
-            archive = get_nearest_archive(settings, date)
-            if not archive:
-                raise Error('archive not available.', culprit=date)
+        if not archive:
+            if date:
+                archive = get_name_of_nearest_archive(settings, date)
+            elif latest:
+                archive = get_name_of_latest_archive(settings)
 
         # create mount point if it does not exist
         try:
