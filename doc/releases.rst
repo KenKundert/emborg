@@ -6,12 +6,13 @@ Releases
     | Released: 2019-09-23
 
     - Added composite configurations.
+    - Added support for multiple backup configurations in a single repository.
+    - Added *prefix*, *exclude_from*, and *verbose* settings.
+    - Provide default value for *archive* setting.
+    - Add --latest command line option to *mount* command.
     - Moved log files to ~/.local/share/emborg (run 'mv 
       ~/.config/emborg/*.{log,lastbackup}* ~/.local/share/emborg' before using 
       this version).
-    - Added *prefix*, *exclude_from*, and *verbose* settings.
-    - Provide defaults for *archive* setting.
-    - Add --latest command line option to *mount* command.
 
 **1.4 (2019-04-24)**:
     - Added *ssh_command* setting
