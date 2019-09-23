@@ -120,11 +120,8 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
     exclude_if_present = '.nobackup'
     exclude_caches = True
 
-
-Home
-^^^^
-
-Here is the contents of the *home* configuration file: ~/.config/emborg/home::
+And here is the contents of the *home* configuration file: 
+~/.config/emborg/home::
 
     repository = 'backups:/mnt/borg-backups/repositories/{host_name}-{user_name}-{config_name}'
     encryption = 'keyfile'
