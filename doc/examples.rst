@@ -66,10 +66,8 @@ And here is the contents of the *root* configuration file: /root/.config/emborg/
     src_dirs = '/'.split()      # absolute path to directory to be backed up
     excludes = '''
         /dev
-        /home/*/.cache
         /mnt
         /proc
-        /root/.cache
         /run
         /sys
         /tmp
@@ -120,8 +118,11 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
     exclude_if_present = '.nobackup'
     exclude_caches = True
 
-And here is the contents of the *home* configuration file: 
-~/.config/emborg/home::
+
+Home
+^^^^
+
+Here is the contents of the *home* configuration file: ~/.config/emborg/home::
 
     repository = 'backups:/mnt/borg-backups/repositories/{host_name}-{user_name}-{config_name}'
     encryption = 'keyfile'

@@ -44,8 +44,8 @@ following::
         # prog_name config_name, or any of the user specified settings.
         # Double up the braces to specify parameters that should be interpreted 
         # by borg rather than by emborg.
-    exclude_caches = True                 # do not backup cache directories
-    exclude_if_present = '.no-backup'     # do not backup directories containing this file
+    exclude_caches = True                 # do not backup directories that contain CACHEDIR.TAG
+    exclude_if_present = '.nobackup'      # do not backup directories containing this file
     keep_within = '1d'                    # keep all archives within this time interval
     keep_hourly = '48'                    # number of hourly archives to keep
     keep_daily = '7'                      # number of daily archives to keep
