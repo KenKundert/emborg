@@ -35,6 +35,8 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
 
     # repository settings
     repository = 'backups:/mnt/backups/{host_name}-{user_name}-{config_name}'
+    archive = '{config_name}-{{now:%Y%m%d}}'
+    prefix = '{config_name}-'
     compression = 'lz4'
 
     # shared filter settings

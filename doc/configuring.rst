@@ -100,11 +100,19 @@ that.
 
 It is generally better to specify *prefix* rather than *archive*, though you can 
 specify both if you wish.  If *archive* is not specified and *prefix* is, then 
-*archive* is created by adding '{{now}}' to *prefix*. For example, if *prefix* 
-is '{host_name}-' and *archive* is not given then *archive* becomes 
-'{config_name}-{{now}}'.  If neither *archive* or *prefix* is specified, then 
-'{config_name}-{{now}}' is used for *archive* and '{config_name}-' is used for 
-*prefix*.
+*archive* is created by adding '{{now}}' to *prefix*. If *archive* is specified 
+but *prefix* is not, then *archive* is used as given and *prefix* is not passed 
+to the *prune* command. In this case you should not have multiple configurations 
+backup into the same repository.
+
+For example, if *prefix* is '{config_name}-' and *archive* is not given then 
+*archive* becomes '{config_name}-{{now}}'.  If neither *archive* or *prefix* is 
+specified, then '{config_name}-{{now}}' is used for *archive* and 
+'{config_name}-' is used for *prefix*.  One would specify both *archive* and 
+*prefix* when you wanted to use a different format for *now*. For example::
+
+    archive = '{config_name}-{{now:%Y%m%d}}'
+    prefix = '{config_name}-'
 
 
 Includes
@@ -122,7 +130,7 @@ or::
 
 
 Composite Configurations
--------------------------
+------------------------
 
 It is possible to define composite configurations that allow you to run several 
 configurations at once.  This might be useful if you have files that benefit, 
@@ -131,19 +139,19 @@ for example, from different prune schedules.
 As an example, consider having three configurations that you would like to run 
 all at once. You can specify these configurations as follows::
 
-    configurations = 'root1 root2 root3 root=root1,root2,root3'
+    configurations = 'root home lamp all=root,home,lamp'
 
-In this case *root1*, *root2* and *root3* are simple configurations and *root* 
-is a composite configuration.  *root1*, *root2*, and *root3* would have 
-configuration files whereas *root* would not.
+In this case *root*, *home* and *lamp* are simple configurations and *all* is 
+a composite configuration.  *root*, *home*, and *lamp* would have configuration 
+files whereas *all* would not.
 
 You can run a specific configuration with:
 
-    emborg -c root1 extract ~/bin
+    emborg -c root extract ~/bin
 
 You can run all three configurations with:
 
-    emborg -c root create
+    emborg -c all create
 
 Only certain commands support composite configurations. Specifically, *create*, 
 *check*, *configs*, *due*, *help*, *info*, *prune*, and *version* support 
