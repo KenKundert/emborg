@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.4.2
-    | Released: 2019-09-22
+    | Version: 1.4.3
+    | Released: 2019-09-23
 
     - Added documentation.
     - Moved log files to ~/.local/share/emborg (run 'mv 
