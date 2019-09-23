@@ -128,9 +128,13 @@ def get_config(name, settings, composite_config_allowed):
 # Settings class {{{1
 class Settings:
     # Constructor {{{2
-    def __init__(self, name, command, options=()):
-        self.requires_exclusivity = command.REQUIRES_EXCLUSIVITY
-        self.composite_config_allowed = command.COMPOSITE_CONFIGS
+    def __init__(self, name=None, command=None, options=()):
+        if command:
+            self.requires_exclusivity = command.REQUIRES_EXCLUSIVITY
+            self.composite_config_allowed = command.COMPOSITE_CONFIGS
+        else:
+            self.requires_exclusivity = True
+            self.composite_config_allowed = False
         self.settings = {}
         self.options = options
         self.read(name)

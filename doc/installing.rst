@@ -14,8 +14,8 @@ Alternately, you can download a precompiled version from `Borg Github Releases
 commands (they will need to be adjusted for to get the latest version)::
 
     cd ~/bin
-    wget https://github.com/borgbackup/borg/releases/download/1.1.9/borg-linux64
-    wget https://github.com/borgbackup/borg/releases/download/1.1.9/borg-linux64.asc
+    wget https://github.com/borgbackup/borg/releases/download/1.1.10/borg-linux64
+    wget https://github.com/borgbackup/borg/releases/download/1.1.10/borg-linux64.asc
     gpg --recv-keys "FAF7B393"
     gpg --verify borg-linux64.asc
     rm borg-linux64.asc
@@ -70,11 +70,11 @@ repository.  For a local repository you would use something like this::
 
     repository = '/mnt/backups/{host_name}-{user_name}-{config_name}'
 
-This assumes that */mnt/backups* contains many independent respositories.
-Borg allows you to make a single repository the target of multiple backup 
-configurations, and in this way you can further benefit from its ability to 
-de-duplicate files.  In this case you might want to use a less granular name for 
-you respository.
+These examples assume that */mnt/backups* contains many independent 
+repositories.  Borg allows you to make a single repository the target of 
+multiple backup configurations, and in this way you can further benefit from its 
+ability to de-duplicate files.  In this case you might want to use a less 
+granular name for you repository.
 
 **archive** and **prefix**
 
@@ -82,6 +82,10 @@ you respository.
 value might be::
 
     archive = '{config_name}-{{now}}'
+
+*Emborg* examines the string for names within a single brace-pair and replaces 
+them with the value specified by the name. Names within double-brace pairs are 
+interpreted by *Borg*.
 
 This template consists of a leading part that is fixed ('{config_name}-') and 
 a trailing part that varies on each archive ('{{now}}', which is replaced by 
@@ -101,19 +105,19 @@ When sharing a repository between multiple backup configurations, it is
 important that all prefixes be unique. Be careful of one prefix that is a prefix 
 of another. For example, prefixes of *root* and *root2* would be bad because 
 *root* is a prefix of *root2*.  In the examples given, *prefix* ends with '-' to 
-reduce the risk that one prefix could be a prefix of another.
+reduce this risk.
 
-If you do not specify either *archive* or *prefix*, they you get the following 
+If you do not specify either *archive* or *prefix*, then you get the following 
 defaults::
 
     archive = '{config_name}-{{now}}'
     prefix = '{config_name}-'
 
-If you only specify *prefix*, then *archive* becomes::
+If you specify only *prefix*, then *archive* becomes::
 
     archive = '<prefix>{{now}}'
 
-If you only specify *archive*, then *prefix* remains unset. This is only 
+If you specify only *archive*, then *prefix* remains unset. This is only 
 suitable when there is only one backup configuration using a repository.
 
 If you want *prefix* and want to customize *now*, you should give both *prefix* 
@@ -126,7 +130,7 @@ In this example the host name was used as the prefix rather than the
 configuration name. When specifying both the *prefix* and the *archive*, the 
 leading part of *archive* should match *prefix*.  Be aware that by including 
 only the date in the archive name rather than the full timestamp, you are 
-limiting yourself to one archive per day.
+limiting yourself to creating one archive per day.
 
 
 **encryption**

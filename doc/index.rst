@@ -36,8 +36,8 @@ maintenance (*check*, *prune*).  *borgmatic* recently added support for the
 Why Borg?
 ---------
 
-Well, everyone needs to backup their files. So perhaps the questions should be 
-'Why not Duplicity?'. `Duplicity <http://duplicity.nongnu.org>`_ has been the 
+Well, everyone needs to backup their files. So perhaps the questions should be: 
+why not Duplicity?  `Duplicity <http://duplicity.nongnu.org>`_ has been the 
 standard way to do backups on Unix systems for many years.
 
 *Duplicity* provides full and incremental backups. A full backup makes complete 
