@@ -158,6 +158,7 @@ class BorgCommand(Command):
         repository.  The passphrase is set before the command is run.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -182,6 +183,7 @@ class BreakLockCommand(Command):
         running before using this command.
     """).strip()
     REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -216,6 +218,7 @@ class CreateCommand(Command):
         This can help you debug slow create operations.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -314,6 +317,7 @@ class CheckCommand(Command):
             -v, --verify-data    perform a full integrity verification (slow)
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -341,6 +345,7 @@ class ConfigsCommand(Command):
             emborg configs
     """).strip()
     REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = None
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -363,6 +368,7 @@ class DeleteCommand(Command):
             emborg delete <archive>
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -390,6 +396,7 @@ class DiffCommand(Command):
             emborg diff <archive1> <archive2>
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -445,6 +452,7 @@ class DueCommand(Command):
             It has been 4 months since the last backup.
     """).strip()
     REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -542,6 +550,7 @@ class ExtractCommand(Command):
             ./home/ken/src/verif/av/manpages/settings.py
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -596,6 +605,7 @@ class HelpCommand(Command):
             emborg help [<topic>]
     """).strip()
     REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = None
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -618,6 +628,7 @@ class InfoCommand(Command):
             -f, --fast            only report local information
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -661,6 +672,7 @@ class InitializeCommand(Command):
             emborg init
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -689,6 +701,7 @@ class ListCommand(Command):
             emborg lr
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -715,6 +728,7 @@ class LogCommand(Command):
             emborg log
     """).strip()
     REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -761,6 +775,7 @@ class ManifestCommand(Command):
             emborg manifest --date 2018-12-05T12:39
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -827,6 +842,7 @@ class MountCommand(Command):
         You should use `emborg umount` when you are done.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -870,6 +886,7 @@ class PruneCommand(Command):
             emborg prune
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -909,6 +926,7 @@ class SettingsCommand(Command):
             -a, --available   list available settings
     """).strip()
     REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -947,6 +965,7 @@ class UmountCommand(Command):
             emborg [options] unmount <mount_point>
     """).strip()
     REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -977,6 +996,7 @@ class VersionCommand(Command):
             emborg version
     """).strip()
     REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = None
 
     @classmethod
     def run(cls, command, args, settings, options):

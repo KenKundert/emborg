@@ -41,8 +41,8 @@ from .python import PythonFile
 from .utilities import gethostname, getusername, render_paths
 from shlib import getmod, mv, rm, Run, to_path, render_command, to_path
 from inform import (
-    Error, codicil, conjoin, done, full_stop, get_informer, indent, is_str,
-    narrate, output, render, warn,
+    Error, codicil, conjoin, display, done, full_stop, get_informer, indent,
+    is_str, narrate, output, render, warn,
 )
 from textwrap import dedent
 import arrow
@@ -53,24 +53,84 @@ import os
 hostname = gethostname()
 username = getusername()
 
+borg_commands_with_dryrun = 'create extract delete prune upgrade recreate'
+
 # borg_options_arg_count {{{2
 borg_options_arg_count = {
     'borg': 1,
     '--exclude': 1,
+    '--exclude-from': 1,
     '--encryption': 1,
 }
 for name, attrs in BORG_SETTINGS.items():
     if 'arg' in attrs and attrs['arg']:
         borg_options_arg_count[convert_name_to_option(name)] = 1
 
-commands_with_dryrun = 'create extract delete prune upgrade recreate'.split()
+# get_config {{{2
+config_queue = None
+
+class NoMoreConfigs(Exception):
+    pass
+
+def get_config(name, settings, composite_config_allowed):
+    global config_queue
+
+    if config_queue is not None:
+        try:
+            active_config = config_queue.pop(0)
+            display('\n===', active_config, '===')
+            return active_config
+        except IndexError:
+            raise NoMoreConfigs()
+
+    configs = Collection(settings.get(CONFIGS_SETTING, ''))
+    default = settings.get(DEFAULT_CONFIG_SETTING)
+
+    config_groups = {}
+    for config in configs:
+        if '=' in config:
+            group, _, sub_configs = config.partition('=')
+            sub_configs = sub_configs.split(',')
+        else:
+            group = config
+            sub_configs = [config]
+        config_groups[group] = sub_configs
+
+    if not name:
+        name = default
+    if name:
+        if name not in config_groups:
+            raise Error('unknown configuration.', culprit=name)
+    else:
+        if len(configs) > 1:
+            name = configs[0]
+        else:
+            raise Error(
+                'no known configurations.',
+                culprit=(settings_filename, CONFIGS_SETTING)
+            )
+    configs = list(config_groups[name])
+    num_configs = len(configs)
+    if num_configs > 1 and composite_config_allowed is False:
+        raise Error('command does not support composite configs.', culprit=name)
+    elif num_configs < 1:
+        raise Error('empty composite config.', culprit=name)
+    active_config = configs.pop(0)
+    if composite_config_allowed is None:
+        config_queue = []
+    else:
+        config_queue = configs
+    if config_queue:
+        display('===', active_config, '===')
+    return active_config
 
 
 # Settings class {{{1
 class Settings:
     # Constructor {{{2
-    def __init__(self, name=None, requires_exclusivity=True, options=()):
-        self.requires_exclusivity = requires_exclusivity
+    def __init__(self, name, command, options=()):
+        self.requires_exclusivity = command.REQUIRES_EXCLUSIVITY
+        self.composite_config_allowed = command.COMPOSITE_CONFIGS
         self.settings = {}
         self.options = options
         self.read(name)
@@ -96,7 +156,7 @@ class Settings:
             parent = path.parent
             includes = Collection(settings.get(INCLUDE_SETTING))
         else:
-            # this is generic settings file
+            # this is the generic settings file
             parent = to_path(CONFIG_DIR)
             if not parent.exists():
                 # config dir does not exist, create and populate it
@@ -123,25 +183,7 @@ class Settings:
             settings_filename = path.path
             settings = path.run()
 
-            configs = Collection(settings.get(CONFIGS_SETTING, ''))
-            default = settings.get(DEFAULT_CONFIG_SETTING)
-            if not name:
-                name = default
-            if name:
-                if name not in configs:
-                    raise Error(
-                        'unknown configuration.',
-                        culprit=(settings_filename, CONFIGS_SETTING, name)
-                    )
-                config = name
-            else:
-                if len(configs) > 1:
-                    config = configs[0]
-                else:
-                    raise Error(
-                        'no known configurations.',
-                        culprit=(settings_filename, CONFIGS_SETTING)
-                    )
+            config = get_config(name, settings, self.composite_config_allowed)
             settings['config_name'] = config
             self.config_name = config
             includes = Collection(settings.get(INCLUDE_SETTING))
@@ -258,7 +300,7 @@ class Settings:
             args.append('--verbose')
         elif self.value('verbose'):
             args.append('--verbose')
-        if 'trial-run' in options and cmd in commands_with_dryrun:
+        if 'trial-run' in options and cmd in borg_commands_with_dryrun.split():
             args.append('--dry-run')
         if cmd == 'create':
             if 'verbose' in options:

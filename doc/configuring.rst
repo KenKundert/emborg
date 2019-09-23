@@ -119,3 +119,33 @@ of strings::
 or::
 
     include = ['first-file-to-include', 'second-file-to-include']
+
+
+Composite Configurations
+-------------------------
+
+It is possible to define composite configurations that allow you to run several 
+configurations at once.  This might be useful if you have files that benefit, 
+for example, from different prune schedules.
+
+As an example, consider having three configurations that you would like to run 
+all at once. You can specify these configurations as follows::
+
+    configurations = 'root1 root2 root3 root=root1,root2,root3'
+
+In this case *root1*, *root2* and *root3* are simple configurations and *root* 
+is a composite configuration.  *root1*, *root2*, and *root3* would have 
+configuration files whereas *root* would not.
+
+You can run a specific configuration with:
+
+    emborg -c root1 extract ~/bin
+
+You can run all three configurations with:
+
+    emborg -c root create
+
+Only certain commands support composite configurations. Specifically, *create*, 
+*check*, *configs*, *due*, *help*, *info*, *prune*, and *version* support 
+composite configures.  Specifying a composite configuration to a command that 
+does not support them results in an error.

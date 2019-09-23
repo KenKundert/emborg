@@ -44,8 +44,8 @@ Use 'emborg help' for list of available help topics.
 # Imports {{{1
 from . import __version__, __released__
 from .command import Command
-from .settings import Settings
-from inform import Inform, Error, cull, fatal, display, terminate, os_error
+from .settings import Settings, NoMoreConfigs
+from inform import Inform, Error, cull, display, fatal, terminate, os_error
 from docopt import docopt
 
 # Globals {{{1
@@ -74,14 +74,15 @@ def main():
             inform.narrate = True
 
         try:
-            cmd, cmd_name = Command.find(command)
+            while True:
+                cmd, cmd_name = Command.find(command)
 
-            with Settings(config, cmd.REQUIRES_EXCLUSIVITY, options) as settings:
-                try:
-                    exit_status = cmd.execute(cmd_name, args, settings, options)
-                except Error as e:
-                    settings.fail(e)
-                    e.terminate(True)
+                with Settings(config, cmd, options) as settings:
+                    try:
+                        exit_status = cmd.execute(cmd_name, args, settings, options)
+                    except Error as e:
+                        settings.fail(e)
+                        e.terminate(True)
 
         except KeyboardInterrupt:
             display('Terminated by user.')
@@ -90,4 +91,6 @@ def main():
             e.terminate()
         except OSError as e:
             fatal(os_error(e))
+        except NoMoreConfigs:
+            pass
         terminate(exit_status)

@@ -54,6 +54,7 @@ EMBORG_SETTINGS = dict(
     default_configuration = 'default emborg configuration',
     encryption = 'encryption method (see borg documentation)',
     excludes = 'list of glob strings of files or directories to skip',
+    exclude_from = 'file that contains exclude patterns',
     must_exist = 'if set, each of these files or directorys must exist or create will quit with an error',
     needs_ssh_agent = 'if set, emborg will complain if ssh_agent is not available',
     notifier = 'notification program',
@@ -86,11 +87,6 @@ BORG_SETTINGS = dict(
     exclude_caches = dict(
         cmds = 'create',
         desc = 'exclude directories that contain a CACHEDIR.TAG file'
-    ),
-    exclude_from = dict(
-        cmds = 'create',
-        arg = 'FILE',
-        desc = 'file that contains exclude patterns',
     ),
     exclude_if_present = dict(
         cmds = 'create',
