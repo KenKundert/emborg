@@ -211,7 +211,7 @@ class Settings:
         # default archive if not given
         if 'archive' not in self.settings:
             if not 'prefix' in self.settings:
-                self.settings['prefix'] = '{config_name}-'
+                self.settings['prefix'] = '{host_name}-{user_name}-{config_name}-'
             self.settings['archive'] = self.settings['prefix'] + '{{now}}'
 
     # check() {{{2
@@ -297,7 +297,7 @@ class Settings:
             yield self.resolve(value)
 
     # borg_options() {{{2
-    def borg_options(self, cmd, options):
+    def borg_options(self, cmd, options, strip_prefix=True):
         # handle special cases first {{{3
         args = []
         if 'verbose' in options:
@@ -346,6 +346,8 @@ class Settings:
 
         # add the borg command line options appropriate to this command {{{3
         for name, attrs in BORG_SETTINGS.items():
+            if strip_prefix and name == 'prefix':
+                continue
             if cmd in attrs['cmds'] or 'all' in attrs['cmds']:
                 opt = convert_name_to_option(name)
                 val = self.value(name)
@@ -392,7 +394,7 @@ class Settings:
         raise Error('Cannot determine the encryption passphrase.')
 
     # run_borg() {{{2
-    def run_borg(self, cmd, args='', borg_opts=None, emborg_opts=()):
+    def run_borg(self, cmd, args='', borg_opts=None, emborg_opts=(), strip_prefix=True):
 
         # prepare the command
         os.environ.update(self.publish_passcode())
@@ -401,7 +403,7 @@ class Settings:
             os.environ['BORG_RSH'] = self.ssh_command
         executable = self.value('borg_executable', BORG)
         if borg_opts is None:
-            borg_opts = self.borg_options(cmd, emborg_opts)
+            borg_opts = self.borg_options(cmd, emborg_opts, strip_prefix)
         command = (
             [executable]
           + cmd.split()

@@ -9,7 +9,10 @@ Releases
     - Added support for multiple backup configurations in a single repository.
     - Added *prefix*, *exclude_from*, and *verbose* settings.
     - Provide default value for *archive* setting.
-    - Add --latest command line option to *mount* command.
+    - Add --all command line option to *mount* command.
+    - Add --include-external command line option to *check*, *list*, *mount*, 
+      and *prune* commands.
+    - *umount* command now deletes directory used as mount point.
     - Moved log files to ~/.local/share/emborg (run 'mv 
       ~/.config/emborg/*.{log,lastbackup}* ~/.local/share/emborg' before using 
       this version).

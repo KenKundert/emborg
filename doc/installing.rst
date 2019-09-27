@@ -110,8 +110,8 @@ reduce this risk.
 If you do not specify either *archive* or *prefix*, then you get the following 
 defaults::
 
-    archive = '{config_name}-{{now}}'
-    prefix = '{config_name}-'
+    prefix = '{host_name}-{user_name}-{config_name}-'
+    archive = '{prefix}-{{now}}'
 
 If you specify only *prefix*, then *archive* becomes::
 

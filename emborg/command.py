@@ -28,7 +28,7 @@ from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
-    codicil, conjoin, full_stop, is_str, narrate, os_error, output,
+    codicil, conjoin, display, full_stop, is_str, narrate, os_error, output,
     render, warn,
 )
 from docopt import docopt
@@ -314,7 +314,9 @@ class CheckCommand(Command):
             emborg check [options]
 
         Options:
-            -v, --verify-data    perform a full integrity verification (slow)
+            -e, --include-external   check all archives in repository, not just
+                                     those associated with this configuration
+            -v, --verify-data        perform a full integrity verification (slow)
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = True
@@ -324,12 +326,14 @@ class CheckCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         verify = ['--verify-data'] if cmdline['--verify-data'] else []
+        include_external_archives = cmdline['--include-external']
 
         # run borg
         borg = settings.run_borg(
             cmd = 'check',
             args = verify + [settings.destination()],
             emborg_opts = options,
+            strip_prefix = include_external_archives,
         )
         out = borg.stdout
         if out:
@@ -367,6 +371,12 @@ class DeleteCommand(Command):
         Usage:
             emborg delete <archive>
     """).strip()
+        # borg allows you to delete all archives by simply not specifying an
+        # archive, but then it interactively asks the user to type YES if that
+        # deletes all archives from repository. Emborg currently does not have
+        # the ability support this and there appears to be no way of stopping
+        # borg from asking for confirmation, so just limit user to deleting one
+        # archive at a time.
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = False
 
@@ -381,6 +391,7 @@ class DeleteCommand(Command):
             cmd = 'delete',
             args = [settings.destination(archive)],
             emborg_opts = options,
+            strip_prefix = True,
         )
         out = borg.stdout
         if out:
@@ -625,7 +636,7 @@ class InfoCommand(Command):
             emborg [options] info
 
         Options:
-            -f, --fast            only report local information
+            -f, --fast               only report local information
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = True
@@ -635,6 +646,8 @@ class InfoCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         fast = cmdline['--fast']
+
+        # report local information
         src_dirs = (str(d) for d in settings.src_dirs)
         output(f'              config: {settings.config_name}')
         output(f'              source: {", ".join(src_dirs)}')
@@ -651,11 +664,12 @@ class InfoCommand(Command):
         if fast:
             return
 
-        # now output the info from our borg repository
+        # now output the information from borg about the repository
         borg = settings.run_borg(
             cmd = 'info',
             args = [settings.destination()],
             emborg_opts = options,
+            strip_prefix = True,
         )
         out = borg.stdout
         if out:
@@ -696,9 +710,13 @@ class ListCommand(Command):
     DESCRIPTION = 'list the archives currently contained in the repository'
     USAGE = dedent("""
         Usage:
-            emborg list
-            emborg archives
-            emborg lr
+            emborg [options] list
+            emborg [options] archives
+            emborg [options] lr
+
+        Options:
+            -e, --include-external   list all archives in repository, not just
+                                     those associated with this configuration
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = False
@@ -706,13 +724,15 @@ class ListCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        docopt(cls.USAGE, argv=[command] + args)
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        include_external_archives = cmdline['--include-external']
 
         # run borg
         borg = settings.run_borg(
             cmd = 'list',
             args = ['--short', settings.destination()],
             emborg_opts = options,
+            strip_prefix = include_external_archives,
         )
         out = borg.stdout
         if out:
@@ -813,9 +833,12 @@ class MountCommand(Command):
             emborg [options] mount <mount_point>
 
         Options:
-            -a <archive>, --archive <archive>   name of the archive to use
-            -d <date>, --date <date>            date of the desired version of paths
-            -l, --latest                        mount latest available archive
+            -a <archive>, --archive <archive>   name of the archive to mount
+            -A, --all                           mount all available archives
+            -d <date>, --date <date>            date of the desired archive
+            -e, --include-external              when mounting all archives, do
+                                                not limit archives to only those
+                                                associated with this configuration
 
         You can mount a repository or archive using:
 
@@ -851,13 +874,14 @@ class MountCommand(Command):
         mount_point = cmdline['<mount_point>']
         archive = cmdline['--archive']
         date = cmdline['--date']
-        latest = cmdline['--latest']
+        mount_all = cmdline['--all']
+        include_external_archives = cmdline['--include-external']
 
         # get the desired archive
         if not archive:
             if date:
                 archive = get_name_of_nearest_archive(settings, date)
-            elif latest:
+            elif not mount_all:
                 archive = get_name_of_latest_archive(settings)
 
         # create mount point if it does not exist
@@ -871,6 +895,7 @@ class MountCommand(Command):
             cmd = 'mount',
             args = [settings.destination(archive), mount_point],
             emborg_opts = options,
+            strip_prefix = include_external_archives,
         )
         out = borg.stdout
         if out:
@@ -883,7 +908,11 @@ class PruneCommand(Command):
     DESCRIPTION = 'prune the repository of excess archives'
     USAGE = dedent("""
         Usage:
-            emborg prune
+            emborg [options] prune
+
+        Options:
+            -e, --include-external   prune all archives in repository, not just
+                                     those associated with this configuration
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = True
@@ -891,7 +920,8 @@ class PruneCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        docopt(cls.USAGE, argv=[command] + args)
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        include_external_archives = cmdline['--include-external']
 
         # checking the settings
         intervals = 'within last minutely hourly daily weekly monthly yearly'
@@ -908,6 +938,7 @@ class PruneCommand(Command):
             cmd = 'prune',
             args = [settings.destination()],
             emborg_opts = options,
+            strip_prefix = include_external_archives,
         )
         out = borg.stdout
         if out:
@@ -980,6 +1011,10 @@ class UmountCommand(Command):
                 args = [mount_point],
                 emborg_opts = options,
             )
+            try:
+                to_path(mount_point).rmdir()
+            except OSError as e:
+                warn(os_error(e))
         except Error as e:
             if 'busy' in str(e):
                 e.reraise(
