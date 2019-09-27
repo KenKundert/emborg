@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.4.4
-    | Released: 2019-09-23
+    | Version: 1.4.5
+    | Released: 2019-09-27
 
     - Added composite configurations.
     - Added support for multiple backup configurations in a single repository.
