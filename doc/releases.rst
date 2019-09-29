@@ -12,6 +12,9 @@ Releases
     - Add --all command line option to *mount* command.
     - Add --include-external command line option to *check*, *list*, *mount*, 
       and *prune* commands.
+    - Add --sort command line option to *manifest* command.
+    - Add --latest command line option to *delete* command.
+    - Added --quiet option
     - *umount* command now deletes directory used as mount point.
     - Moved log files to ~/.local/share/emborg (run 'mv 
       ~/.config/emborg/*.{log,lastbackup}* ~/.local/share/emborg' before using 

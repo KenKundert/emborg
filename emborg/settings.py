@@ -137,9 +137,9 @@ class Settings:
             self.composite_config_allowed = False
         self.settings = {}
         self.options = options
+        self.config_dir = to_path(CONFIG_DIR)
         self.read(name)
         self.check()
-        self.config_dir = to_path(CONFIG_DIR)
 
     # read() {{{2
     def read(self, name=None, path=None):
@@ -156,14 +156,16 @@ class Settings:
         """
 
         if path:
+            narrate('reading:', str(path))
             settings = PythonFile(path).run()
             parent = path.parent
             includes = Collection(settings.get(INCLUDE_SETTING))
         else:
             # this is the generic settings file
-            parent = to_path(CONFIG_DIR)
+            parent = self.config_dir
             if not parent.exists():
                 # config dir does not exist, create and populate it
+                narrate('creating config directory:', str(parent))
                 parent.mkdir(mode=0o700, parents=True, exist_ok=True)
                 for name, contents in [
                     (SETTINGS_FILE, INITIAL_SETTINGS_FILE_CONTENTS),
@@ -185,6 +187,7 @@ class Settings:
 
             path = PythonFile(parent, SETTINGS_FILE)
             settings_filename = path.path
+            narrate('reading:', str(path))
             settings = path.run()
 
             config = get_config(name, settings, self.composite_config_allowed)
@@ -239,6 +242,7 @@ class Settings:
                 return str(value)
             return value
 
+        # expand names contained in braces
         try:
             resolved = value.format(
                 host_name=hostname, user_name=username, prog_name=PROGRAM_NAME,
@@ -251,6 +255,12 @@ class Settings:
 
         # restore escaped double braces with single braces
         return resolved.replace(r'\b', '{').replace(r'\e', '}')
+
+    # resolve_path {{{2
+    def resolve_path(self, value, parent_dir=None):
+        if parent_dir:
+            return to_path(parent_dir, self.resolve(value))
+        return to_path(self.resolve(value))
 
     # handle errors {{{2
     def fail(self, *msg, comment=''):
@@ -388,13 +398,15 @@ class Settings:
         if passcode:
             return dict(BORG_PASSPHRASE = passcode)
 
+        if self.encryption is None:
+            self.encryption = 'none'
         if self.encryption == 'none':
             narrate('passphrase is not available, encryption disabled.')
             return {}
         raise Error('Cannot determine the encryption passphrase.')
 
     # run_borg() {{{2
-    def run_borg(self, cmd, args='', borg_opts=None, emborg_opts=(), strip_prefix=True):
+    def run_borg(self, cmd, args='', borg_opts=None, emborg_opts=(), strip_prefix=False):
 
         # prepare the command
         os.environ.update(self.publish_passcode())
@@ -439,7 +451,7 @@ class Settings:
         os.environ.update(self.publish_passcode())
         os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
         executable = self.value('borg_executable', BORG)
-        repository = self.value('repository')
+        repository = str(self.repository)
         command = (
             [executable] + [
                 (repository if a == '@repo' else a) for a in args
@@ -454,7 +466,7 @@ class Settings:
 
     # destination() {{{2
     def destination(self, archive=None):
-        repository = self.value('repository')
+        repository = str(self.repository)
         if archive is True:
             archive = self.value('archive')
             if not archive:
@@ -476,37 +488,34 @@ class Settings:
     # enter {{{2
     def __enter__(self):
         # resolve src directories
-        self.src_dirs = [to_path(self.resolve(d)) for d in self.src_dirs]
+        self.src_dirs = [self.resolve_path(d) for d in self.src_dirs]
 
         # resolve repository and archive
-        self.repository = self.resolve(self.repository)
+        self.repository = self.resolve_path(self.repository)
         self.archive = self.resolve(self.archive)
 
         # resolve other files and directories
-        data_dir = self.resolve(DATA_DIR)
-        self.data_dir = to_path(data_dir, data_dir)
+        data_dir = self.resolve_path(DATA_DIR)
+        self.data_dir = data_dir
 
-        if not self.data_dir.exists():
-            # config dir does not exist, create and populate it
+        if not data_dir.exists():
+            # data dir does not exist, create it
             self.data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
 
-        logfile = self.resolve(LOG_FILE)
-        self.logfile = to_path(data_dir, logfile)
+        self.logfile = self.resolve_path(LOG_FILE, data_dir)
 
         if 'no-log' not in self.options:
-            prev_logfile = self.resolve(PREV_LOG_FILE)
-            self.prev_logfile = to_path(data_dir, prev_logfile)
+            self.prev_logfile = self.resolve_path(PREV_LOG_FILE, data_dir)
             rm(self.prev_logfile)
             if self.logfile.exists():
                 mv(self.logfile, self.prev_logfile)
 
-        date_file = self.resolve(DATE_FILE)
-        self.date_file = to_path(data_dir, date_file)
+        self.date_file = self.resolve_path(DATE_FILE, data_dir)
 
         # perform locking
-        lockfile = self.lockfile = to_path(data_dir, self.resolve(LOCK_FILE))
+        lockfile = self.lockfile = self.resolve_path(LOCK_FILE, data_dir)
         if self.requires_exclusivity:
-            # check for existance of lockfile
+            # check for existence of lockfile
             if lockfile.exists():
                 raise Error(f'currently running (see {lockfile} for details).')
 

@@ -28,7 +28,7 @@ from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
-    codicil, conjoin, display, full_stop, is_str, narrate, os_error, output,
+    codicil, conjoin, full_stop, is_str, narrate, os_error, output,
     render, warn,
 )
 from docopt import docopt
@@ -369,7 +369,10 @@ class DeleteCommand(Command):
     DESCRIPTION = 'delete an archive currently contained in the repository'
     USAGE = dedent("""
         Usage:
-            emborg delete <archive>
+            emborg [options] delete [<archive>]
+
+        Options:
+            -l, --latest   delete the most recently created archive
     """).strip()
         # borg allows you to delete all archives by simply not specifying an
         # archive, but then it interactively asks the user to type YES if that
@@ -385,6 +388,10 @@ class DeleteCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         archive = cmdline['<archive>']
+        if not archive:
+            archive = get_name_of_latest_archive(settings)
+        if not archive:
+            raise Error('archive missing.')
 
         # run borg
         borg = settings.run_borg(
@@ -577,7 +584,7 @@ class ExtractCommand(Command):
         if paths != new_paths:
             for path in paths:
                 if path.startswith('/'):
-                    warn('removing initial /.', culprit=path)
+                    narrate('removing initial /.', culprit=path)
             paths = new_paths
 
         # assure that paths correspond to src_dirs
@@ -776,6 +783,7 @@ class ManifestCommand(Command):
             -a <archive>, --archive <archive>   name of the archive to use
             -d <date>, --date <date>            date of the desired archive
             -n, --name                          output only the filename
+            -s, --sort                          sort by filename if -n specified
 
         Once a backup has been performed, you can list the files available in
         your archive using:
@@ -804,6 +812,7 @@ class ManifestCommand(Command):
         archive = cmdline['--archive']
         date = cmdline['--date']
         filenames_only = cmdline['--name']
+        sort = cmdline['--sort'] and filenames_only
 
         # get the desired archive
         if date and not archive:
@@ -821,7 +830,11 @@ class ManifestCommand(Command):
         )
         out = borg.stdout
         if out:
-            output(out.rstrip())
+            out = out.rstrip()
+            if sort:
+                output('\n'.join(sorted(out.splitlines())))
+            else:
+                output(out)
 
 
 # MountCommand command {{{1

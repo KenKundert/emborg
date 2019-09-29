@@ -13,6 +13,7 @@ Options:
     -h, --help                        Output basic usage information.
     -m, --mute                        Suppress all output.
     -n, --narrate                     Send emborg and Borg narration to stdout.
+    -q, --quiet                       Suppress optional output.
     -t, --trial-run                   Run Borg in dry run mode.
     -v, --verbose                     Make Borg more verbose.
     --no-log                          Do not create log file.
@@ -64,6 +65,8 @@ def main():
         args = cmdline['<args>']
         if cmdline['--mute']:
             inform.mute = True
+        if cmdline['--quiet']:
+            inform.quiet = True
         options = cull([
             'verbose' if cmdline['--verbose'] else '',
             'narrate' if cmdline['--narrate'] else '',
