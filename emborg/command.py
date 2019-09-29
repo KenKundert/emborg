@@ -28,7 +28,7 @@ from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
-    codicil, conjoin, full_stop, is_str, narrate, os_error, output,
+    codicil, conjoin, done, full_stop, is_str, narrate, os_error, output,
     render, warn,
 )
 from docopt import docopt
@@ -94,6 +94,7 @@ def get_available_files(settings, archive):
 
 # Command base class {{{1
 class Command(object):
+
     @classmethod
     def commands(cls):
         for cmd in cls.__subclasses__():
@@ -145,6 +146,13 @@ class Command(object):
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
         )
 
+    @classmethod
+    def setup(cls):
+        return
+
+    @classmethod
+    def run(cls):
+        return
 
 # BorgCommand command {{{1
 class BorgCommand(Command):
@@ -1047,9 +1055,7 @@ class VersionCommand(Command):
     COMPOSITE_CONFIGS = None
 
     @classmethod
-    def run(cls, command, args, settings, options):
-        # read command line
-        docopt(cls.USAGE, argv=[command] + args)
+    def setup(cls):
 
         # get the Python version
         python = 'Python %s.%s.%s' % (
@@ -1058,8 +1064,13 @@ class VersionCommand(Command):
             sys.version_info.micro,
         )
 
-        # output the Avendesora version along with the Python version
+        # output the Emborg version along with the Python version
         from .__init__ import __version__, __released__
         output('emborg version: %s (%s) [%s].' % (
             __version__, __released__, python
         ))
+
+        # Need to quit now. The version command need not have a valid settings
+        # file, so if we keep going emborg might emit in spurious errors is the
+        # settings files are not yet properly configured.
+        done()

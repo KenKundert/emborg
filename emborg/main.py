@@ -79,6 +79,7 @@ def main():
         try:
             while True:
                 cmd, cmd_name = Command.find(command)
+                cmd.setup()
 
                 with Settings(config, cmd, options) as settings:
                     try:
