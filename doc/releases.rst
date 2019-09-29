@@ -2,7 +2,7 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.4.6
+    | Version: 1.4.7
     | Released: 2019-09-28
 
     - Added composite configurations.
