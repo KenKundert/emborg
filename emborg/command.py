@@ -28,7 +28,8 @@ from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
-    codicil, conjoin, full_stop, is_str, narrate, os_error, output, render, warn
+    codicil, conjoin, cull, full_stop, is_str, narrate, os_error, output,
+    render, warn
 )
 from docopt import docopt
 from shlib import mkdir, rm, to_path, Run, set_prefs
@@ -255,7 +256,7 @@ class CreateCommand(Command):
         cmds = settings.value('run_before_backup')
         if is_str(cmds):
             cmds = [cmds]
-        for cmd in cmds:
+        for cmd in cull(cmds):
             narrate('running pre-backup script:', cmd)
             try:
                 Run(cmd, 'SoEW')
@@ -286,7 +287,7 @@ class CreateCommand(Command):
         cmds = settings.value('run_after_backup')
         if is_str(cmds):
             cmds = [cmds]
-        for cmd in cmds:
+        for cmd in cull(cmds):
             narrate('running post-backup script:', cmd)
             try:
                 Run(cmd, 'SoEW')
