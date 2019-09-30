@@ -28,8 +28,7 @@ from .utilities import two_columns, render_paths, gethostname
 hostname = gethostname()
 from inform import (
     Color, Error,
-    codicil, conjoin, done, full_stop, is_str, narrate, os_error, output,
-    render, warn,
+    codicil, conjoin, full_stop, is_str, narrate, os_error, output, render, warn
 )
 from docopt import docopt
 from shlib import mkdir, rm, to_path, Run, set_prefs
@@ -119,9 +118,21 @@ class Command(object):
         raise Error('unknown command.', culprit=name)
 
     @classmethod
+    def execute_early(cls, name, args, settings, options):
+        # run_early() takes same arguments as run(), but is run before the
+        # settings files have been read. As such, the settings argument is None.
+        # run_early() is used for commands that do not need settings and should
+        # work even if the settings files do not exist or are not valid.
+        if hasattr(cls, 'run_early'):
+            narrate('running {} pre-command'.format(name))
+            return cls.run_early(name, args if args else [], settings, options)
+
+    @classmethod
     def execute(cls, name, args, settings, options):
-        narrate('running {} command'.format(name))
-        return cls.run(name, args if args else [], settings, options)
+        if hasattr(cls, 'run'):
+            narrate('running {} command'.format(name))
+            exit_status = cls.run(name, args if args else [], settings, options)
+            return 0 if exit_status is None else exit_status
 
     @classmethod
     def summarize(cls, width=16):
@@ -146,13 +157,6 @@ class Command(object):
             title=title(cls.DESCRIPTION), usage=cls.USAGE,
         )
 
-    @classmethod
-    def setup(cls):
-        return
-
-    @classmethod
-    def run(cls):
-        return
 
 # BorgCommand command {{{1
 class BorgCommand(Command):
@@ -997,14 +1001,17 @@ class SettingsCommand(Command):
             output('Borg settings:')
             for name, attrs in BORG_SETTINGS.items():
                 output(f"{known(name):>33s}: {attrs['desc']}")
-            return
+            return 0
 
-        for k, v in settings:
-            is_known = k in EMBORG_SETTINGS or k in BORG_SETTINGS
-            key = known(k) if is_known else unknown(k)
-            if k == 'passphrase':
-                v = '<set>'
-            output(f'{key:>33}: {render(v, level=6)}')
+        if settings:
+            for k, v in settings:
+                is_known = k in EMBORG_SETTINGS or k in BORG_SETTINGS
+                key = known(k) if is_known else unknown(k)
+                if k == 'passphrase':
+                    v = '<set>'
+                output(f'{key:>33}: {render(v, level=6)}')
+
+    run_early = run
 
 
 # UmountCommand command {{{1
@@ -1055,7 +1062,7 @@ class VersionCommand(Command):
     COMPOSITE_CONFIGS = None
 
     @classmethod
-    def setup(cls):
+    def run_early(cls, command, args, settings, options):
 
         # get the Python version
         python = 'Python %s.%s.%s' % (
@@ -1073,4 +1080,4 @@ class VersionCommand(Command):
         # Need to quit now. The version command need not have a valid settings
         # file, so if we keep going emborg might emit in spurious errors is the
         # settings files are not yet properly configured.
-        done()
+        return 0

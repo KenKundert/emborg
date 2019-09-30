@@ -156,7 +156,6 @@ class Settings:
         """
 
         if path:
-            narrate('reading:', str(path))
             settings = PythonFile(path).run()
             parent = path.parent
             includes = Collection(settings.get(INCLUDE_SETTING))
@@ -187,7 +186,6 @@ class Settings:
 
             path = PythonFile(parent, SETTINGS_FILE)
             settings_filename = path.path
-            narrate('reading:', str(path))
             settings = path.run()
 
             config = get_config(name, settings, self.composite_config_allowed)

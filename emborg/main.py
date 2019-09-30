@@ -76,10 +76,13 @@ def main():
         if cmdline['--narrate']:
             inform.narrate = True
 
+        worst_exit_status = 0
         try:
             while True:
                 cmd, cmd_name = Command.find(command)
-                cmd.setup()
+                exit_status = cmd.execute_early(cmd_name, args, None, options)
+                if exit_status is not None:
+                    terminate(exit_status)
 
                 with Settings(config, cmd, options) as settings:
                     try:
@@ -88,13 +91,15 @@ def main():
                         settings.fail(e)
                         e.terminate(True)
 
+                if exit_status and exit_status > worst_exit_status:
+                    worst_exit_status = exit_status
+
         except KeyboardInterrupt:
             display('Terminated by user.')
-            exit_status = 0
         except Error as e:
             e.terminate()
         except OSError as e:
             fatal(os_error(e))
         except NoMoreConfigs:
             pass
-        terminate(exit_status)
+        terminate(worst_exit_status)
