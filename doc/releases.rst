@@ -5,6 +5,7 @@ Releases
     | Version: 1.5.0
     | Released: 2019-09-30
 
+**1.5 (2019-09-30)**:
     - Added composite configurations.
     - Added support for multiple backup configurations in a single repository.
     - Added *prefix*, *exclude_from*, and *verbose* settings.
