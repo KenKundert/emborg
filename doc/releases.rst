@@ -18,7 +18,7 @@ Releases
     - Added --quiet option
     - *umount* command now deletes directory used as mount point.
     - Moved log files to ~/.local/share/emborg (run 'mv 
-      ~/.config/emborg/*.{log,lastbackup}* ~/.local/share/emborg' before using 
+      ~/.config/emborg/\*.{log,lastbackup}\* ~/.local/share/emborg' before using 
       this version).
 
 **1.4 (2019-04-24)**:
