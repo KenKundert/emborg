@@ -22,6 +22,7 @@ Here are the available commands:
     :manifest:   :ref:`list the files contained in an archive <manifest>`
     :mount:      :ref:`mount a repository or archive <mount>`
     :prune:      :ref:`prune the repository of excess archives <prune>`
+    :restore:    :ref:`recover file or files from archive in place <restore>`
     :settings:   :ref:`list settings of chosen configuration <settings>`
     :umount:     :ref:`un-mount a previously mounted repository or archive <umount>`
     :version:    :ref:`display emborg version <version>`
@@ -174,10 +175,13 @@ Or, you can extract the version from a particular archive using::
 
     emborg extract --archive continuum-2018-12-05T12:54:26 home/ken/bin
 
-The extracted files are placed in the current working directory within their 
-original hierarchy. Thus, the above commands create the file::
+The extracted files are placed in the current working directory with
+the original hierarchy. Thus, the above commands create the file::
 
     ./home/ken/bin
+
+For this reason the *extract* command is often run from the root directory
+(/). Doing so causes the extracted files to replace the existing files.
 
 
 .. _help:
@@ -312,6 +316,23 @@ Prune the repository of excess archives.  You can use the *keep_within*,
 kept. At least one of these settings must be specified to use *prune*::
 
    emborg prune
+
+
+.. _restore:
+
+Restore
+-------
+
+This command is very similar to the extract command except that it is
+meant to be run in place. Thus, the paths given are converted to
+absolute paths and then the borg extract command is run from the root
+directory (/) so that the existing files are replaced by the extracted
+files.
+
+For example, the following commands restore your .bashrc file::
+
+    cd ~
+    emborg restore .bashrc
 
 
 .. _settings:

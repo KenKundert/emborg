@@ -5,10 +5,13 @@ Releases
     | Version: 1.5.0
     | Released: 2019-09-30
 
+    - Added *restore* command.
+    - Added *verbose* setting.
+
 **1.5 (2019-09-30)**:
     - Added composite configurations.
     - Added support for multiple backup configurations in a single repository.
-    - Added *prefix*, *exclude_from*, and *verbose* settings.
+    - Added *prefix* and *exclude_from* settings.
     - Provide default value for *archive* setting.
     - Add --all command line option to *mount* command.
     - Add --include-external command line option to *check*, *list*, *mount*, 

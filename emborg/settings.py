@@ -308,9 +308,9 @@ class Settings:
     def borg_options(self, cmd, options, strip_prefix=True):
         # handle special cases first {{{3
         args = []
+        if self.value('verbose'):
+            options.append('verbose')
         if 'verbose' in options:
-            args.append('--verbose')
-        elif self.value('verbose'):
             args.append('--verbose')
         if 'trial-run' in options and cmd in borg_commands_with_dryrun.split():
             args.append('--dry-run')
