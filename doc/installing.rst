@@ -176,6 +176,8 @@ The list of directories to be backed up.  A typical value might be::
 
     src_dirs = '~'.split()
 
+In general, the source directories should be given as absolute paths.
+
 
 **excludes**
 

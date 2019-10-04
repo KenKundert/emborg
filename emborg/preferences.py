@@ -227,7 +227,7 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
 
 INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
     # Settings for root configuration
-    src_dirs = '/'.split()   # absolute path to directory to be backed up
+    src_dirs = '/'.split()   # absolute paths to directories to be backed up
     excludes = '''
         /dev
         /home/*/.cache

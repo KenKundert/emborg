@@ -610,7 +610,7 @@ class ExtractCommand(Command):
                 unknown_path = True
                 warn('unknown path.', culprit=path)
         if unknown_path:
-            codicil('Paths should start with:', conjoin(src_dirs))
+            codicil('Paths should start with:', conjoin(src_dirs, conj=', or '))
 
         # get the desired archive
         if date and not archive:
@@ -715,6 +715,11 @@ class InitializeCommand(Command):
     def run(cls, command, args, settings, options):
         # read command line
         docopt(cls.USAGE, argv=[command] + args)
+
+        # warn user about relative source directories.
+        for src_dir in settings.src_dirs:
+            if not src_dir.is_absolute():
+                warn('relative source directory.', culprit=src_dir)
 
         # run borg
         borg = settings.run_borg(
@@ -1003,6 +1008,15 @@ class RestoreCommand(Command):
         archive = cmdline['--archive']
         date = cmdline['--date']
 
+        # make sure source directories are given as absolute paths
+        for src_dir in settings.src_dirs:
+            if not src_dir.is_absolute():
+                raise Error(
+                    'restore command cannot be used',
+                    'with relative source directories',
+                    culprit=src_dir
+                )
+
         # convert to absolute resolved paths
         paths = [to_path(p).resolve() for p in paths]
 
@@ -1014,7 +1028,7 @@ class RestoreCommand(Command):
                 unknown_path = True
                 warn('unknown path.', culprit=path)
         if unknown_path:
-            codicil('Paths should start with:', conjoin(src_dirs))
+            codicil('Paths should start with:', conjoin(src_dirs, conj=', or '))
 
         # remove leading / from paths
         paths = [str(p).lstrip('/') for p in paths]

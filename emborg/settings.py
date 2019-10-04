@@ -309,6 +309,7 @@ class Settings:
         # handle special cases first {{{3
         args = []
         if self.value('verbose'):
+            options = list(options)
             options.append('verbose')
         if 'verbose' in options:
             args.append('--verbose')
@@ -487,6 +488,8 @@ class Settings:
     def __enter__(self):
         # resolve src directories
         self.src_dirs = [self.resolve_path(d) for d in self.src_dirs]
+        if not self.src_dirs:
+            raise Error('no source directories given.')
 
         # resolve repository and archive
         self.repository = self.resolve_path(self.repository)

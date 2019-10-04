@@ -63,7 +63,7 @@ And here is the contents of the *root* configuration file: /root/.config/emborg/
     encryption = 'repokey'
     one_file_system = False
 
-    src_dirs = '/'.split()      # absolute path to directory to be backed up
+    src_dirs = '/'.split()      # absolute paths to directories to be backed up
     excludes = '''
         /dev
         /mnt
@@ -195,7 +195,7 @@ And finally, here is the contents of the *cache* configuration file:
     repository = '/home/ken/.cache/backups/{user_name}'
     encryption = 'none'
 
-    src_dirs = '~'.split()   # absolute path to directory to be backed up
+    src_dirs = '~'.split()   # absolute paths to directories to be backed up
     excludes = '''
         ~/.cache
         ~/media

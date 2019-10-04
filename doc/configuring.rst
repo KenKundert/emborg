@@ -74,7 +74,7 @@ Each backup configuration must have a settings file in ~/.config/emborg. The
 name of the file is the name of the backup configuration.  It might look like 
 the following::
 
-    src_dirs = ['~', '/etc']              # absolute path to directories to be backed up
+    src_dirs = ['~', '/etc']              # absolute paths to directories to be backed up
     excludes = '''
         ~/tmp
         ~/**/.hg
