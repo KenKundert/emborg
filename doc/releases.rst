@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.5.1
-    | Released: 2019-10-02
+    | Version: 1.5.2
+    | Released: 2019-10-04
 
     - Added *restore* command.
     - Added *verbose* setting.
