@@ -3,7 +3,19 @@
 Commands
 ========
 
-Here are the available commands:
+You invoke *Emborg* from your shell by entering a line of the form::
+
+    emborg [global-options] <command> [command-options]
+
+Details about the options and commands can be accessed with::
+
+    emborg help
+
+or::
+
+    emborg help <command>
+
+The available commands are:
 
     :borg:       :ref:`run a raw borg command. <borg>`
     :breaklock:  :ref:`breaks the repository and cache locks. <breaklock>`

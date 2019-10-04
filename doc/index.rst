@@ -23,7 +23,7 @@ for your day-to-day activities.
 Use of *Emborg* does not preclude the use of Borg directly on the same 
 repository.  The philosophy of *Emborg* is to provide commands that you would 
 use often and in an interactive manner with the expectation that you would use 
-*Borg* directly for the remaining commands.
+*Borg* directly for more unusual or esoteric situations.
 
 An alternative to *Emborg* is
 `borgmatic <https://github.com/witten/borgmatic>`_.  It seems largely focused on 
@@ -155,8 +155,8 @@ extracts a file or directory from the most recent archive.
     emborg mount restore
 
 creates a directory 'restore' and then mounts the repository on this directory.  
-This allows you to move into the repository, navigating and retrieve files as if 
-it were a file system.
+This allows you to move into the repository, navigating, examining, and 
+retrieving files as if it were a file system.
 
 ::
 

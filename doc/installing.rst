@@ -40,22 +40,23 @@ are backing up your home directory, and start from *root* if you are backing up
 the root file system.  Delete the one you do not need.
 
 Normally people have just two files, the shared settings file and one 
-configuration file, perhaps named 'home' because it used to back up your home 
-directory. However, you may wish to have a second configuration dedicated to 
-creating snapshots of your files every 15 minutes or so. These snapshots may be 
-kept locally and only for a day or so while your primary backups are kept 
-remotely and kept long term.
+configuration file, but you may have as many configurations as you want.
+For example, in addition to your primary backup configuration, you may wish to 
+have a second configuration dedicated to creating snapshots of your files every 
+15 minutes or so. These snapshots may be kept locally and only for a day or so 
+while your primary backups are kept remotely and kept long term.
 
 Settings may be placed in either the shared settings file or the configuration 
-specific file. The ones placed in the configuration specific file dominate.
-The shared settings file must contain at least one setting, *configurations*, 
-which is a list of the available configurations.
+specific file. The ones placed in the configuration specific file dominate for 
+that configuration.  The shared settings file must contain at least one setting, 
+*configurations*, which is a list of the available configurations.
 
 You can find descriptions of all available settings with::
 
     emborg settings -a
 
 There are certain settings that are worth highlighting.
+
 
 **repository**
 
@@ -71,10 +72,18 @@ repository.  For a local repository you would use something like this::
     repository = '/mnt/backups/{host_name}-{user_name}-{config_name}'
 
 These examples assume that */mnt/backups* contains many independent 
-repositories.  Borg allows you to make a single repository the target of 
-multiple backup configurations, and in this way you can further benefit from its 
+repositories, and that each repository contains the files associated with 
+a single backup configuration.  Borg allows you to make a repository the target 
+of many backup configurations, and in this way you can further benefit from its 
 ability to de-duplicate files.  In this case you might want to use a less 
-granular name for you repository.
+granular name for your repository.  For example, a particular user could use 
+a single repository for all their configurations on all their hosts using::
+
+    repository = '/mnt/backups/{user_name}'
+
+In this case you should specify the *prefix* setting, described next, to allow 
+the archives created by each backup configuration to be distinguished.
+
 
 **archive** and **prefix**
 
@@ -111,7 +120,7 @@ If you do not specify either *archive* or *prefix*, then you get the following
 defaults::
 
     prefix = '{host_name}-{user_name}-{config_name}-'
-    archive = '{prefix}-{{now}}'
+    archive = '{prefix}{{now}}'
 
 If you specify only *prefix*, then *archive* becomes::
 
@@ -123,8 +132,8 @@ suitable when there is only one backup configuration using a repository.
 If you want *prefix* and want to customize *now*, you should give both *prefix* 
 and *archive*. For example, you can reduce the length of the timestamp using::
 
-    archive = '{host_name}-{{now:%Y%m%d}}'
     prefix = '{host_name}-'
+    archive = '{prefix}{{now:%Y%m%d}}'
 
 In this example the host name was used as the prefix rather than the 
 configuration name. When specifying both the *prefix* and the *archive*, the 
@@ -150,9 +159,8 @@ a copy in a safe place along with the passphrase.
 
 **passphrase**
 
-The passphrase used when encrypting the encryption key.  This is used as an 
-alternative to *avendesora_account*.  Be sure to make the file that contains it 
-unreadable by others.
+The passphrase used when encrypting the encryption key.  Be sure to make the 
+file that contains it is unreadable by others.
 
 
 **passcommand**
@@ -181,7 +189,8 @@ In general, the source directories should be given as absolute paths.
 
 **excludes**
 
-A list of files to exclude from the backups.  Typical value might be::
+A list of files or directories to exclude from the backups.  Typical value might 
+be::
 
     excludes = '''
         ~/tmp
