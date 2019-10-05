@@ -5,6 +5,7 @@ Releases
     | Version: 1.5.2
     | Released: 2019-10-04
 
+**1.6 (2019-10-04)**:
     - Added *restore* command.
     - Added *verbose* setting.
 
