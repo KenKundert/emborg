@@ -882,19 +882,20 @@ class MountCommand(Command):
         current directory, it must be a directory. If it does not exist, it is
         created.
 
-        If you do not specify an archive or date, all archives are mounted.
-
-        You can mount the latest archive using:
-
-            emborg mount --latest backups
+        If you do not specify an archive or date, the most recently created
+        archive is mounted.
 
         You can mount an archive that existed on a particular date using:
 
             emborg mount --date 2015-04-01 backups
 
-        Or, you can mount a particular archive using:
+        You can mount a particular archive using:
 
             emborg mount --archive kundert-2018-12-05T12:54:26 backups
+
+        Or, you can mount all available archives using:
+
+            emborg mount --all backups
 
         You should use `emborg umount` when you are done.
     """).strip()

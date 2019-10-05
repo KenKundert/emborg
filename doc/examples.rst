@@ -35,7 +35,7 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
 
     # repository settings
     repository = 'backups:/mnt/backups/{host_name}-{user_name}-{config_name}'
-    archive = '{config_name}-{{now:%Y%m%d}}'
+    archive = '{prefix}{{now:%Y%m%d}}'
     prefix = '{config_name}-'
     compression = 'lz4'
 
@@ -145,7 +145,6 @@ Here is the contents of the *home* configuration file: ~/.config/emborg/home::
         ~/**/.~
     '''.split()
 
-    exclude_if_present = '.nobackup'
     run_before_backup = '(cd ~/src; ./clean)'
 
     # prune settings
@@ -162,7 +161,7 @@ Since you are running this configuration interactively, *backups* should be
 configured to use a private key and that key should be preloaded into your SSH 
 agent.
 
-This configuration keeps the passphrase is kept in `Avendesora 
+This passphrase for this configuration is kept in `Avendesora 
 <https://avendesora.readthedocs.io>`_, and the encryption method is *keyfile*.  
 As such, it is critical that you extract the keyfile from *Borg* and copy it and 
 your *Avendesora* files to a safe place so that both the keyfile and passphrase 
@@ -208,7 +207,6 @@ And finally, here is the contents of the *cache* configuration file:
         ~/**/.*.swo
         ~/**/.~
     '''.split()
-    exclude_if_present = '.nobackup'
 
     # prune settings
     keep_within = '1d'

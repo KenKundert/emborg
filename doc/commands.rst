@@ -84,7 +84,7 @@ Check the integrity of the repository and its archives.
 Configs
 -------
 
-List the available backup configurations.  Each configuration will correspond to 
+List the available backup configurations.  Each configuration corresponds to 
 a settings file in your configuration directory (~/.config/emborg). Settings 
 common to all your configurations should be placed in ~/.config/emborg/settings.  
 You can see available configs using::
@@ -111,8 +111,9 @@ only the changes from the already existing archives are saved.
     emborg create
 
 Before creating your first archive, you must use the *init* command to 
-initialize your repository.  *create* is the default command, so you can create 
-an archive with simply::
+initialize your repository.
+
+*create* is the default command, so you can create an archive with simply::
 
     emborg
 
@@ -172,10 +173,10 @@ You extract a file or directory from an archive using::
    emborg extract home/ken/bin
 
 Use manifest to determine what path you should specify to identify the desired 
-file or directory.  You can specify more than one path. They will be paths that 
-are relative to /, thus the paths should look like absolute paths with the 
-leading slash removed.  The paths may point to directories, in which case the 
-entire directory is extracted.  It may also be a glob pattern.
+file or directory.  You can specify more than one path. Usually, they will be 
+paths that are relative to ``/``, thus the paths should look like absolute paths 
+with the leading slash removed.  The paths may point to directories, in which 
+case the entire directory is extracted.  It may also be a glob pattern.
 
 If you do not specify an archive or date, the most recent archive is used.  You 
 can extract the version of a file or directory that existed on a particular date 
@@ -299,19 +300,20 @@ would a normal read-only filesystem.
 In this example, *backups* acts as a mount point. If it exists, it must be 
 a directory. If it does not exist, it is created.
 
-If you do not specify an archive, as above, all archives are mounted.
+If you do not specify an archive, as above, the most recently created archive
+is mounted.
 
 You can explicitly specify an archive::
 
    emborg mount --archive continuum-2015-04-01T12:19:58 backups
 
-Or you can mount the files that existed on a particular date using::
+You can mount the files that existed on a particular date using::
 
    emborg mount --date 2015-04-01 backups
 
-Or you can mount the latest available archive::
+Or, you can mount all the available archives::
 
-   emborg mount --latest backups
+   emborg mount --all backups
 
 You will need to un-mount the repository or archive when you are done with it.  
 To do so, use the *umount* command.
@@ -359,7 +361,7 @@ This command displays all the settings that affect a backup configuration.
    emborg settings
 
 Add '-a' option to list out all available settings and their descriptions rather 
-than the specified settings and their values.
+than the settings actually specified and their values.
 
 
 .. _umount:

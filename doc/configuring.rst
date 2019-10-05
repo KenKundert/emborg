@@ -4,10 +4,10 @@ Configuring
 ===========
 
 Settings file go in ~/.config/emborg. You need a shared settings file and then 
-one file for each repository you need.  Except for *configurations* and 
-*default_configuration* any setting may be place in the shared file or the 
-repository specific file.  If a setting shows in both files, the version on the 
-configuration specific file dominates.
+one file for each backup configuration you need.  Except for *configurations* 
+and *default_configuration* any setting may be place in the shared file or the 
+repository specific file.  If a setting is found in both files, the version in 
+the configuration specific file dominates.
 
 You can get a complete list of available configuration settings by running::
 
@@ -61,7 +61,7 @@ the Avendesora account name of the key to *avendesora_account*.
 
 This example assumes that there is one backup configuration per repository. You 
 can instead have all of your configurations share a single repository replacing 
-*repository* and *archive* with::
+*repository* and adding *prefix* like so::
 
     repository = 'archives:/mnt/backups/{host_name}/{user_name}'
     prefix = '{config_name}-'
