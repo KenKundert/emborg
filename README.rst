@@ -27,9 +27,9 @@ Borg directly for the remaining commands.
 An alternative to *Emborg* is
 `Borgmatic <https://github.com/witten/borgmatic>`_.  It seems largely focused on 
 the archive creation process and offers little for the other management tasks 
-such as monitoring (*due*, *list*, *manifest*), restoration (*extract*, 
-*restore*, and *mount*), and maintenance (*check*, *prune*). *borgmatic* 
-recently added support for the Borg extract command.
+such as monitoring (*due*, *list*, *manifest*), restoration (*extract*, *restore*,
+*mount*), and maintenance (*check*, *prune*). *borgmatic* recently added support 
+for the Borg extract command.
 
 
 Getting Help
