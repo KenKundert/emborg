@@ -206,6 +206,10 @@ be::
         ~/**/.*.swo
     '''.split()
 
+If given as a string, the excludes are split at white space to create a list.  
+You can also specify *excludes* as a list of strings if one or more of your 
+excludes contain spaces.
+
 
 Once you have set up your configuration directory, you will need to create your 
 repository. To do so, assure that the parent directory of your repository exists 

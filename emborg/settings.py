@@ -236,7 +236,7 @@ class Settings:
         try:
             value = value.replace('{{', r'\b').replace('}}', r'\e')
         except AttributeError:
-            if isinstance(value, int):
+            if isinstance(value, int) and not isinstance(value, bool):
                 return str(value)
             return value
 
