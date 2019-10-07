@@ -5,6 +5,9 @@ Releases
     | Version: 1.6.1
     | Released: 2019-10-05
 
+    - Fixed bug that involved the boolean Borg settings
+      (*one_file_system*, *exclude_caches*, ...)
+
 **1.6 (2019-10-04)**:
     - Added *restore* command.
     - Added *verbose* setting.
@@ -21,9 +24,9 @@ Releases
     - Add --latest command line option to *delete* command.
     - Added --quiet option
     - *umount* command now deletes directory used as mount point.
-    - Moved log files to ~/.local/share/emborg (run 'mv 
-      ~/.config/emborg/\*.{log,lastbackup}\* ~/.local/share/emborg' before using 
-      this version).
+    - Moved log files to ~/.local/share/emborg
+      (run 'mv ~/.config/emborg/\*.{log,lastbackup}\* ~/.local/share/emborg' 
+      before using this version).
 
 **1.4 (2019-04-24)**:
     - Added *ssh_command* setting
