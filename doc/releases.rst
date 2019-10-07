@@ -5,6 +5,8 @@ Releases
     | Version: 1.6.1
     | Released: 2019-10-05
 
+
+**1.7 (2019-10-07)**:
     - Fixed bug that involved the boolean Borg settings
       (*one_file_system*, *exclude_caches*, ...)
 
