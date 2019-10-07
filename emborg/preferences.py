@@ -238,10 +238,9 @@ INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
         /sys
         /tmp
         /var/cache
+        /var/lib/dnf
         /var/lock
-        /var/log
         /var/run
-        /var/spool
         /var/tmp
     '''.split()              # list of files or directories to skip
 """).lstrip()

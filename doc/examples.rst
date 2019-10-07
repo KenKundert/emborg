@@ -73,9 +73,7 @@ And here is the contents of the *root* configuration file: /root/.config/emborg/
         /tmp
         /var/cache
         /var/lock
-        /var/log
         /var/run
-        /var/spool
         /var/tmp
     '''.split()                 # list of files or directories to skip
 
