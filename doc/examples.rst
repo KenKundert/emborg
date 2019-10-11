@@ -83,10 +83,28 @@ configuration uses *repokey* as the encryption method, which is suitable when
 you control the server that holds the repository and you know it to be secure.  
 
 Once this configuration is complete and has been tested, you would want to add 
-a crontab entry so that it runs on a routine schedule. To do so, you would run 
-`crontab -e` and add an entry like this::
+a crontab entry so that it runs on a routine schedule. On servers that are 
+always running, you could use `crontab -e` and add an entry like this::
 
     30 03 * * * emborg --mute --config root create
+
+For individual workstations or laptops that are likely to be turned off at 
+night, one would instead create an executable script in /etc/cron.daily that 
+contains the following::
+
+    #/bin/sh
+    # Run root backups
+
+    emborg --mute --config root create
+
+Assume that this file is named *emborg*. Then after creating it, you would make 
+it executable with::
+
+    chmod a+x /etc/cron.daily/emborg
+
+Scripts in /etc/cron.daily are one once a day, either at a fixed time generally 
+early in the morning or, if not powered up at that time, shortly after being 
+powered up.
 
 
 User
@@ -212,7 +230,7 @@ And finally, here is the contents of the *cache* configuration file:
     prune_after_create = True
     check_after_create = False
 
-To run this configuration every 15 minutes, add the following entry to your 
+To run this configuration every 10 minutes, add the following entry to your 
 crontab file using 'crontab -e'::
 
-    0,15,30,45 * * * * emborg --config cache create
+    0,10,20,30,40,50 * * * * emborg --config cache create

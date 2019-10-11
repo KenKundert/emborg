@@ -5,6 +5,7 @@ Releases
     | Version: 1.7.0
     | Released: 2019-10-07
 
+    - Remove duplicated commands.
 
 **1.7 (2019-10-07)**:
     - Fixed bug that involved the boolean Borg settings
