@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.7.0
-    | Released: 2019-10-07
+    | Version: 1.7.1
+    | Released: 2019-10-11
 
     - Remove duplicated commands.
 
