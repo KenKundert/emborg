@@ -5,6 +5,7 @@ Releases
     | Version: 1.7.1
     | Released: 2019-10-11
 
+**1.8 (2019-10-12)**:
     - Remove duplicated commands.
 
 **1.7 (2019-10-07)**:
