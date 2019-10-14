@@ -3,8 +3,8 @@
 Getting Started
 ===============
 
-Many Linux distributes include *Borg* in their package managers. In Fedora it is 
-referred to as *borgbackup*. In this case you would install *borg* by running 
+Many Linux distributions include *Borg* in their package managers. In Fedora it 
+is referred to as *borgbackup*. In this case you would install *borg* by running 
 the following::
 
     sudo dnf install borgbackup
