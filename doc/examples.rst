@@ -1,4 +1,4 @@
-.. _examples:
+.. _emborg examples:
 
 Examples
 ========
@@ -31,7 +31,7 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
     notify = "root@continuum.com"
     remote_ratelimit = 2000     # bandwidth limit in kbps
     prune_after_create = True
-    check_after_create = True
+    check_after_create = 'latest'
 
     # repository settings
     repository = 'backups:/mnt/backups/{host_name}-{user_name}-{config_name}'
@@ -146,7 +146,7 @@ Here is the contents of the *home* configuration file: ~/.config/emborg/home::
     needs_ssh_agent = True
     remote_ratelimit = 2000
     prune_after_create = True
-    check_after_create = True
+    check_after_create = 'latest'
 
     src_dirs = '~'.split()              # paths to be backed up
     excludes = '''
@@ -228,7 +228,7 @@ And finally, here is the contents of the *cache* configuration file:
     keep_within = '1d'
     keep_hourly = 24
     prune_after_create = True
-    check_after_create = False
+    check_after_create = 'latest'
 
 To run this configuration every 10 minutes, add the following entry to your 
 crontab file using 'crontab -e'::

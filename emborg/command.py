@@ -244,7 +244,10 @@ class CreateCommand(Command):
             raise Error('src_dirs: setting has no value.')
 
         # check the dependencies are available
-        for each in settings.values('must_exist'):
+        must_exist = settings.value('must_exist')
+        if is_str(must_exist):
+            must_exist = [must_exist]
+        for each in must_exist:
             path = to_path(each)
             if not path.exists():
                 raise Error(
@@ -303,8 +306,22 @@ class CreateCommand(Command):
             activity = 'checking'
             if settings.check_after_create:
                 narrate('checking archive')
+                if settings.check_after_create == 'latest':
+                    args = []
+                elif settings.check_after_create in [True, 'all']:
+                    args = ['--all']
+                elif settings.check_after_create == 'all in repository':
+                    args = ['--all', '--include-external']
+                else:
+                    warn(
+                        'unknown value: {}, checking latest.'.format(
+                            settings.check_after_create
+                        ),
+                        cuplrit='check_after_create'
+                    )
+                    args = []
                 check = CheckCommand()
-                check.run('check', [], settings, options)
+                check.run('check', args, settings, options)
 
             activity = 'pruning'
             if settings.prune_after_create:
@@ -324,12 +341,16 @@ class CheckCommand(Command):
     DESCRIPTION = 'checks the repository and its archives'
     USAGE = dedent("""
         Usage:
-            emborg check [options]
+            emborg check [options] [<archive>]
 
         Options:
-            -e, --include-external   check all archives in repository, not just
-                                     those associated with this configuration
-            -v, --verify-data        perform a full integrity verification (slow)
+            -A, --all                           mount all available archives
+            -e, --include-external              check all archives in repository, not just
+                                                those associated with this configuration
+            -v, --verify-data                   perform a full integrity verification (slow)
+
+        The most recently created archive is checked if one is not specified
+        unless --all is given, in which case all archives are checked.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = True
@@ -338,13 +359,21 @@ class CheckCommand(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        archive = cmdline['<archive>']
+        check_all = cmdline['--all']
         verify = ['--verify-data'] if cmdline['--verify-data'] else []
         include_external_archives = cmdline['--include-external']
+
+        # identify archive or archives to check
+        if check_all:
+            archive = None
+        elif not archive:
+            archive = get_name_of_latest_archive(settings)
 
         # run borg
         borg = settings.run_borg(
             cmd = 'check',
-            args = verify + [settings.destination()],
+            args = verify + [settings.destination(archive)],
             emborg_opts = options,
             strip_prefix = include_external_archives,
         )

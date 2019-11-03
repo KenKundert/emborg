@@ -5,6 +5,10 @@ Releases
     | Version: 1.8.0
     | Released: 2019-10-12
 
+    - Added ability to check individual archives on the *check* command
+    - Made latest archive the default for *check* command
+    - Allow *exclude_from* setting to be a list of filenames.
+
 **1.8 (2019-10-12)**:
     - Remove duplicated commands.
 

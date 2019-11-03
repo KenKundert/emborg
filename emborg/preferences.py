@@ -1,6 +1,6 @@
-# Avendesora Password Generator Settings
+# Emborg Settings
 #
-# Copyright (C) 2018 Kenneth S. Kundert
+# Copyright (C) 2018-2019 Kenneth S. Kundert
 
 # License {{{1
 # This program is free software: you can redistribute it and/or modify

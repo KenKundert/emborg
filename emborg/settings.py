@@ -1,7 +1,7 @@
 # Settings
 
 # License {{{1
-# Copyright (C) 2018 Kenneth S. Kundert
+# Copyright (C) 2018-2019 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,8 +41,8 @@ from .python import PythonFile
 from .utilities import gethostname, getusername, render_paths
 from shlib import getmod, mv, rm, Run, to_path, render_command, to_path
 from inform import (
-    Error, codicil, conjoin, display, done, full_stop, get_informer, indent,
-    is_str, narrate, output, render, warn,
+    Color, Error, codicil, conjoin, display, done, full_stop, get_informer, 
+    indent, is_str, narrate, output, render, warn,
 )
 from textwrap import dedent
 import arrow
@@ -264,7 +264,7 @@ class Settings:
     def fail(self, *msg, comment=''):
         msg = full_stop(' '.join(str(m) for m in msg))
         try:
-            if self.notify:
+            if self.notify and not Color.isTTY():
                 Run(
                     ['mail', '-s', f'{PROGRAM_NAME} on {hostname}: {msg}'] + self.notify.split(),
                     stdin=dedent(f'''
@@ -279,7 +279,7 @@ class Settings:
         except Error:
             pass
         try:
-            if self.notifier:
+            if self.notifier and not Color.isTTY():
                 Run(
                     self.notifier.format(
                         msg=msg, hostname=hostname,
@@ -324,10 +324,13 @@ class Settings:
                 args.extend(['--exclude', path])
             exclude_from = self.value('exclude_from')
             if exclude_from:
-                path = to_path(self.config_dir, exclude_from)
-                if not path.exists():
-                    raise Error('--exclude-from file does not exist.', culprit=path)
-                args.extend(['--exclude-from', str(path)])
+                if is_str(exclude_from):
+                    exclude_from = [exclude_from]
+                for each in exclude_from:
+                    path = to_path(self.config_dir, each)
+                    if not path.exists():
+                        raise Error('--exclude-from file does not exist.', culprit=path)
+                    args.extend(['--exclude-from', str(path)])
 
         if cmd == 'extract':
             if 'verbose' in options:
@@ -491,9 +494,8 @@ class Settings:
         if not self.src_dirs:
             raise Error('no source directories given.')
 
-        # resolve repository and archive
+        # resolve repository
         self.repository = self.resolve_path(self.repository)
-        self.archive = self.resolve(self.archive)
 
         # resolve other files and directories
         data_dir = self.resolve_path(DATA_DIR)
