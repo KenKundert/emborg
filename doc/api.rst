@@ -10,7 +10,7 @@ separately::
 
     from emborg import Emborg
 
-    with Emborg() as emborg:
+    with Emborg('home') as emborg:
         borg = emborg.run_borg(
             cmd = 'key export',
             args = [emborg.destination(), archive / '.config/borg.repokey']
