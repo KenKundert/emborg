@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.8.0
-    | Released: 2019-10-12
+    | Version: 1.8.1
+    | Released: 2019-11-06
 
     - Added ability to check individual archives to the :ref:`check <check>` command.
     - Made latest archive the default for :ref:`check <check>` command.
