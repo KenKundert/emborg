@@ -489,7 +489,7 @@ delete large files that can be easily recreated from those files that are backed
 up.
 
 
-.. src_dirs:
+.. _src_dirs:
 
 src_dirs
 ~~~~~~~~
@@ -497,7 +497,7 @@ src_dirs
 A list of strings, each of which specifies a directory to be backed up.
 
 
-.. ssh_command:
+.. _ssh_command:
 
 ssh_command
 ~~~~~~~~~~~
@@ -506,7 +506,7 @@ A string that contains the command to be used for SSH. The default is ``"ssh"``.
 This can be used to specify SSH options.
 
 
-.. verbose:
+.. _verbose:
 
 verbose
 ~~~~~~~

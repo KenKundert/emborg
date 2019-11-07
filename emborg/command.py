@@ -215,6 +215,76 @@ class BreakLockCommand(Command):
         rm(settings.lockfile)
 
 
+# CheckCommand command {{{1
+class CheckCommand(Command):
+    NAMES = 'check'.split()
+    DESCRIPTION = 'checks the repository and its archives'
+    USAGE = dedent("""
+        Usage:
+            emborg check [options] [<archive>]
+
+        Options:
+            -A, --all                           mount all available archives
+            -e, --include-external              check all archives in repository, not just
+                                                those associated with this configuration
+            -v, --verify-data                   perform a full integrity verification (slow)
+
+        The most recently created archive is checked if one is not specified
+        unless --all is given, in which case all archives are checked.
+    """).strip()
+    REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = True
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        archive = cmdline['<archive>']
+        check_all = cmdline['--all']
+        verify = ['--verify-data'] if cmdline['--verify-data'] else []
+        include_external_archives = cmdline['--include-external']
+
+        # identify archive or archives to check
+        if check_all:
+            archive = None
+        elif not archive:
+            archive = get_name_of_latest_archive(settings)
+
+        # run borg
+        borg = settings.run_borg(
+            cmd = 'check',
+            args = verify + [settings.destination(archive)],
+            emborg_opts = options,
+            strip_prefix = include_external_archives,
+        )
+        out = borg.stdout
+        if out:
+            output(out.rstrip())
+
+
+# ConfigsCommand command {{{1
+class ConfigsCommand(Command):
+    NAMES = 'configs'.split()
+    DESCRIPTION = 'list available backup configurations'
+    USAGE = dedent("""
+        Usage:
+            emborg configs
+    """).strip()
+    REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = None
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        docopt(cls.USAGE, argv=[command] + args)
+
+        configurations = Collection(settings.configurations)
+        if configurations:
+            output('Available Configurations:', *configurations, sep='\n    ')
+        else:
+            output('No configurations available.')
+
+
 # CreateCommand command {{{1
 class CreateCommand(Command):
     NAMES = 'create backup'.split()
@@ -333,76 +403,6 @@ class CreateCommand(Command):
                 f'This error occurred while {activity} the archives.',
                 'No error was reported while creating the archive.'
             ))
-
-
-# CheckCommand command {{{1
-class CheckCommand(Command):
-    NAMES = 'check'.split()
-    DESCRIPTION = 'checks the repository and its archives'
-    USAGE = dedent("""
-        Usage:
-            emborg check [options] [<archive>]
-
-        Options:
-            -A, --all                           mount all available archives
-            -e, --include-external              check all archives in repository, not just
-                                                those associated with this configuration
-            -v, --verify-data                   perform a full integrity verification (slow)
-
-        The most recently created archive is checked if one is not specified
-        unless --all is given, in which case all archives are checked.
-    """).strip()
-    REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = True
-
-    @classmethod
-    def run(cls, command, args, settings, options):
-        # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-        archive = cmdline['<archive>']
-        check_all = cmdline['--all']
-        verify = ['--verify-data'] if cmdline['--verify-data'] else []
-        include_external_archives = cmdline['--include-external']
-
-        # identify archive or archives to check
-        if check_all:
-            archive = None
-        elif not archive:
-            archive = get_name_of_latest_archive(settings)
-
-        # run borg
-        borg = settings.run_borg(
-            cmd = 'check',
-            args = verify + [settings.destination(archive)],
-            emborg_opts = options,
-            strip_prefix = include_external_archives,
-        )
-        out = borg.stdout
-        if out:
-            output(out.rstrip())
-
-
-# ConfigsCommand command {{{1
-class ConfigsCommand(Command):
-    NAMES = 'configs'.split()
-    DESCRIPTION = 'list available backup configurations'
-    USAGE = dedent("""
-        Usage:
-            emborg configs
-    """).strip()
-    REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = None
-
-    @classmethod
-    def run(cls, command, args, settings, options):
-        # read command line
-        docopt(cls.USAGE, argv=[command] + args)
-
-        configurations = Collection(settings.configurations)
-        if configurations:
-            output('Available Configurations:', *configurations, sep='\n    ')
-        else:
-            output('No configurations available.')
 
 
 # DeleteCommand command {{{1
