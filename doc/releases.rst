@@ -5,6 +5,8 @@ Releases
     | Version: 1.9.0
     | Released: 2019-11-08
 
+
+**1.9 (2019-11-08)**:
     - Added ability to check individual archives to the :ref:`check <check>` command.
     - Made latest archive the default for :ref:`check <check>` command.
     - Allow :ref:`exclude_from <exclude_from>` setting to be a list of file names.
