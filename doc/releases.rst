@@ -6,6 +6,8 @@ Releases
     | Released: 2019-11-08
 
 
+**1.10 (2019-11-11)**:
+
 **1.9 (2019-11-08)**:
     - Added ability to check individual archives to the :ref:`check <check>` command.
     - Made latest archive the default for :ref:`check <check>` command.
