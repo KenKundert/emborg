@@ -442,7 +442,11 @@ class Settings:
         narrate('running:\n{}'.format(
             indent(render_command(command, borg_options_arg_count))
         ))
-        narrating = 'verbose' in emborg_opts or 'narrate' in emborg_opts
+        narrating = (
+            '--verbose' in borg_opts or
+            'verbose' in emborg_opts or
+            'narrate' in emborg_opts
+        )
         modes = 'soeW' if narrating else 'sOEW'
         return Run(command, modes=modes, stdin='', env=os.environ, log=False)
 
