@@ -446,7 +446,7 @@ class Settings:
             '--verbose' in borg_opts or
             'verbose' in emborg_opts or
             'narrate' in emborg_opts
-        )
+        ) and not '--json' in command
         modes = 'soeW' if narrating else 'sOEW'
         return Run(command, modes=modes, stdin='', env=os.environ, log=False)
 
