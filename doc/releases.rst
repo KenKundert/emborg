@@ -5,8 +5,11 @@ Releases
     | Version: 1.10.1
     | Released: 2019-11-21
 
+**1.11 (2019-11-27)**:
+    - Bug fix release.
 
 **1.10 (2019-11-11)**:
+    - Bug fix release.
 
 **1.9 (2019-11-08)**:
     - Added ability to check individual archives to the :ref:`check <check>` command.
