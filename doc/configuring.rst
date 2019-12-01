@@ -520,7 +520,7 @@ Borg Settings
 
 These settings control the behavior of *Borg*. Detailed descriptions can be 
 found in the `Borg documentation 
-<https://borgbackup.readthedocs.io/en/stable/usage/general.html>`.
+<https://borgbackup.readthedocs.io/en/stable/usage/general.html>`_.
 
 .. _append_only:
 

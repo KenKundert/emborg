@@ -495,8 +495,6 @@ class Settings:
     def __enter__(self):
         # resolve src directories
         self.src_dirs = [self.resolve_path(d) for d in self.src_dirs]
-        if not self.src_dirs:
-            raise Error('no source directories given.')
 
         # resolve repository
         self.repository = self.resolve_path(self.repository)

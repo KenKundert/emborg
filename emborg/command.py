@@ -340,7 +340,7 @@ class CreateCommand(Command):
         try:
             settings.run_borg(
                 cmd = 'create',
-                args = [settings.destination(True)] + render_paths(settings.src_dirs),
+                args = [settings.destination(True)] + src_dirs,
                 emborg_opts = options,
             )
         except Error as e:
