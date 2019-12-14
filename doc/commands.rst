@@ -308,6 +308,9 @@ would a normal read-only filesystem.
 In this example, *backups* acts as a mount point. If it exists, it must be 
 a directory. If it does not exist, it is created.
 
+If you do not specify a mount point, the value of *default_mount_point* setting 
+is used if set.
+
 If you do not specify an archive, as above, the most recently created archive
 is mounted.
 
@@ -383,6 +386,9 @@ Un-mount a previously mounted repository or archive::
    > rmdir backups
 
 where *backups* is the existing mount point.
+
+If you do not specify a mount point, the value of *default_mount_point* setting 
+is used if set.
 
 
 .. _version:

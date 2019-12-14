@@ -224,7 +224,7 @@ class CheckCommand(Command):
             emborg check [options] [<archive>]
 
         Options:
-            -A, --all                           mount all available archives
+            -A, --all                           check all available archives
             -e, --include-external              check all archives in repository, not just
                                                 those associated with this configuration
             -v, --verify-data                   perform a full integrity verification (slow)
@@ -894,7 +894,7 @@ class MountCommand(Command):
     DESCRIPTION = 'mount a repository or archive'
     USAGE = dedent("""
         Usage:
-            emborg [options] mount <mount_point>
+            emborg [options] mount [<mount_point>]
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to mount
@@ -937,6 +937,11 @@ class MountCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         mount_point = cmdline['<mount_point>']
+        if not mount_point:
+            mount_point = settings.value('default_mount_point')
+            if not mount_point:
+                raise Error('must specify directory to use as mount point')
+        mount_point = to_path(mount_point)
         archive = cmdline['--archive']
         date = cmdline['--date']
         mount_all = cmdline['--all']
@@ -1133,8 +1138,8 @@ class UmountCommand(Command):
     DESCRIPTION = 'un-mount a previously mounted repository or archive'
     USAGE = dedent("""
         Usage:
-            emborg [options] umount <mount_point>
-            emborg [options] unmount <mount_point>
+            emborg [options] umount [<mount_point>]
+            emborg [options] unmount [<mount_point>]
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = False
@@ -1144,6 +1149,11 @@ class UmountCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         mount_point = cmdline['<mount_point>']
+        if not mount_point:
+            mount_point = settings.value('default_mount_point')
+            if not mount_point:
+                raise Error('must specify directory to use as mount point')
+        mount_point = to_path(mount_point)
 
         # run borg
         try:

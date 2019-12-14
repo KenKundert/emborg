@@ -52,6 +52,7 @@ EMBORG_SETTINGS = dict(
     config_name = 'name of active configuration (set by program)',
     configurations = 'available Emborg configurations',
     default_configuration = 'default Emborg configuration',
+    default_mount_point = 'directory to use as mount point if one is not specified',
     encryption = 'encryption method (see Borg documentation)',
     excludes = 'list of glob strings of files or directories to skip',
     exclude_from = 'file that contains exclude patterns',

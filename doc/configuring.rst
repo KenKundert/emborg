@@ -287,6 +287,15 @@ The name of the configuration to use if one is not specified on the command
 line.
 
 
+.. _default_mount_point:
+
+default_mount_point
+~~~~~~~~~~~~~~~~~~~
+
+The path to a directory that should be used if one is not specified on the 
+:ref:`mount command <mount>` or :ref:`umount command <umount>` commands.
+
+
 .. _encryption:
 
 encryption
