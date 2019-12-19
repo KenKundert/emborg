@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.11.2
-    | Released: 2019-12-13
+    | Version: 1.11.3
+    | Released: 2019-12-19
 
     - added :ref:`default_mount_point` setting.
     - fixed some issues with  :ref:`borg <borg>` command.
