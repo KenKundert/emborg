@@ -293,7 +293,12 @@ default_mount_point
 ~~~~~~~~~~~~~~~~~~~
 
 The path to a directory that should be used if one is not specified on the 
-:ref:`mount command <mount>` or :ref:`umount command <umount>` commands.
+:ref:`mount command <mount>` or :ref:`umount command <umount>` commands.  When 
+set the mount point directory becomes optional on these commands. You should 
+choose a directory that itself is not subject to being backed up to avoid 
+creating a loop. For example, you might consider something in /tmp::
+
+    _default_mount_point = '/tmp/emborg'
 
 
 .. _encryption:

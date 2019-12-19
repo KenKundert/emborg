@@ -344,7 +344,7 @@ class Settings:
                     warn('passphrase given but not needed as encryption set to none.')
                 if encryption in 'keyfile keyfile-blake2'.split():
                     warn(
-                        "you should use 'borg export key' to export the",
+                        "you should use 'borg key export' to export the",
                         "encryption key, and then keep that key in a safe",
                         "place.  If you lose the key you will lose access to",
                         "your backups.",
@@ -442,13 +442,19 @@ class Settings:
         narrate('running:\n{}'.format(
             indent(render_command(command, borg_options_arg_count))
         ))
+        starts_at = arrow.now()
+        narrate('starts at: {!s}'.format(starts_at))
         narrating = (
             '--verbose' in borg_opts or
             'verbose' in emborg_opts or
             'narrate' in emborg_opts
         ) and not '--json' in command
         modes = 'soeW' if narrating else 'sOEW'
-        return Run(command, modes=modes, stdin='', env=os.environ, log=False)
+        borg = Run(command, modes=modes, stdin='', env=os.environ, log=False)
+        ends_at = arrow.now()
+        narrate('ends at: {!s}'.format(ends_at))
+        narrate('elapsed = {!s}'.format(ends_at-starts_at))
+        return borg
 
     # run_borg_raw() {{{2
     def run_borg_raw(self, args):
@@ -457,9 +463,11 @@ class Settings:
         os.environ.update(self.publish_passcode())
         os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
         executable = self.value('borg_executable', BORG)
+        remote_path = self.value('remote_path')
+        remote_path = ['--remote-path', remote_path] if remote_path else []
         repository = str(self.repository)
         command = (
-            [executable] + [
+            [executable] + remote_path + [
                 (repository if a == '@repo' else a) for a in args
             ]
         )
@@ -468,7 +476,13 @@ class Settings:
         narrate('running:\n{}'.format(
             indent(render_command(command, borg_options_arg_count))
         ))
-        return Run(command, modes='soeW', env=os.environ, log=False)
+        starts_at = arrow.now()
+        narrate('starts at: {!s}'.format(starts_at))
+        borg = Run(command, modes='soeW', env=os.environ, log=False)
+        ends_at = arrow.now()
+        narrate('ends at: {!s}'.format(ends_at))
+        narrate('elapsed = {!s}'.format(ends_at-starts_at))
+        return borg
 
     # destination() {{{2
     def destination(self, archive=None):

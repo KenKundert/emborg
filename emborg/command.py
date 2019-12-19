@@ -180,7 +180,10 @@ class BorgCommand(Command):
         borg_args = cmdline['<borg_args>']
 
         # run borg
-        settings.run_borg_raw(borg_args)
+        borg = settings.run_borg_raw(borg_args)
+        out = borg.stdout
+        if out:
+            output(out.rstrip())
 
 
 # BreakLockCommand command {{{1
