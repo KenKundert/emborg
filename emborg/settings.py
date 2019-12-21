@@ -72,13 +72,14 @@ config_queue = None
 class NoMoreConfigs(Exception):
     pass
 
-def get_config(name, settings, composite_config_allowed):
+def get_config(name, settings, composite_config_allowed, show_config_name):
     global config_queue
 
     if config_queue is not None:
         try:
             active_config = config_queue.pop(0)
-            display('\n===', active_config, '===')
+            if show_config_name:
+                display('\n===', active_config, '===')
             return active_config
         except IndexError:
             raise NoMoreConfigs()
@@ -120,7 +121,7 @@ def get_config(name, settings, composite_config_allowed):
         config_queue = []
     else:
         config_queue = configs
-    if config_queue:
+    if config_queue and show_config_name:
         display('===', active_config, '===')
     return active_config
 
@@ -132,9 +133,11 @@ class Settings:
         if command:
             self.requires_exclusivity = command.REQUIRES_EXCLUSIVITY
             self.composite_config_allowed = command.COMPOSITE_CONFIGS
+            self.show_config_name = command.SHOW_CONFIG_NAME
         else:
             self.requires_exclusivity = True
             self.composite_config_allowed = False
+            self.show_config_name = False
         self.settings = {}
         self.options = options
         self.config_dir = to_path(CONFIG_DIR)
@@ -188,7 +191,10 @@ class Settings:
             settings_filename = path.path
             settings = path.run()
 
-            config = get_config(name, settings, self.composite_config_allowed)
+            config = get_config(
+                name, settings, self.composite_config_allowed,
+                self.show_config_name
+            )
             settings['config_name'] = config
             self.config_name = config
             includes = Collection(settings.get(INCLUDE_SETTING))
@@ -291,7 +297,6 @@ class Settings:
             pass
         except KeyError as e:
             warn('unknown key.', culprit=(self.settings_file, 'notifier', e))
-        raise Error(msg)
 
     # get resolved value {{{2
     def value(self, name, default=''):

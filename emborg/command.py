@@ -94,6 +94,9 @@ def get_available_files(settings, archive):
 
 # Command base class {{{1
 class Command(object):
+    REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = False
+    SHOW_CONFIG_NAME = True
 
     @classmethod
     def commands(cls):
@@ -120,7 +123,7 @@ class Command(object):
 
     @classmethod
     def execute_early(cls, name, args, settings, options):
-        # run_early() takes same arguments as run(), but is run before the
+        # execute_early() takes same arguments as run(), but is run before the
         # settings files have been read. As such, the settings argument is None.
         # run_early() is used for commands that do not need settings and should
         # work even if the settings files do not exist or are not valid.
@@ -134,6 +137,16 @@ class Command(object):
             narrate('running {} command'.format(name))
             exit_status = cls.run(name, args if args else [], settings, options)
             return 0 if exit_status is None else exit_status
+
+    @classmethod
+    def execute_late(cls, name, args, settings, options):
+        # execute_late() takes same arguments as run(), but is run after all the
+        # configurations have been run. As such, the settings argument is None.
+        # run_late() is used for commands that want to create a summary that
+        # includes the results from all the configurations.
+        if hasattr(cls, 'run_late'):
+            narrate('running {} post-command'.format(name))
+            return cls.run_late(name, args if args else [], settings, options)
 
     @classmethod
     def summarize(cls, width=16):
@@ -493,8 +506,10 @@ class DueCommand(Command):
         Options:
             -d <num>, --days <num>     emit message if this many days have passed
                                        since last backup
-            -m <msg>, --message <msg>  the message to emit
             -e <addr>, --email <addr>  send email message rather than print message
+            -m <msg>, --message <msg>  the message to emit
+            -o, --oldest               with composite configuration, only report
+                                       the oldest
 
         If you specify the days, then the message is only printed if the backup
         is overdue.  If not overdue, nothing is printed. The message is always
@@ -516,6 +531,10 @@ class DueCommand(Command):
     """).strip()
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = True
+    MESSAGES = {}
+    SHOW_CONFIG_NAME = False
+    OLDEST_DATE = None
+    OLDEST_CONFIG = None
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -528,28 +547,30 @@ class DueCommand(Command):
                 since_last_backup = arrow.now() - date
                 days = since_last_backup.total_seconds()/86400
                 elapsed = date.humanize(only_distance=True)
-                return cmdline['--message'].format(
-                    days=days, elapsed=elapsed
-                )
+                try:
+                    return cmdline['--message'].format(
+                        days=days, elapsed=elapsed, config=settings.config_name
+                    )
+                except KeyError as e:
+                    raise Error(
+                        'unknown key in:',
+                        culprit = e.args[0], codicil = cmdline['--message']
+                    )
             else:
-                return f'The latest complete archive was created {date.humanize()}.'
+                return f'The latest {settings.config_name} archive was created {date.humanize()}.'
 
         if email:
-            def report(msg):
-                Run(
-                    ['mail', '-s', f'{PROGRAM_NAME}: backup is overdue', email],
-                    stdin=dedent(f'''
+            def save_message(msg):
+                cls.MESSAGES[settings.config_name] = dedent(f'''
                         {msg}
                         config = {settings.config_name}
                         source host = {hostname}
                         source directories = {', '.join(str(d) for d in settings.src_dirs)}
                         destination = {settings.repository}
-                    ''').lstrip(),
-                    modes='soeW'
-                )
+                    ''').lstrip()
         else:
-            def report(msg):
-                output(msg)
+            def save_message(msg):
+                cls.MESSAGES[settings.config_name] = msg
 
         # Get date of last backup and warn user if it is overdue
         date_file = settings.date_file
@@ -564,16 +585,40 @@ class DueCommand(Command):
             days = since_last_backup.total_seconds()/86400
             try:
                 if days > float(cmdline['--days']):
-                    report(gen_message(backup_date))
+                    save_message(gen_message(backup_date))
                     if not email:
                         return 1
             except ValueError:
                 raise Error('expected a number for --days.')
             return
 
-        # Otherwise, simply report age of backups
-        report(gen_message(backup_date))
+        # record the name of the oldest config
+        if not cls.OLDEST_DATE or backup_date < cls.OLDEST_DATE:
+            cls.OLDEST_DATE = backup_date
+            cls.OLDEST_CONFIG = settings.config_name
 
+        # Otherwise, simply report age of backups
+        save_message(gen_message(backup_date))
+
+    @classmethod
+    def run_late(cls, command, args, settings, options):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        email = cmdline['--email']
+
+        if cmdline['--oldest']:
+            message = cls.MESSAGES[cls.OLDEST_CONFIG]
+        else:
+            message = '\n'.join(cls.MESSAGES.values())
+
+        if email:
+            Run(
+                ['mail', '-s', f'{PROGRAM_NAME}: backup is overdue', email],
+                stdin = message,
+                modes = 'soeW'
+            )
+        else:
+            output(message)
 
 # ExtractCommand command {{{1
 class ExtractCommand(Command):
@@ -809,7 +854,7 @@ class LogCommand(Command):
             emborg log
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1133,6 +1178,7 @@ class SettingsCommand(Command):
                 output(f'{key:>33}: {render(v, level=6)}')
 
     run_early = run
+        # --avalable is handled in run_early
 
 
 # UmountCommand command {{{1

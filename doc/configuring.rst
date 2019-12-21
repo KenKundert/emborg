@@ -148,9 +148,9 @@ You can run all three configurations with:
 
 Only certain commands support composite configurations. Specifically, 
 :ref:`create`, :ref:`check`, :ref:`configs`, :ref:`due`, :ref:`help`, 
-:ref:`info`, :ref:`prune`, and :ref:`version` support composite configures.  
-Specifying a composite configuration to a command that does not support them 
-results in an error.
+:ref:`info`, :ref:`log`, :ref:`prune`, and :ref:`version` support composite 
+configures.  Specifying a composite configuration to a command that does not 
+support them results in an error.
 
 
 Emborg Settings

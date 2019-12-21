@@ -168,6 +168,19 @@ printed.  This allows you to run the :ref:`due <due>` command from a cron script
 in order to send your self reminders to do a backup if one has not occurred for 
 a while.
 
+You can specify a specific message to be printed with --message. In this case, 
+{days} is replaced by the number of days since the last backup. You can add 
+floating-point format codes to specify the resolution used. For example: 
+{days:.1f}. Also, {elapsed} is replaced with a humanized description of how long 
+it has been since the last backup, and {config} is replaced with the name of the 
+configuration being reported on. So ``--message '{elapsed} since last backup of 
+{config}.'`` might produce something like this::
+
+    12 hours since last backup of home.
+
+With composite configs the message is printed for each component config unless 
+--oldest is specified, in which case only the oldest is displayed.
+
 
 .. _extract:
 

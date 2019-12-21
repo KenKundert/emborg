@@ -76,20 +76,23 @@ def main():
         if cmdline['--narrate']:
             inform.narrate = True
 
+        # find the command
+        cmd, cmd_name = Command.find(command)
+
+        # execute the command initialization
+        exit_status = cmd.execute_early(cmd_name, args, None, options)
+        if exit_status is not None:
+            terminate(exit_status)
+
         worst_exit_status = 0
         try:
             while True:
-                cmd, cmd_name = Command.find(command)
-                exit_status = cmd.execute_early(cmd_name, args, None, options)
-                if exit_status is not None:
-                    terminate(exit_status)
-
                 with Settings(config, cmd, options) as settings:
                     try:
                         exit_status = cmd.execute(cmd_name, args, settings, options)
                     except Error as e:
                         settings.fail(e)
-                        e.terminate(True)
+                        e.terminate()
 
                 if exit_status and exit_status > worst_exit_status:
                     worst_exit_status = exit_status
@@ -102,4 +105,10 @@ def main():
             fatal(os_error(e))
         except NoMoreConfigs:
             pass
+
+        # execute the command termination
+        exit_status = cmd.execute_late(cmd_name, args, None, options)
+        if exit_status and exit_status > worst_exit_status:
+            worst_exit_status = exit_status
+
         terminate(worst_exit_status)
