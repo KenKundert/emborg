@@ -572,7 +572,7 @@ class DueCommand(Command):
             def save_message(msg):
                 cls.MESSAGES[settings.config_name] = msg
 
-        # Get date of last backup and warn user if it is overdue
+        # Get date of last backup
         date_file = settings.date_file
         try:
             backup_date = arrow.get(date_file.read_text())
@@ -580,6 +580,13 @@ class DueCommand(Command):
             backup_date = arrow.get('19560105', 'YYYYMMDD')
         except arrow.parser.ParserError:
             raise Error('date not given in iso format.', culprit=date_file)
+
+        # Record the name of the oldest config
+        if not cls.OLDEST_DATE or backup_date < cls.OLDEST_DATE:
+            cls.OLDEST_DATE = backup_date
+            cls.OLDEST_CONFIG = settings.config_name
+
+        # Warn user if backup is overdue
         if cmdline.get('--days'):
             since_last_backup = arrow.now() - backup_date
             days = since_last_backup.total_seconds()/86400
@@ -591,11 +598,6 @@ class DueCommand(Command):
             except ValueError:
                 raise Error('expected a number for --days.')
             return
-
-        # record the name of the oldest config
-        if not cls.OLDEST_DATE or backup_date < cls.OLDEST_DATE:
-            cls.OLDEST_DATE = backup_date
-            cls.OLDEST_CONFIG = settings.config_name
 
         # Otherwise, simply report age of backups
         save_message(gen_message(backup_date))
