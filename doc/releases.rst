@@ -5,6 +5,8 @@ Releases
     | Version: 1.11.6
     | Released: 2019-12-23
 
+
+**1.12 (2019-12-25)**:
     - added :ref:`default_mount_point` setting.
     - fixed some issues with :ref:`borg <borg>` command.
     - added ``--oldest`` option to :ref:`due <due>` command.
