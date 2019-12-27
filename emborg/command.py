@@ -608,6 +608,9 @@ class DueCommand(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         email = cmdline['--email']
 
+        if not cls.MESSAGES:
+            return
+
         if cmdline['--oldest']:
             message = cls.MESSAGES[cls.OLDEST_CONFIG]
         else:
