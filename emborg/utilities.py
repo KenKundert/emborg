@@ -28,6 +28,9 @@ import pwd
 def gethostname():
     return socket.gethostname().split('.')[0]
 
+def getfullhostname():
+    return socket.gethostname()
+
 # getusername {{{1
 def getusername():
     return pwd.getpwuid(os.getuid()).pw_name

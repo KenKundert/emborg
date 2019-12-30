@@ -38,7 +38,7 @@ from .preferences import (
     SETTINGS_FILE,
 )
 from .python import PythonFile
-from .utilities import gethostname, getusername, render_paths
+from .utilities import gethostname, getfullhostname, getusername, render_paths
 from shlib import getmod, mv, rm, Run, to_path, render_command, to_path
 from inform import (
     Color, Error, codicil, conjoin, display, done, full_stop, get_informer, 
@@ -51,6 +51,7 @@ import os
 
 # Utilities {{{1
 hostname = gethostname()
+fullhostname = getfullhostname()
 username = getusername()
 
 borg_commands_with_dryrun = 'create extract delete prune upgrade recreate'
@@ -272,7 +273,7 @@ class Settings:
         try:
             if self.notify and not Color.isTTY():
                 Run(
-                    ['mail', '-s', f'{PROGRAM_NAME} on {hostname}: {msg}'] + self.notify.split(),
+                    ['mail', '-s', f'{PROGRAM_NAME} on {fullhostname}: {msg}'] + self.notify.split(),
                     stdin=dedent(f'''
                         {msg}
                         {comment}
