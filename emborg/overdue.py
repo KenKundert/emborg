@@ -81,9 +81,12 @@ def main():
     with Inform(flush=True, quiet=quiet, version=version) as inform:
 
         # read the settings file
-        settings_file = PythonFile(CONFIG_DIR, OVERDUE_FILE)
-        settings_filename = settings_file.path
-        settings = settings_file.run()
+        try:
+            settings_file = PythonFile(CONFIG_DIR, OVERDUE_FILE)
+            settings_filename = settings_file.path
+            settings = settings_file.run()
+        except Error as e:
+            e.terminate()
 
         # gather needed settings
         default_maintainer = settings.get('default_maintainer')
