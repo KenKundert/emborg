@@ -55,6 +55,10 @@ the repository.
 
    > emborg borg key export @repo key.borg
 
+::
+
+   > emborg borg check --repair @repo
+
 
 .. _breaklock:
 

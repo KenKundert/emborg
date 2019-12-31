@@ -258,6 +258,11 @@ class CheckCommand(Command):
         archive = cmdline['<archive>']
         check_all = cmdline['--all']
         verify = ['--verify-data'] if cmdline['--verify-data'] else []
+        #repair = ['--repair'] if cmdline['--repair'] else []
+        repair = []
+            # repair has been deleted because it requires the user to
+            # interactively respond to a query, and emborg does not support that
+            # yet.
         include_external_archives = cmdline['--include-external']
 
         # identify archive or archives to check
@@ -269,7 +274,7 @@ class CheckCommand(Command):
         # run borg
         borg = settings.run_borg(
             cmd = 'check',
-            args = verify + [settings.destination(archive)],
+            args = verify + repair + [settings.destination(archive)],
             emborg_opts = options,
             strip_prefix = include_external_archives,
         )

@@ -153,6 +153,10 @@ BORG_SETTINGS = dict(
         arg = 'RATE',
         desc = 'set remote network upload rate limit in kiB/s (default: 0=unlimited)'
     ),
+    repair = dict(
+        cmds = 'check',
+        desc = 'attempt to repair any inconsistencies found'
+    ),
     umask = dict(
         cmds = 'all',
         arg = 'M',
