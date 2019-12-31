@@ -60,7 +60,7 @@ def gethostname():
 set_prefs(use_inform=True)
 
 overdue_message = dedent("""
-    Backup of {host} is overdue.
+    Backup of {host} ({gethostname()} is overdue.
     The backup sentinel file ({path!s}) has not changed in {age:0.0f} hours.
 """).strip()
 
