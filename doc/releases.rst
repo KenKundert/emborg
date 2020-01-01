@@ -6,6 +6,9 @@ Releases
     | Released: 2019-12-31
 
 
+**1.13 (2019-12-31)**:
+    - enhance emborg-overdue to work on clients as well as servers
+
 **1.12 (2019-12-25)**:
     - added :ref:`default_mount_point` setting.
     - fixed some issues with :ref:`borg <borg>` command.
