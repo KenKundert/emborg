@@ -19,14 +19,6 @@ Options:
     --no-log                          Do not create log file.
 """
 
-commands = """
-Commands:
-{commands}
-
-Use 'emborg help <command>' for information on a specific command.
-Use 'emborg help' for list of available help topics.
-"""
-
 # License {{{1
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,11 +42,18 @@ from inform import Inform, Error, cull, display, fatal, terminate, os_error
 from docopt import docopt
 
 # Globals {{{1
+version = f'{__version__} ({__released__})'
+commands = """
+Commands:
+{commands}
+
+Use 'emborg help <command>' for information on a specific command.
+Use 'emborg help' for list of available help topics.
+"""
 synopsis = __doc__
 expanded_synopsis = synopsis + commands.format(commands=Command.summarize())
-version = f'{__version__} ({__released__})'
 
-from .command import Command
+
 # Main {{{1
 def main():
     with Inform(error_status=2, flush=True, version=version) as inform:

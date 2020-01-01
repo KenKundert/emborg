@@ -7,6 +7,9 @@ Utilities
 Overdue
 -------
 
+Checking for Overdue Backups from the Server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 *Emborg* contains an additional executable, *emborg-overdue*, that can be run on 
 the destination server to determine whether the backups have been performed 
 recently.  It reads its own settings file in ~/.config/emborg/overdue.conf that 
@@ -22,7 +25,7 @@ Here is an example config file::
 
     default_maintainer = 'root@continuum.com'
     dumper = 'dumper@continuum.com'
-    default_max_age = 12 # hours
+    default_max_age = 12  # hours
     root = '/mnt/borg-backups/repositories'
     repositories = [
         dict(host='mercury (/)', path='mercury-root-root'),
@@ -37,14 +40,15 @@ Here is an example config file::
     ]
 
 The dictionaries in *repositories* can contain the following fields: *host*, 
-*path*, *maintainer*, *max_age*. *host* is a description of the host. It is 
-included in the email that is sent when problems occur to identify the backup.  
-It is a good idea for it to contain both the host name and the source directory 
-being backed up.  *path* is either the archive name or a full absolute path to 
-the archive.  If *path* is an absolute path, it is used, otherwise it is added 
-to the end of *root*.  *maintainer* is an email address, an email is sent to 
-this address if there is an issue.  *max_age* is the number of hours that may 
-pass before an archive is considered overdue.
+*path*, *maintainer*, *max_age*. *host* is an arbitrary string that is used as 
+description of the repository.  It is included in the email that is sent when 
+problems occur to identify the backup and so should be unique.  It is a good 
+idea for it to contain both the host name and the source directory being backed 
+up.  *path* is either the archive name or a full absolute path to the archive.  
+If *path* is an absolute path, it is used, otherwise it is added to the end of 
+*root*.  *maintainer* is an email address, an email is sent to this address if 
+there is an issue.  *max_age* is the number of hours that may pass before an 
+archive is considered overdue.
 
 *repositories* can also be specified as multi-line string::
 
@@ -79,11 +83,11 @@ so, run::
 
 and add something like the following::
 
-    4 5 * * * ~/dumper/.local/bin/emborg-overdue --mail > ~/dumper/emborg-overdue.out 2>&
+    34 5 * * * ~/.local/bin/emborg-overdue --mail > ~/.local/share/emborg/emborg-overdue.out 2>&
 
 or::
 
-    4 5 * * * ~/dumper/.local/bin/emborg-overdue --quiet --mail
+    34 5 * * * ~/.local/bin/emborg-overdue --quiet --mail
 
 to your crontab.
 
@@ -93,3 +97,24 @@ send mail to the maintainer when backups are found to be overdue.
 
 The second example is similar except the output is suppressed rather than being 
 saved to a file.
+
+
+Checking for Overdue Backups from the Client
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*emborg-overdue* can also be configured to run on the client.  This can be used 
+when you do not control the server and so cannot run *emborg-overdue* there.  
+The configuration is identical, except you give the path to the *lastbackup* 
+file.  For example::
+
+    default_maintainer = 'me@continuum.com'
+    dumper = 'me@continuum.com'
+    default_max_age = 12  # hours
+    root = '~/.local/share/emborg'
+    repositories = [
+        dict(host='earth (cache)', path='cache.lastbackup', max_age=0.2),
+        dict(host='earth (home)', path='home.lastbackup'),
+    ]
+
+Again, you can 
+

@@ -39,9 +39,9 @@ from .preferences import (
 )
 from .python import PythonFile
 from .utilities import gethostname, getfullhostname, getusername, render_paths
-from shlib import getmod, mv, rm, Run, to_path, render_command, to_path
+from shlib import getmod, mv, rm, Run, to_path, render_command
 from inform import (
-    Color, Error, codicil, conjoin, display, done, full_stop, get_informer, 
+    Color, Error, codicil, conjoin, display, done, full_stop, get_informer,
     indent, is_str, narrate, output, render, warn,
 )
 from textwrap import dedent
@@ -70,8 +70,10 @@ for name, attrs in BORG_SETTINGS.items():
 # get_config {{{2
 config_queue = None
 
+
 class NoMoreConfigs(Exception):
     pass
+
 
 def get_config(name, settings, composite_config_allowed, show_config_name):
     global config_queue
@@ -109,7 +111,7 @@ def get_config(name, settings, composite_config_allowed, show_config_name):
         else:
             raise Error(
                 'no known configurations.',
-                culprit=(settings_filename, CONFIGS_SETTING)
+                culprit=(settings.settings_filename, CONFIGS_SETTING)
             )
     configs = list(config_groups[name])
     num_configs = len(configs)
@@ -189,7 +191,7 @@ class Settings:
                 done()
 
             path = PythonFile(parent, SETTINGS_FILE)
-            settings_filename = path.path
+            self.settings_filename = path.path
             settings = path.run()
 
             config = get_config(
@@ -218,7 +220,7 @@ class Settings:
 
         # default archive if not given
         if 'archive' not in self.settings:
-            if not 'prefix' in self.settings:
+            if 'prefix' not in self.settings:
                 self.settings['prefix'] = '{host_name}-{user_name}-{config_name}-'
             self.settings['archive'] = self.settings['prefix'] + '{{now}}'
 
@@ -425,10 +427,10 @@ class Settings:
         if borg_opts is None:
             borg_opts = self.borg_options(cmd, emborg_opts, strip_prefix)
         command = (
-            [executable]
-          + cmd.split()
-          + borg_opts
-          + (args.split() if is_str(args) else args)
+            [executable] +
+            cmd.split() +
+            borg_opts +
+            (args.split() if is_str(args) else args)
         )
         environ = {k:v for k, v in os.environ.items() if k.startswith('BORG_')}
         if 'BORG_PASSPHRASE' in environ:
@@ -454,12 +456,12 @@ class Settings:
             '--verbose' in borg_opts or
             'verbose' in emborg_opts or
             'narrate' in emborg_opts
-        ) and not '--json' in command
+        ) and '--json' not in command
         modes = 'soeW' if narrating else 'sOEW'
         borg = Run(command, modes=modes, stdin='', env=os.environ, log=False)
         ends_at = arrow.now()
         narrate('ends at: {!s}'.format(ends_at))
-        narrate('elapsed = {!s}'.format(ends_at-starts_at))
+        narrate('elapsed = {!s}'.format(ends_at - starts_at))
         return borg
 
     # run_borg_raw() {{{2
@@ -487,7 +489,7 @@ class Settings:
         borg = Run(command, modes='soeW', env=os.environ, log=False)
         ends_at = arrow.now()
         narrate('ends at: {!s}'.format(ends_at))
-        narrate('elapsed = {!s}'.format(ends_at-starts_at))
+        narrate('elapsed = {!s}'.format(ends_at - starts_at))
         return borg
 
     # destination() {{{2

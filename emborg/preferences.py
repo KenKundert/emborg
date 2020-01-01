@@ -34,6 +34,7 @@ DATA_DIR = user_data_dir(PROGRAM_NAME)
 SETTINGS_FILE = 'settings'
 OVERDUE_FILE = 'overdue.conf'
 LOG_FILE = '{config_name}.log'
+OVERDUE_LOG_FILE = 'overdue.log'
 PREV_LOG_FILE = '{config_name}.log.prev'
 LOCK_FILE = '{config_name}.lock'
 DATE_FILE = '{config_name}.lastbackup'
@@ -153,10 +154,10 @@ BORG_SETTINGS = dict(
         arg = 'RATE',
         desc = 'set remote network upload rate limit in kiB/s (default: 0=unlimited)'
     ),
-    repair = dict(
-        cmds = 'check',
-        desc = 'attempt to repair any inconsistencies found'
-    ),
+    #repair = dict(
+    #    cmds = 'check',
+    #    desc = 'attempt to repair any inconsistencies found'
+    #),
     umask = dict(
         cmds = 'all',
         arg = 'M',
@@ -174,9 +175,11 @@ BORG_SETTINGS = dict(
 for opt, attrs in BORG_SETTINGS.items():
     attrs['cmds'] = attrs['cmds'].split()
 
+
 # utility function that converts setting names to borg option names
 def convert_name_to_option(name):
     return '--' + name.replace('_', '-')
+
 
 # Initial contents of files {{{2
 INITIAL_SETTINGS_FILE_CONTENTS = dedent("""

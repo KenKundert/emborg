@@ -22,6 +22,7 @@
 # Imports {{{1
 from inform import is_str, is_collection
 
+
 # Collection {{{1
 class Collection(object):
     def __init__(self, collection, splitter=None):

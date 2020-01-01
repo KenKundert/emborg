@@ -23,17 +23,14 @@ from .preferences import (
     EMBORG_SETTINGS,
     PROGRAM_NAME,
 )
-from .settings import Settings
 from .utilities import two_columns, render_paths, gethostname
-hostname = gethostname()
 from inform import (
     Color, Error,
     codicil, conjoin, cull, full_stop, is_str, narrate, os_error, output,
     render, warn
 )
 from docopt import docopt
-from shlib import cd, cwd, mkdir, mv, rm, to_path, Run, set_prefs
-set_prefs(use_inform=True, log_cmd=True)
+from shlib import cd, mkdir, rm, to_path, Run, set_prefs
 from textwrap import dedent
 import arrow
 import json
@@ -41,9 +38,14 @@ import sys
 
 
 # Utilities {{{1
+hostname = gethostname()
+set_prefs(use_inform=True, log_cmd=True)
+
+
 # title() {{{2
 def title(text):
     return full_stop(text.capitalize())
+
 
 # get_available_archives() {{{2
 def get_available_archives(settings):
@@ -58,6 +60,7 @@ def get_available_archives(settings):
     except json.decoder.JSONDecodeError as e:
         raise Error('Could not decode output of Borg list command.', codicil=e)
 
+
 # get_name_of_latest_archive() {{{2
 def get_name_of_latest_archive(settings):
     archives = get_available_archives(settings)
@@ -65,6 +68,7 @@ def get_name_of_latest_archive(settings):
         raise Error('no archives are available.')
     if archives:
         return archives[-1]['name']
+
 
 def get_name_of_nearest_archive(settings, date):
     archives = get_available_archives(settings)
@@ -76,6 +80,7 @@ def get_name_of_nearest_archive(settings, date):
         if arrow.get(archive['time']) >= date:
             return archive['name']
     raise Error('archive not available.', culprit=date)
+
 
 # get_available_files() {{{2
 def get_available_files(settings, archive):
@@ -91,6 +96,7 @@ def get_available_files(settings, archive):
         return files
     except json.decoder.JSONDecodeError as e:
         raise Error('Could not decode output of Borg list command.', codicil=e)
+
 
 # Command base class {{{1
 class Command(object):
@@ -258,7 +264,7 @@ class CheckCommand(Command):
         archive = cmdline['<archive>']
         check_all = cmdline['--all']
         verify = ['--verify-data'] if cmdline['--verify-data'] else []
-        #repair = ['--repair'] if cmdline['--repair'] else []
+        # repair = ['--repair'] if cmdline['--repair'] else []
         repair = []
             # repair has been deleted because it requires the user to
             # interactively respond to a query, and emborg does not support that
@@ -629,6 +635,7 @@ class DueCommand(Command):
             )
         else:
             output(message)
+
 
 # ExtractCommand command {{{1
 class ExtractCommand(Command):

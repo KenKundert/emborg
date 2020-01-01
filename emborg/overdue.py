@@ -33,9 +33,8 @@ Options:
 
 # Imports {{{1
 from . import __version__, __released__
-from .preferences import CONFIG_DIR, OVERDUE_FILE
+from .preferences import CONFIG_DIR, OVERDUE_FILE, DATA_DIR, OVERDUE_LOG_FILE
 from .python import PythonFile
-from .utilities import error_source
 from inform import (
     Inform, Error, display, os_error, error, get_prog_name, is_str, terminate
 )
@@ -51,6 +50,7 @@ import socket
 # Utilities {{{1
 def getusername():
     return pwd.getpwuid(os.getuid()).pw_name
+
 
 def gethostname():
     return socket.gethostname()
@@ -78,12 +78,13 @@ def main():
     cmdline = docopt(__doc__, version=version)
     quiet = cmdline['--quiet']
     problem = False
-    with Inform(flush=True, quiet=quiet, version=version) as inform:
+    log = to_path(DATA_DIR, OVERDUE_LOG_FILE) if OVERDUE_LOG_FILE else False
+    ddd(log=log)
+    with Inform(flush=True, quiet=quiet, logfile=log, version=version):
 
         # read the settings file
         try:
             settings_file = PythonFile(CONFIG_DIR, OVERDUE_FILE)
-            settings_filename = settings_file.path
             settings = settings_file.run()
         except Error as e:
             e.terminate()
@@ -121,19 +122,18 @@ def main():
         # check age of repositories
         now = arrow.now()
         display(f'current time = {now}')
-        for host, path, maintainer, max_age  in backups:
+        for host, path, maintainer, max_age in backups:
             maintainer = default_maintainer if not maintainer else maintainer
-            max_age = int(max_age) if max_age else default_max_age
+            max_age = float(max_age) if max_age else default_max_age
             try:
                 path = to_path(root, path)
-                if not path.is_dir():
-                    raise Error('does not exist or is not a directory.', culprit=path)
-                paths = list(path.glob('index.*'))
-                if not paths:
-                    raise Error('no sentinel file found.', culprit=path)
-                if len(paths) > 1:
-                    raise Error('too many sentinel files.', *paths, sep='\n    ')
-                path = paths[0]
+                if path.is_dir():
+                    paths = list(path.glob('index.*'))
+                    if not paths:
+                        raise Error('no sentinel file found.', culprit=path)
+                    if len(paths) > 1:
+                        raise Error('too many sentinel files.', *paths, sep='\n    ')
+                    path = paths[0]
                 mtime = arrow.get(path.stat().st_mtime)
                 delta = now - mtime
                 age = 24 * delta.days + delta.seconds / 3600
@@ -156,7 +156,7 @@ def main():
                 problem = True
                 msg = os_error(e)
                 error(msg)
-                if maintaner:
+                if maintainer:
                     send_mail(
                         maintainer,
                         f'{get_prog_name()} error', error_message.format(msg)
@@ -164,10 +164,9 @@ def main():
             except Error as e:
                 problem = True
                 e.report()
-                if maintaner:
+                if maintainer:
                     send_mail(
                         maintainer,
                         f'{get_prog_name()} error', error_message.format(str(e))
                     )
         terminate(problem)
-

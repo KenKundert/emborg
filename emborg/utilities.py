@@ -16,29 +16,31 @@
 
 # Imports {{{1
 from shlib import Run, to_path
-from inform import is_str
-from pipes import quote
 import os
-import shlex
 import socket
 import pwd
+
 
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
 def gethostname():
     return socket.gethostname().split('.')[0]
 
+
 def getfullhostname():
     return socket.gethostname()
+
 
 # getusername {{{1
 def getusername():
     return pwd.getpwuid(os.getuid()).pw_name
 
+
 # pager {{{1
 def pager(text):
     program = os.environ.get('PAGER', 'less')
     Run([program], stdin=text, modes='Woes')
+
 
 # two_columns {{{1
 def two_columns(col1, col2, width=16, indent=True):
@@ -49,6 +51,7 @@ def two_columns(col1, col2, width=16, indent=True):
         )
     else:
         return '%s%-*s  %s' % (indent, width, col1, col2)
+
 
 # error_source {{{1
 def error_source():
@@ -75,11 +78,12 @@ def error_source():
         line = tb.tb_next.tb_lineno
     return filename, 'line %s' % line
 
+
 # render_path() {{{1
 def render_path(path):
     return str(to_path(path))
 
+
 # render_paths() {{{1
 def render_paths(path_list):
     return [render_path(path) for path in path_list]
-
