@@ -79,7 +79,6 @@ def main():
     quiet = cmdline['--quiet']
     problem = False
     log = to_path(DATA_DIR, OVERDUE_LOG_FILE) if OVERDUE_LOG_FILE else False
-    ddd(log=log)
     with Inform(flush=True, quiet=quiet, logfile=log, version=version):
 
         # read the settings file
