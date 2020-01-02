@@ -305,11 +305,19 @@ class ConfigsCommand(Command):
         # read command line
         docopt(cls.USAGE, argv=[command] + args)
 
-        configurations = Collection(settings.configurations)
-        if configurations:
-            output('Available Configurations:', *configurations, sep='\n    ')
+        configs = Collection(settings.configurations)
+        if configs:
+            output('Available Configurations:', *configs, sep='\n    ')
         else:
             output('No configurations available.')
+
+        output()
+
+        default_config= settings.default_configuration
+        if default_config:
+            output('Default Configurations:', default_config, sep='\n    ')
+        else:
+            output('No default configuration available.')
 
 
 # CreateCommand command {{{1
