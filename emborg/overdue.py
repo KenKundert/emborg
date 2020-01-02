@@ -11,9 +11,11 @@ Usage:
     emborg-overdue [options]
 
 Options:
-    -h, --help     Output basic usage information.
-    -m, --mail     Send mail message if backup is overdue
-    -q, --quiet    Suppress output to stdout.
+    -c, --no-color   Do not color the output
+    -h, --help       Output basic usage information
+    -m, --mail       Send mail message if backup is overdue
+    -p, --no-passes  Do not show hosts that are not overdue
+    -q, --quiet      Suppress output to stdout
 """
 
 # License {{{1
@@ -36,7 +38,8 @@ from . import __version__, __released__
 from .preferences import CONFIG_DIR, OVERDUE_FILE, DATA_DIR, OVERDUE_LOG_FILE
 from .python import PythonFile
 from inform import (
-    Inform, Error, display, os_error, error, get_prog_name, is_str, terminate
+    Inform, Error, Color,
+    display, os_error, error, get_prog_name, is_str, terminate, warn
 )
 from docopt import docopt
 from shlib import to_path, Run, set_prefs
@@ -47,27 +50,22 @@ import pwd
 import socket
 
 
-# Utilities {{{1
-def getusername():
-    return pwd.getpwuid(os.getuid()).pw_name
-
-
-def gethostname():
-    return socket.gethostname()
-
-
 # Globals {{{1
 set_prefs(use_inform=True)
+username = pwd.getpwuid(os.getuid()).pw_name
+hostname = socket.gethostname()
+now = arrow.now()
 
-overdue_message = dedent("""
-    Backup of {host} is overdue.
-    The backup sentinel file ({path!s}) has not changed in {age:0.0f} hours.
+overdue_message = dedent(f"""
+    Backup of {{host}} is overdue:
+       from: {username}@{hostname} at {now}
+       message: the backup sentinel file has not changed in {{age:0.0f}} hours.
+       sentinel file: {{path!s}}
 """).strip()
 
 error_message = dedent(f"""
    {get_prog_name()} generated the following error:
-       host: {gethostname()}
-       user: {getusername()}
+       from: {username}@{hostname} at {now}
        message: {{}}
 """)
 
@@ -78,7 +76,22 @@ def main():
     cmdline = docopt(__doc__, version=version)
     quiet = cmdline['--quiet']
     problem = False
+    use_color = Color.isTTY() and not cmdline['--no-color']
+    passes = Color('green', enable=use_color)
+    fails = Color('red', enable=use_color)
+
+    # prepare to create logfile
     log = to_path(DATA_DIR, OVERDUE_LOG_FILE) if OVERDUE_LOG_FILE else False
+    if log:
+        data_dir = to_path(DATA_DIR)
+        if not data_dir.exists():
+            try:
+                # data dir does not exist, create it
+                data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+            except OSError as e:
+                warn(os_error(e))
+                log = False
+
     with Inform(flush=True, quiet=quiet, logfile=log, version=version):
 
         # read the settings file
@@ -91,7 +104,7 @@ def main():
         # gather needed settings
         default_maintainer = settings.get('default_maintainer')
         default_max_age = settings.get('default_max_age', 28)
-        dumper = settings.get('dumper', f'{getusername()}@{gethostname()}')
+        dumper = settings.get('dumper', f'{username}@{hostname}')
         repositories = settings.get('repositories')
         root = settings.get('root')
 
@@ -119,8 +132,6 @@ def main():
                 Run(mail_cmd, stdin=message, modes='soeW0')
 
         # check age of repositories
-        now = arrow.now()
-        display(f'current time = {now}')
         for host, path, maintainer, max_age in backups:
             maintainer = default_maintainer if not maintainer else maintainer
             max_age = float(max_age) if max_age else default_max_age
@@ -137,14 +148,16 @@ def main():
                 delta = now - mtime
                 age = 24 * delta.days + delta.seconds / 3600
                 report = age > max_age
-                display(dedent(f"""
-                    HOST: {host}
-                        sentinel file: {path!s}
-                        last modified: {mtime}
-                        since last change: {age:0.1f} hours
-                        maximum age: {max_age} hours
-                        overdue: {report}
-                """))
+                color = fails if report else passes
+                if report or not cmdline['--no-passes']:
+                    display(color(dedent(f"""
+                        HOST: {host}
+                            sentinel file: {path!s}
+                            last modified: {mtime}
+                            since last change: {age:0.1f} hours
+                            maximum age: {max_age} hours
+                            overdue: {report}
+                    """).lstrip()))
 
                 if report:
                     problem = True
