@@ -5,6 +5,9 @@ Releases
     | Version: 1.14.2
     | Released: 2020-01-02
 
+    - improve messaging from *emborg-overdue*
+    - :ref:`configs <configs>` command now outputs default configuration too.
+
 
 **1.14 (2019-12-31)**:
     - remove debug message accidentally left in *emborg-overdue*
