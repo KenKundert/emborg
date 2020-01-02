@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.14.0
-    | Released: 2019-12-31
+    | Version: 1.14.1
+    | Released: 2020-01-02
 
 
 **1.14 (2019-12-31)**:
