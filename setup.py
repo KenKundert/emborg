@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 from setuptools import setup
+from codecs import open
 
-with open('README.rst') as file:
+with open('README.rst', encoding='utf-8') as file:
     readme = file.read()
 
 setup(
