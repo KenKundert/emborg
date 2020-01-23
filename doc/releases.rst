@@ -7,6 +7,8 @@ Releases
 
     - improve messaging from *emborg-overdue*
     - :ref:`configs <configs>` command now outputs default configuration too.
+    - some commands now use first subconfig when run with a composite config
+      rather than terminating with an error.
 
 
 **1.14 (2019-12-31)**:

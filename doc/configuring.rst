@@ -146,11 +146,36 @@ You can run all three configurations with:
 
     emborg -c all create
 
-Only certain commands support composite configurations. Specifically, 
-:ref:`create`, :ref:`check`, :ref:`configs`, :ref:`due`, :ref:`help`, 
-:ref:`info`, :ref:`log`, :ref:`prune`, and :ref:`version` support composite 
-configures.  Specifying a composite configuration to a command that does not 
-support them results in an error.
+Only certain commands support composite configurations, and if a command does 
+support composite configs it may either apply each subconfig in sequence, or 
+only the first subconfig.
+
+==========  ============================
+Command     Response to Composite Config
+==========  ============================
+borg        error
+breaklock   error
+check       run on each subconfig
+configs     does not use any configs
+create      run on each subconfig
+delete      error
+diff        error
+due         run on each subconfig
+extract     run only on first subconfig
+help        does not use any configs
+info        run on each subconfig
+initialize  run on each subconfig
+list        run only on first subconfig
+log         run on each subconfig
+manifest    run only on first subconfig
+mount       run only on first subconfig
+prune       run on each subconfig
+restore     run only on first subconfig
+settings    error
+umount      run only on first subconfig
+version     does not use any configs
+==========  ============================
+
 
 
 Emborg Settings

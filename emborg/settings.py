@@ -75,7 +75,7 @@ class NoMoreConfigs(Exception):
     pass
 
 
-def get_config(name, settings, composite_config_allowed, show_config_name):
+def get_config(name, settings, composite_config_response, show_config_name):
     global config_queue
 
     if config_queue is not None:
@@ -115,15 +115,15 @@ def get_config(name, settings, composite_config_allowed, show_config_name):
             )
     configs = list(config_groups[name])
     num_configs = len(configs)
-    if num_configs > 1 and composite_config_allowed is False:
+    if num_configs > 1 and composite_config_response == 'error':
         raise Error('command does not support composite configs.', culprit=name)
     elif num_configs < 1:
         raise Error('empty composite config.', culprit=name)
     active_config = configs.pop(0)
-    if composite_config_allowed is None:
-        config_queue = []
-    else:
+    if composite_config_response == 'all':
         config_queue = configs
+    else:
+        config_queue = []
     if config_queue and show_config_name:
         display('===', active_config, '===')
     return active_config
@@ -135,11 +135,11 @@ class Settings:
     def __init__(self, name=None, command=None, options=()):
         if command:
             self.requires_exclusivity = command.REQUIRES_EXCLUSIVITY
-            self.composite_config_allowed = command.COMPOSITE_CONFIGS
+            self.composite_config_response = command.COMPOSITE_CONFIGS
             self.show_config_name = command.SHOW_CONFIG_NAME
         else:
             self.requires_exclusivity = True
-            self.composite_config_allowed = False
+            self.composite_config_response = 'error'
             self.show_config_name = False
         self.settings = {}
         self.options = options
@@ -195,7 +195,7 @@ class Settings:
             settings = path.run()
 
             config = get_config(
-                name, settings, self.composite_config_allowed,
+                name, settings, self.composite_config_response,
                 self.show_config_name
             )
             settings['config_name'] = config

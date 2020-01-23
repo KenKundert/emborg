@@ -26,8 +26,8 @@ from .preferences import (
 from .utilities import two_columns, render_paths, gethostname
 from inform import (
     Color, Error,
-    codicil, conjoin, cull, full_stop, is_str, narrate, os_error, output,
-    render, warn
+    codicil, conjoin, cull, display, full_stop, is_str, narrate, os_error,
+    output, render, warn
 )
 from docopt import docopt
 from shlib import cd, mkdir, rm, to_path, Run, set_prefs
@@ -101,7 +101,12 @@ def get_available_files(settings, archive):
 # Command base class {{{1
 class Command(object):
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'error'
+        # possible values are:
+        #     'error': emit error if applied to composite config
+        #     'all'  : use all configs of composite config in sequence
+        #     'first': only use the first config in a composite config
+        #     'none' : do not use any of configs in composite config
     SHOW_CONFIG_NAME = True
 
     @classmethod
@@ -190,7 +195,7 @@ class BorgCommand(Command):
         repository.  The passphrase is set before the command is run.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'error'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -218,7 +223,7 @@ class BreakLockCommand(Command):
         running before using this command.
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'error'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -255,7 +260,7 @@ class CheckCommand(Command):
         unless --all is given, in which case all archives are checked.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = True
+    COMPOSITE_CONFIGS = 'all'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -298,7 +303,7 @@ class ConfigsCommand(Command):
             emborg configs
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = None
+    COMPOSITE_CONFIGS = 'none'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -336,7 +341,7 @@ class CreateCommand(Command):
         This can help you debug slow create operations.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = True
+    COMPOSITE_CONFIGS = 'all'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -458,7 +463,7 @@ class DeleteCommand(Command):
         # borg from asking for confirmation, so just limit user to deleting one
         # archive at a time.
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'error'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -491,7 +496,7 @@ class DiffCommand(Command):
             emborg diff <archive1> <archive2>
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'error'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -549,7 +554,7 @@ class DueCommand(Command):
             It has been 4 months since the last backup.
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = True
+    COMPOSITE_CONFIGS = 'all'
     MESSAGES = {}
     SHOW_CONFIG_NAME = False
     OLDEST_DATE = None
@@ -686,7 +691,7 @@ class ExtractCommand(Command):
         (/). Doing so causes the extracted files to replace the existing files.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'first'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -741,7 +746,7 @@ class HelpCommand(Command):
             emborg help [<topic>]
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = None
+    COMPOSITE_CONFIGS = 'none'
 
     @classmethod
     def run_early(cls, command, args, settings, options):
@@ -765,7 +770,7 @@ class InfoCommand(Command):
             -f, --fast               only report local information
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = True
+    COMPOSITE_CONFIGS = 'all'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -812,7 +817,7 @@ class InitializeCommand(Command):
             emborg init
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'all'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -850,7 +855,7 @@ class ListCommand(Command):
                                      those associated with this configuration
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'first'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -879,7 +884,7 @@ class LogCommand(Command):
             emborg log
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = True
+    COMPOSITE_CONFIGS = 'all'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -927,7 +932,7 @@ class ManifestCommand(Command):
             emborg manifest --date 2018-12-05T12:39
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'first'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1003,7 +1008,7 @@ class MountCommand(Command):
         You should use `emborg umount` when you are done.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'first'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1012,7 +1017,9 @@ class MountCommand(Command):
         mount_point = cmdline['<mount_point>']
         if not mount_point:
             mount_point = settings.value('default_mount_point')
-            if not mount_point:
+            if mount_point:
+                display('mount point is', mount_point)
+            else:
                 raise Error('must specify directory to use as mount point')
         mount_point = to_path(mount_point)
         archive = cmdline['--archive']
@@ -1058,7 +1065,7 @@ class PruneCommand(Command):
                                      those associated with this configuration
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = True
+    COMPOSITE_CONFIGS = 'all'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1107,7 +1114,7 @@ class RestoreCommand(Command):
         files.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'first'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1173,7 +1180,7 @@ class SettingsCommand(Command):
             -a, --available   list available settings
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'error'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1216,7 +1223,7 @@ class UmountCommand(Command):
             emborg [options] unmount [<mount_point>]
     """).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = False
+    COMPOSITE_CONFIGS = 'first'
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1256,7 +1263,7 @@ class VersionCommand(Command):
             emborg version
     """).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = None
+    COMPOSITE_CONFIGS = 'none'
 
     @classmethod
     def run_early(cls, command, args, settings, options):
@@ -1275,6 +1282,6 @@ class VersionCommand(Command):
         ))
 
         # Need to quit now. The version command need not have a valid settings
-        # file, so if we keep going emborg might emit in spurious errors is the
+        # file, so if we keep going emborg might emit spurious errors if the
         # settings files are not yet properly configured.
         return 0
