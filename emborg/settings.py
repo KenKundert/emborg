@@ -350,12 +350,15 @@ class Settings:
                 args.append(f'--encryption={encryption}')
                 if encryption == 'none':
                     warn('passphrase given but not needed as encryption set to none.')
-                if encryption in 'keyfile keyfile-blake2'.split():
+                if encryption.startswith('keyfile'):
                     warn(
-                        "you should use 'borg key export' to export the",
-                        "encryption key, and then keep that key in a safe",
-                        "place.  If you lose the key you will lose access to",
-                        "your backups.",
+                        dedent("""
+                            you should use 'borg key export' to export the
+                            encryption key, and then keep that key in a safe
+                            place.  You can do this with emborg using 'emborg
+                            borg key export @repo <outfile>'.  If you lose the
+                            key you will lose access to, your backups.
+                        """).strip(),
                         wrap=True
                     )
             else:
