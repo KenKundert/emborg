@@ -41,8 +41,8 @@ from .python import PythonFile
 from .utilities import gethostname, getfullhostname, getusername, render_paths
 from shlib import getmod, mv, rm, Run, to_path, render_command
 from inform import (
-    Color, Error, codicil, conjoin, display, done, full_stop, get_informer,
-    indent, is_str, narrate, output, render, warn,
+    Color, Error, codicil, comment, conjoin, display, done, full_stop,
+    get_informer, indent, is_str, join, narrate, output, render, warn,
 )
 from textwrap import dedent
 import arrow
@@ -271,6 +271,8 @@ class Settings:
 
     # handle errors {{{2
     def fail(self, *msg, comment=''):
+        comment('failure detected:')
+        codicil(indent(join(*msg)))
         msg = full_stop(' '.join(str(m) for m in msg))
         try:
             if self.notify and not Color.isTTY():
