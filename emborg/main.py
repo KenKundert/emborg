@@ -14,7 +14,7 @@ Options:
     -m, --mute                        Suppress all output.
     -n, --narrate                     Send emborg and Borg narration to stdout.
     -q, --quiet                       Suppress optional output.
-    -t, --trial-run                   Run Borg in dry run mode.
+    -t, --dry-run                     Run Borg in dry run mode.
     -v, --verbose                     Make Borg more verbose.
     --no-log                          Do not create log file.
 """
@@ -31,7 +31,7 @@ Options:
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see http://www.gnu.org/licenses/.
+# along with this program.  If not, see http://www.gnu.org/licenses.
 
 
 # Imports {{{1
@@ -66,10 +66,10 @@ def main():
             inform.mute = True
         if cmdline['--quiet']:
             inform.quiet = True
-        options = cull([
+        emborg_opts = cull([
             'verbose' if cmdline['--verbose'] else '',
             'narrate' if cmdline['--narrate'] else '',
-            'trial-run' if cmdline['--trial-run'] else '',
+            'dry-run' if cmdline['--dry-run'] else '',
             'no-log' if cmdline['--no-log'] else '',
         ])
         if cmdline['--narrate']:
@@ -80,16 +80,16 @@ def main():
             cmd, cmd_name = Command.find(command)
 
             # execute the command initialization
-            exit_status = cmd.execute_early(cmd_name, args, None, options)
+            exit_status = cmd.execute_early(cmd_name, args, None, emborg_opts)
             if exit_status is not None:
                 terminate(exit_status)
 
             worst_exit_status = 0
             try:
                 while True:
-                    with Settings(config, cmd, options) as settings:
+                    with Settings(config, cmd, emborg_opts) as settings:
                         try:
-                            exit_status = cmd.execute(cmd_name, args, settings, options)
+                            exit_status = cmd.execute(cmd_name, args, settings, emborg_opts)
                         except Error as e:
                             settings.fail(e)
                             e.terminate()
@@ -100,7 +100,7 @@ def main():
                 pass
 
             # execute the command termination
-            exit_status = cmd.execute_late(cmd_name, args, None, options)
+            exit_status = cmd.execute_late(cmd_name, args, None, emborg_opts)
             if exit_status and exit_status > worst_exit_status:
                 worst_exit_status = exit_status
 

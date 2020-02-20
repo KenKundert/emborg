@@ -79,11 +79,3 @@ def error_source():
     return filename, 'line %s' % line
 
 
-# render_path() {{{1
-def render_path(path):
-    return str(to_path(path))
-
-
-# render_paths() {{{1
-def render_paths(path_list):
-    return [render_path(path) for path in path_list]

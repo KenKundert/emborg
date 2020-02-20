@@ -3,11 +3,11 @@
 Configuring
 ===========
 
-Settings file go in ~/.config/emborg. You need a shared settings file and then 
+Settings files go in ~/.config/emborg. You need a shared settings file and then 
 one file for each backup configuration you need.  Except for 
-:ref:`configurations` and :ref:`default_configuration` any setting may be place 
-in the shared file or the repository specific file.  If a setting is found in 
-both files, the version in the configuration specific file dominates.
+:ref:`configurations` and :ref:`default_configuration` any setting may be placed 
+in either the shared file or the configuration specific file.  If a setting is 
+found in both files, the version in the configuration specific file dominates.
 
 You can get a complete list of available configuration settings by running::
 
@@ -19,7 +19,9 @@ Shared Settings
 
 Shared settings go in ~/.config/emborg/settings.  This is a Python file that 
 contains values needed by all of your configurations.  It might look like the 
-following::
+following:
+
+.. code-block:: python
 
     default_configuration = 'home'        # default backup configuration
     configurations = 'home websites'      # available backup configurations
@@ -55,13 +57,17 @@ following::
 
 If you encrypt your backups, you can specify the encryption key in this file as 
 :ref:`passphrase`. In this case, you should be careful to assure the file is not 
-readable by others (chmod 600 settings).  Alternatively, you can use `Avendesora 
-<https://avendesora.readthedocs.io>`_ to securely hold your key by specifying 
-the Avendesora account name of the key to *avendesora_account*.
+readable by others (chmod 600 settings).  Alternatively, you can use 
+:ref:`passcommand`, which runs a command that returns your pass phrase.  
+Finally, you can use `Avendesora <https://avendesora.readthedocs.io>`_ to 
+securely hold your key by specifying the Avendesora account name of the key to 
+:ref:`avendesora_account`.
 
 This example assumes that there is one backup configuration per repository. You 
-can instead have all of your configurations share a single repository replacing 
-:ref:`repository` and adding :ref:`prefix` like so::
+can instead have all of your configurations share a single repository by 
+replacing :ref:`repository` and adding :ref:`prefix` like so:
+
+.. code-block:: python
 
     repository = 'archives:/mnt/backups/{host_name}/{user_name}'
     prefix = '{config_name}-'
@@ -72,9 +78,11 @@ Configurations
 
 Each backup configuration must have a settings file in ~/.config/emborg. The 
 name of the file is the name of the backup configuration.  It might look like 
-the following::
+the following:
 
-    src_dirs = ['~', '/etc']              # absolute paths to directories to be backed up
+.. code-block:: python
+
+    src_dirs = '~'           # absolute paths to directories to be backed up
     excludes = '''
         ~/tmp
         ~/**/.hg
@@ -82,8 +90,8 @@ the following::
         ~/**/*.pyc
         ~/**/.*.swp
         ~/**/.*.swo
-    '''.split()                           # list of glob strings of files or directories to skip
-    one_file_system = False               # okay to traverse filesystems
+    '''                      # list of glob strings of files or directories to skip
+    one_file_system = False  # okay to traverse filesystems
 
     # commands to be run before and after backups (run from working directory)
     run_before_backup = [
@@ -92,7 +100,7 @@ the following::
     ]
     run_after_backup = [
         './rebuild-manpages > /dev/null',
-            # rebuild my man pages, they were deleted in clean
+            # rebuild my man pages, they were deleted by clean-home
     ]
 
     # if set, this file or these files must exist or backups will quit with an error
@@ -100,25 +108,108 @@ the following::
 
 String values may incorporate other string valued settings. Use braces to 
 interpolate another setting. In addition, you may interpolate the configuration 
-name ('config_name'), the host name ('host_name'), the user name ('user_name') 
-or Emborg's program name ('prog_name'). An example of this is shown in both
+name ('config_name'), the host name ('host_name'), the user name ('user_name'), 
+Emborg's program name ('prog_name'), your home directory ('home_dir') or the 
+configuration directory ('config_dir').  An example of this is shown in both
 :ref:`repository` and :ref:`archive` above.  Doubling up the braces acts to 
-escape them.  In this way you gain access to *Borg* settings. :ref:`archive` 
-shows and example of that.
+escape them.  In this way you gain access to *Borg* placeholders. :ref:`archive` 
+shows an example of that.  Interpolation is not performed on any setting whose 
+name is given in :ref:`do_not_expand`.
 
+Settings that take lists of strings can be specified as a single multi-line 
+string where one item is given per line.  Lines that begin with # are ignored, 
+as are empty lines.  For example:
+
+.. code-block:: python
+
+    excludes = '''
+        # these directories would be problematic if backed up
+        /dev
+        /proc
+
+        # these directories contain largely derived files which can be recreated
+        /run
+        /sys
+        /tmp
+        /var
+    '''
+
+
+Paths
+-----
+
+When *Borg* places files into a repository, it always uses relative paths.  
+However, you may specify them either using relative paths or absolute paths.
+*Borg* starts backing up from the recursion roots. These are directories that 
+you specify to :ref:`src_dirs` or using the ``R`` key in :ref:`patterns` or 
+:ref:`patterns_from`.  Within a recursion root you can specify particular paths 
+to exclude and within those you can specify particular files to include. This is 
+done using :ref:`excludes` and :ref:`exclude_from` and using the path keys 
+(``+``, ``-``, ``!``) in :ref:`patterns` and :ref:`patterns_from`.  When you use 
+a relative path to specify a recursion root then you should also use relative 
+paths for its include and exclude paths. Similarly, if you use an absolute path 
+for the a recursion root then you should also use absolute paths for its include 
+and exclude paths. *Borg* is okay with you having some recursion roots specified 
+with relative paths and some with absolute paths, but this confuses *Emborg* 
+when it comes time to extract or restore files from your repository. With 
+*Emborg*, all of your recursive roots must either be specified using relative 
+paths or they must all be specified with absolute paths.
+
+If you specify absolute paths, *Borg* converts them to relative paths as it 
+inserts them into the repository by stripping off the leading ``/`` from the 
+path.  If you specify relative paths, it inserts them as is.  When using *Borg* 
+directly, the relative paths would be relative to the directory where *borg 
+create* is invoked. For this reason, *borg create* must always be invoked from 
+the same directory when using relative paths. To make this work, *Emborg* 
+internally changes to :ref:`working_dir` before running *borg create*.  Thus, if 
+you choose to use relative paths, you should also specify :ref:`working_dir`, 
+which should be specified with an absolute path.  For example:
+
+.. code-block:: python
+
+    working_dir = '~'
+    src_dirs = '.'
+    excludes = '''
+        .cache
+        *~
+    '''
+
+If you do not specify :ref:`working_dir`, it defaults to ``/``.
+
+Other than paths to include files, all relative paths specified in your 
+configuration are relative to :ref:`working_dir`.  This can be confusing, so it 
+is recommended that all paths in your configuration, other than those being 
+passed directly to *Borg* should be given using absolute paths.  This includes 
+settings such as :ref:`default_mount_point`, :ref:`must_exist`, 
+:ref:`patterns_from`, and :ref:`exclude_from`.
+
+Paths specified directly to *Emborg* are processed and any leading tildes 
+(``~``) are expanded to the appropriate user's home directory. However, paths 
+specified in :ref:`exclude_from` and :ref:`patterns_from` files are processed 
+directly by *Borg*, which does not expand tildes to a user's home directory.
 
 Includes
 --------
 
 Any settings file may include the contents of another file by using
 :ref:`include`.  You may either specify a single include file as a string or 
-a collection as a list of strings::
+a collection as a list of strings or a multi-line string. For example:
+
+.. code-block:: python
 
     include = 'file-to-include'
 
-or::
+or:
 
-    include = ['first-file-to-include', 'second-file-to-include']
+.. code-block:: python
+
+    include = '''
+        first-file-to-include
+        second-file-to-include
+    '''
+
+If you specify a relative path for an include file, it it relative to the file 
+that includes it.
 
 
 Composite Configurations
@@ -129,7 +220,9 @@ configurations at once.  This might be useful if you have files that benefit,
 for example, from different prune schedules.
 
 As an example, consider having three configurations that you would like to run 
-all at once. You can specify these configurations as follows::
+all at once. You can specify these configurations as follows:
+
+.. code-block:: python
 
     configurations = 'home lamp data all=home,lamp,data'
 
@@ -138,11 +231,11 @@ a composite configuration.  *home*, *lamp*, and *data* would have configuration
 files whereas *all* would not.  The composite configuration should be specified 
 without spaces.
 
-You can run a specific configuration with:
+You can run a specific configuration with::
 
     emborg -c home extract ~/bin
 
-You can run all three configurations with:
+You can run all three configurations with::
 
     emborg -c all create
 
@@ -177,19 +270,59 @@ version     does not use any configs
 ==========  ============================
 
 
+Patterns
+--------
+
+Patterns are a relatively new feature of *Borg*. They are an alternate way of 
+specifying which files are backed up, and which are not.  Patterns can be 
+specified in conjunction with, or instead of, :ref:`src_dirs` and 
+:ref:`excludes`.  One powerful feature of patterns is that it allow you to 
+specify that a directory or file should be backed up even if it is contained 
+within a directory that is being excluded.
+
+An example that uses :ref:`patterns` in lieu of :ref:`src_dirs` and 
+:ref:`excludes` is:
+
+.. code-block:: python
+
+    patterns = '''
+        R /
+        + /home/susan
+        - /home
+        - /dev
+        - /opt
+        - /proc
+        - /run
+        - /sys
+        - /tmp
+        - /var
+    '''
+
+In this example, ``R`` specifies a root, which would otherwise be specified to 
+:ref:`src_dirs`.  ``+`` specifies path that should be included in the backups 
+and ``-`` specifies a path that should be excluded.  With this example, Susan's 
+home directory is included while all other home directories are not. In cases 
+such as this, the subdirectory to include must be specified before the directory 
+that contains it is excluded.  This is a relatively simple example, additional 
+features are described in the `Borg patterns documentation 
+<https://borgbackup.readthedocs.io/en/stable/usage/help.html>`_.
+
 
 Emborg Settings
 ---------------
 
 These settings control the behavior of *Emborg*.
 
+.. code-block:: python
 .. _archive:
 
 archive
 ~~~~~~~
 
 *archive* is a template that specifies the name of each archive.  A typical 
-value might be::
+value might be:
+
+.. code-block:: python
 
     archive = '{config_name}-{{now}}'
 
@@ -200,7 +333,9 @@ interpreted by *Borg*.
 This template consists of a leading part that is fixed ('{config_name}-') and 
 a trailing part that varies on each archive ('{{now}}', which is replaced by 
 a datestamp). The leading fixed part is referred to as the *prefix* and can be 
-given separately::
+given separately:
+
+.. code-block:: python
 
     archive = '{config_name}-{{now}}'
     prefix = '{config_name}-'
@@ -218,12 +353,16 @@ of another. For example, prefixes of *root* and *root2* would be bad because
 reduce this risk.
 
 If you do not specify either *archive* or *prefix*, then you get the following 
-defaults::
+defaults:
+
+.. code-block:: python
 
     prefix = '{host_name}-{user_name}-{config_name}-'
     archive = '{prefix}{{now}}'
 
-If you specify only *prefix*, then *archive* becomes::
+If you specify only *prefix*, then *archive* becomes:
+
+.. code-block:: python
 
     archive = '<prefix>{{now}}'
 
@@ -231,7 +370,9 @@ If you specify only *archive*, then *prefix* remains unset. This is only
 suitable when there is only one backup configuration using a repository.
 
 If you want *prefix* and want to customize *now*, you should give both *prefix* 
-and *archive*. For example, you can reduce the length of the timestamp using::
+and *archive*. For example, you can reduce the length of the timestamp using:
+
+.. code-block:: python
 
     prefix = '{host_name}-'
     archive = '{prefix}{{now:%Y%m%d}}'
@@ -282,15 +423,16 @@ check_after_create
 ~~~~~~~~~~~~~~~~~~
 
 Whether the archive or repository should be checked after an archive is created.  
-May be one of the following: *False*, *True*, ``"latest"``, ``"all"``, or 
-``"all in repository"``.  If *False*, not checking is performed. If 
-``"latest"``, only the just created archive is checked.  If *True* or ``"all"``, 
-all archives associated with the current configuration are checked.  Finally, if 
-``"all in repository"``, all the archives contained in the repository are 
-checked.  In all cases checked are performed on the repository and the archive 
-or archives selected, but in none of the cases is data integrity verification 
-performed.  Regardless, the checking can be quite slow if ``"all"`` or ``"all in 
-repository"`` are used.
+May be one of the following: *False*, *True*, ``"latest"``, ``"all"``, or ``"all 
+in repository"``.  If *False*, no checking is performed. If ``"latest"``, only 
+the archive just created is checked.  If *True* or ``"all"``, all archives 
+associated with the current configuration are checked.  Finally, if ``"all in 
+repository"``, all the archives contained in the repository are checked, 
+including those associated with other archives.  In all cases checks are 
+performed on the repository and the archive or archives selected, but in none of 
+the cases is data integrity verification performed.  To check the integrity of 
+the data you must explicitly run the :ref:`check command <check>`.  Regardless, 
+the checking can be quite slow if ``"all"`` or ``"all in repository"`` are used.
 
 
 .. _configurations:
@@ -301,6 +443,9 @@ configurations
 The list of available *Emborg* configurations.  To be usable the name of 
 a configuration must be in this list and there must be a file of the same name 
 in the ``~/.config/emborg`` directory.
+
+The value may be specified as a list of strings or just as a string. If 
+specified as a string, it is split on white space to form the list.
 
 
 .. _default_configuration:
@@ -321,10 +466,32 @@ The path to a directory that should be used if one is not specified on the
 :ref:`mount command <mount>` or :ref:`umount command <umount>` commands.  When 
 set the mount point directory becomes optional on these commands. You should 
 choose a directory that itself is not subject to being backed up to avoid 
-creating a loop. For example, you might consider something in /tmp::
+creating a loop. For example, you might consider something in /tmp:
 
-    _default_mount_point = '/tmp/emborg'
+.. code-block:: python
 
+    default_mount_point = '/tmp/emborg'
+
+
+.. _do_not_expand:
+
+do_not_expand
+~~~~~~~~~~~~~
+
+All settings that are specified as strings or lists of strings may contain 
+placeholders that are expanded before use. The placeholder is replaced by the 
+value it names.  For example, in::
+
+    archive = '{host_name}-{{now}}'
+
+*host_name* is a placeholder that is replaced by the host name of your computer 
+before it is used (*now* is escaped using double braces and so does not act as 
+a placeholder for *Emborg*.
+
+*do_not_expand* is a list of names for settings that should not undergo 
+placeholder replacement.  The value may be specified as a list of strings or 
+just as a string. If specified as a string, it is split on white space to form 
+the list.
 
 .. _encryption:
 
@@ -351,7 +518,9 @@ excludes
 ~~~~~~~~
 
 A list of files or directories to exclude from the backups.  Typical value might 
-be::
+be:
+
+.. code-block:: python
 
     excludes = '''
         ~/tmp
@@ -365,10 +534,16 @@ be::
         ~/**/*.pyc
         ~/**/.*.swp
         ~/**/.*.swo
-    '''.split()
+    '''
 
-In this example ``.split()`` was used to create the list, which would not be 
-appropriate if one or more of your excludes contained spaces.
+The value can either be specified as a list of strings or as a multi-line string 
+with one exclude per line.
+
+*Emborg* supports the same exclude patterns that `Borg 
+<https://borgbackup.readthedocs.io/en/stable/usage/help.html>`_ itself supports. 
+
+When specifying paths to excludes, the paths may be relative or absolute. When 
+relative, they are taken to be relative to :ref:`working_dir`.
 
 
 .. _exclude_from:
@@ -378,10 +553,12 @@ exclude_from
 
 An alternative to :ref:`excludes`.  You can list your excludes in one or more 
 files, one per line, and then specify the file or files using the *exclude_from* 
-setting.  The value of *exclude_from* may either be a string or a list of 
-strings. The string or strings would be the paths to the file or files that 
-contain the list of files or directories to exclude. If given as relative paths, 
-they are relative to the ``~/.config/emborg`` directory.
+setting.  The value of *exclude_from* may either be a multi-line string, one 
+file per line, or a list of strings. The string or strings would be the paths to 
+the file or files that contain the list of files or directories to exclude. If 
+given as relative paths, they are relative to :ref:`working_dir`.  These files 
+are processed directly by *Borg*, which does not allow ``~`` to represent users' 
+home directories, unlike the patterns specified using :ref:`patterns`.
 
 
 .. _include:
@@ -390,7 +567,64 @@ include
 ~~~~~~~
 
 Can be a string or a list of strings. Each string specifies a path to a file.  
-The contents of that file are read into *Emborg*.
+The contents of that file are read into *Emborg*.  If the path is relative, it 
+is relative to the file that includes it.
+
+
+.. _manifest_formats:
+
+manifest_formats
+~~~~~~~~~~~~~~~~
+
+A dictionary that defines how the output of the manifest command is to be 
+formatted.  The default value for *manifest_formats* is:
+
+.. code-block:: python
+
+        manifest_formats = dict(
+            name = '{path}',
+            date = '{day} {date} {time} {path}',
+            size = '{Size:<5.2r} {path}',
+            owner = '{owner:<8} {path}',
+            group = '{group:<8} {path}',
+            long = '{Size:<5.2r} {date} {time} {path}',
+            full = '{permissions:<10} {owner:<6} {group:<6} {size:>8} {Date:YYMMDD HH:mm} {path}',
+        )
+
+Notice that 7 formats are defined:
+
+ |  *name*: used by default when sorting by name or when ``--name-only`` is specified.
+ |  *date*: used by default when sorting by date.
+ |  *size*: used by default when sorting by size.
+ |  *owner*: used by default when sorting by owner.
+ |  *group*: used by default when sorting by group.
+ |  *long*: used when ``--long`` is specified.
+ |  *full*: used when ``--full`` is specified.
+
+Your *manifest_formats* need not define all or even any of these formats. The 
+default format is used for any not specified.
+
+The formats may contain the following fields:
+
+ | *permissions*: the file permission bits, ex: -rw-r--r-- (a string)
+ | *owner* = the name of the owner (a string)
+ | *group* = the name of the group (a string)
+ | *size* = the size of the file in bytes (an integer)
+ | *Size* = the size of the file in bytes (a `Quantity <https://quantiphy.readthedocs.io/en/stable/user.html#string-formatting>`_ object)
+ | *Date* = the modification time for the file (an `Arrow <https://arrow.readthedocs.io/en/latest/#supported-tokens>`_ object)
+ | *day* = the day the file was last modified, ex: Fri (a string)
+ | *date* = the date the file was last modified, ex: 2019-03-21 (a string)
+ | *time* = the time the file was last modified, ex: 17:50:14 (a string)
+ | *path* = the path to the file (a string)
+
+Quantity objects allow you to format the size using SI scale factors (K, Ki, M, 
+Mi, etc.). Arrow objects allow you to format the date and time in a wide variety 
+of ways.
+
+The fields support `Python format strings 
+<https://docs.python.org/3/library/string.html#formatstrings>`_, which allows 
+you to specify how they are to be formatted.  Anything outside a field is copied 
+literally.
 
 
 .. _must_exist:
@@ -398,11 +632,12 @@ The contents of that file are read into *Emborg*.
 must_exist
 ~~~~~~~~~~
 
-Can be a string or a list of strings. The strings specify paths to files that 
-must exist before :ref:`create command <create>` can be run.  This is used to 
-assure that relevant file systems are mounted before making backups of their 
-files.
+Specify paths to files that must exist before :ref:`create command <create>` can 
+be run.  This is used to assure that relevant file systems are mounted before 
+making backups of their files.
 
+May be specified as a list of strings or as a multi-line string with one path 
+per line.
 
 .. _needs_ssh_agent:
 
@@ -419,17 +654,19 @@ notifier
 ~~~~~~~~
 
 A string that specifies the command used to interactively notify the user of an 
-issue. A typical value is::
+issue. A typical value is:
+
+.. code-block:: python
 
     notifier = 'notify-send -u normal {prog_name} "{msg}"'
 
 Any of the following names may be embedded in braces and included in the string.  
 They will be replaced by their value:
 
-    msg: The message for the user.
-    hostname: The host name of the system that *Emborg* is running on.
-    user_name: The user name of the person that started *Emborg*
-    prog_name: The name of the *Emborg* program.
+ |  *msg*: The message for the user.
+ |  *hostname*: The host name of the system that *Emborg* is running on.
+ |  *user_name*: The user name of the person that started *Emborg*
+ |  *prog_name*: The name of the *Emborg* program.
 
 The notifier is only used if the command is not running from a TTY.
 
@@ -482,14 +719,18 @@ archive.
 repository
 ~~~~~~~~~~
 
-The destination for the backups. A typical value might be::
+The destination for the backups. A typical value might be:
+
+.. code-block:: python
 
     repository = 'archives:/mnt/backups/{host_name}-{user_name}-{config_name}'
 
 where in this example 'archives' is the hostname and /mnt/backups is the 
 absolute path to the directory that is to contain your Borg repositories, 
 and {host_name}-{user_name}-{config_name} is the directory to contain this 
-repository.  For a local repository you would use something like this::
+repository.  For a local repository you would use something like this:
+
+.. code-block:: python
 
     repository = '/mnt/backups/{host_name}-{user_name}-{config_name}'
 
@@ -499,12 +740,18 @@ a single backup configuration.  Borg allows you to make a repository the target
 of many backup configurations, and in this way you can further benefit from its 
 ability to de-duplicate files.  In this case you might want to use a less 
 granular name for your repository.  For example, a particular user could use 
-a single repository for all their configurations on all their hosts using::
+a single repository for all their configurations on all their hosts using:
+
+.. code-block:: python
 
     repository = '/mnt/backups/{user_name}'
 
-In this case you should specify the :ref:`prefix` setting, described next, to 
-allow the archives created by each backup configuration to be distinguished.
+In this case you should specify the :ref:`prefix` setting to allow the archives 
+created by each backup configuration to be distinguished.
+
+A local repository should be specified with an absolute path, and that path 
+should not contain a colon (``:``) to avoid confusing the algorithm that 
+determines whether the repository is local or remote.
 
 
 .. _run_after_backup:
@@ -512,20 +759,38 @@ allow the archives created by each backup configuration to be distinguished.
 run_after_backup
 ~~~~~~~~~~~~~~~~
 
-Can be a string or a list of strings. Each string specifies a command that is to 
-be run after the :ref:`create` command completes. These commands often recreate 
-useful files that were deleted by the :ref:`run_before_backup` commands.
+Specified commands that are to be run after the :ref:`create` command completes.  
+These commands often recreate useful files that were deleted by the 
+:ref:`run_before_backup` commands.
 
+May be specified as a list of strings or as a multi-line string with one command 
+per line.
 
 .. _run_before_backup:
 
 run_before_backup
 ~~~~~~~~~~~~~~~~~
 
-Can be a string or a list of strings. Each string specifies a command that is to 
-be run before the :ref:`create` command starts the backup. These commands often 
-delete large files that can be easily recreated from those files that are backed 
-up.
+Specifies commands that are to be run before the :ref:`create` command starts 
+the backup. These commands often delete large files that can be easily recreated 
+from those files that are backed up.
+
+May be specified as a list of strings or as a multi-line string with one command 
+per line.
+
+.. _show_stats:
+
+show_stats
+~~~~~~~~~~
+
+Show statistics when running *Borg*'s *create*, *delete* and *prune* commands.
+You can always get this by adding the ``--stats`` command line option to the 
+appropriate commands, but if this options is set True then these commands will 
+always show the statistics.  If the statistics are not requested, they will be 
+recorded in the log file rather than being displayed.
+
+Statistics are incompatible with the --dry-run option and will be suppressed 
+on trial runs.
 
 
 .. _src_dirs:
@@ -533,7 +798,13 @@ up.
 src_dirs
 ~~~~~~~~
 
-A list of strings, each of which specifies a directory to be backed up.
+A list of strings, each of which specifies a directory to be backed up.  May be 
+specified as a list of strings or as a multi-line string with one source 
+directory per line.
+
+When specifying the paths to the source directories, the paths may be relative 
+or absolute.  When relative, they are taken to be relative to 
+:ref:`working_dir`.
 
 
 .. _ssh_command:
@@ -590,7 +861,15 @@ Exclude directories that contain a CACHEDIR.TAG file.
 exclude_if_present
 ~~~~~~~~~~~~~~~~~~
 
-exclude directories that are tagged by containing a filesystem object with the given NAME
+Exclude directories that are tagged by containing a filesystem object with the given NAME
+
+
+.. _exclude_nodump:
+
+exclude_nodump
+~~~~~~~~~~~~~~
+
+Exclude files flagged NODUMP.
 
 
 .. _lock_wait:
@@ -674,6 +953,60 @@ Stay in the same file system and do not store mount points of other file
 systems.
 
 
+.. _patterns:
+
+patterns
+~~~~~~~~
+
+A list of files or directories to exclude from the backups.  Typical value might 
+be:
+
+.. code-block:: python
+
+    patterns = '''
+        R /
+        - /home/*/.cache
+        - /home/*/Downloads
+
+        # include susans home
+        + /home/susan
+
+        # don't backup the other home directories
+        - /home/*
+    '''
+
+The value can either be specified as a list of strings or as a multi-line string 
+with one pattern per line.
+
+Patterns are a new experimental feature of *Borg*. They allow you to specify 
+what to back up and what not to in a manner that is more flexible than 
+:ref:`src_dirs` and :ref:`excludes` allows, and can fully replace them.
+
+For example, notice that /home/susan is included while excluding the directory 
+that contains it (/home).
+
+*Emborg* supports the same patterns that `Borg 
+<https://borgbackup.readthedocs.io/en/stable/usage/help.html>`_ itself supports. 
+
+When specifying paths in patterns, the paths may be relative or absolute. When 
+relative, they are taken to be relative to :ref:`working_dir`.
+
+
+.. _patterns_from:
+
+patterns_from
+~~~~~~~~~~~~~
+
+An alternative to :ref:`patterns`.  You can list your patterns in one or more 
+files, one per line, and then specify the file or files using the *exclude_from* 
+setting.  The value of *exclude_from* may either be a multi-line string, one 
+file per line, or a list of strings. The string or strings would be the paths to 
+the file or files that contain the patterns. If given as relative paths, they 
+are relative to :ref:`working_dir`.  These files are processed directly by 
+*Borg*, which does not allow ``~`` to represent users' home directories, unlike 
+the patterns specified using :ref:`patterns`.
+
+
 .. _prefix:
 
 prefix
@@ -704,4 +1037,28 @@ Set remote network upload rate limit in KiB/s (default: 0=unlimited).
 umask
 ~~~~~
 
-Set umask to M (local and remote, default: 0o077).
+Set umask. This is passed to *Borg*. It uses it when creating files, either 
+local or remote. The default is 0o077.
+
+
+.. _working_dir:
+
+working_dir
+~~~~~~~~~~~~
+
+All relative paths specified in the configuration files (other than those 
+specified to :ref:`include`) are relative to *working_dir*.
+
+*Emborg* changes to the working directory before running the *Borg* *create* 
+command, meaning that relative paths specified as roots, excludes, or patterns 
+(:ref:`src_dirs`, :ref:`excludes`, :ref:`patterns`, :ref:`exclude_from` or 
+:ref:`patterns_from`) are taken to be relative to the working directory.  If you 
+use absolute paths for your roots, excludes, and pattern, then the working 
+directory must be set to ``/``.
+
+To avoid confusion, it is recommended that all other paths in your configuration 
+be specified using absolute paths (ex: :ref:`default_mount_point`,
+:ref:`must_exist`, :ref:`patterns_from`, and :ref:`exclude_from`).
+
+If specified, *working_dir* must be specified using an absolute path.
+If not specified, *working_dir* defaults to ``/``.

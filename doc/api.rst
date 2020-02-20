@@ -49,8 +49,8 @@ is split at white space.
 *borg_opts* are the command line options needed by *Borg*. If not given, it 
 is created for you by *Emborg* based upon your configuration settings.
 
-Finally, *emborg_opts* is a list that may contain any of the following 
-options: 'verbose', 'narrate', 'trial-run', or 'no-log'.
+Finally, *emborg_opts* is a list that may contain any of the following options: 
+'verbose', 'narrate', 'dry-run', or 'no-log'.
 
 This function runs the *Borg* command and returns a process object that 
 allows you access to stdout via the *stdout* attribute.

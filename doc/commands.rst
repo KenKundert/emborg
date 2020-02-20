@@ -311,6 +311,34 @@ Or you can list the files that existed on a particular date using::
 
    > emborg manifest --date 2015-04-01
 
+The *manifest* command provides a variety of sorting and formatting options. The 
+formatting options are under the control of the :ref:`manifest_formats` setting.  
+For example::
+
+   > emborg manifest
+
+This outputs the files in the order and with the format produced by Borg.
+
+::
+
+   > emborg manifest -l
+   > emborg manifest -n
+
+These use the Borg order but shorten the lines by reducing the amount of fields 
+they contain. With ``-l`` the *long* format is used, which by default contains 
+the size, the date, and the path. With ``-n`` the *name* is used, which by 
+default contains only the path.
+
+Finally::
+
+   > emborg manifest -S
+   > emborg manifest -D
+
+The first sorts the files by size. It uses the *size* format, which by default 
+contains only the size and the path.
+The second sorts the files by modification date. It uses the *date* format, 
+which by default contains the day, date, time and the path.
+
 
 .. _mount:
 

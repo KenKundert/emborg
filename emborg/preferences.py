@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see http://www.gnu.org/licenses/.
+# along with this program.  If not, see http://www.gnu.org/licenses.
 
 # Imports {{{1
 from appdirs import user_config_dir, user_data_dir
@@ -50,26 +50,34 @@ EMBORG_SETTINGS = dict(
     avendesora_field = 'name of field in Avendesora that holds the passphrase',
     borg_executable = 'path to borg',
     check_after_create = 'run check as the last step of an archive creation',
+    config_dir = 'absolute path to configuration directory (read-only)',
     config_name = 'name of active configuration (set by program)',
     configurations = 'available Emborg configurations',
     default_configuration = 'default Emborg configuration',
     default_mount_point = 'directory to use as mount point if one is not specified',
+    do_not_expand = 'names of settings that must not undergo setting evaluation',
     encryption = 'encryption method (see Borg documentation)',
     excludes = 'list of glob strings of files or directories to skip',
     exclude_from = 'file that contains exclude patterns',
+    home_dir = 'users home directory (unused)',
+    manifest_formats = 'format strings used by manifest',
     must_exist = 'if set, each of these files or directories must exist or create will quit with an error',
     needs_ssh_agent = 'if set, Emborg will complain if ssh_agent is not available',
     notifier = 'notification program',
     notify = 'email address to notify when things go wrong',
     passcommand = 'command used by Borg to acquire the passphrase',
     passphrase = 'passphrase for encryption key (if specified, Avendesora is not used)',
+    patterns = 'patterns that indicate whether a path should be included or excluded',
+    patterns_from = 'file that contains patterns',
     prune_after_create = 'run prune after creating an archive',
     repository = 'path to remote directory that contains repository',
     run_after_backup = 'command to run after archive has been created',
     run_before_backup = 'command to run before archive is to be created',
+    show_stats = 'show borg statistics when running create, delete, and prune commands',
     src_dirs = 'the directories to archive',
     ssh_command = 'command to use for ssh, can be used to specify ssh options',
     verbose = 'make Borg more verbose',
+    working_dir = 'working directory',
 )
     # Any setting found in the users settings files that is not found in
     # EMBORG_SETTINGS or BORG_SETTINGS is highlighted as a unknown setting by
@@ -89,6 +97,10 @@ BORG_SETTINGS = dict(
     exclude_caches = dict(
         cmds = 'create',
         desc = 'exclude directories that contain a CACHEDIR.TAG file'
+    ),
+    exclude_nodump = dict(
+        cmds = 'create',
+        desc = 'exclude files flagged NODUMP'
     ),
     exclude_if_present = dict(
         cmds = 'create',
@@ -189,10 +201,7 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
     configurations = '<<list your configurations here>>'
     default_configuration = '<<default-config>>'
 
-    # passcode
-    # specify either passphrase or avendesora_account
-    passphrase = '<<passcode>>'              # passphrase for encryption key
-    avendesora_account = '<<account-name>>'  # avendesora account holding passphrase
+    # encryption
     encryption = '<<encryption>>'            # borg encryption method
         # Common choices are 'repokey' and 'keyfile'.
         # With 'repokey' the encryption key is copied into repository, use this
@@ -200,6 +209,9 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
         # With 'keyfile' the encryption key is only stored locally. Be sure to
         # export it and save a copy in a safe place, otherwise you may not be
         # able to access your backups if you lose your disk.
+    # specify either passphrase or avendesora_account
+    passphrase = '<<passcode>>'              # passphrase for encryption key
+    avendesora_account = '<<account-name>>'  # avendesora account holding passphrase
 
     # basic settings
     # specify notify if batch and notifier if interactive
@@ -208,20 +220,20 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
                                              # interactive notifier program
     remote_ratelimit = 2000                  # bandwidth limit in kbps
     prune_after_create = True                # automatically run prune after a backup
-    check_after_create = False               # automatically run check after a backup
+    check_after_create = 'latest'            # automatically run check after a backup
 
     # repository settings
-    compression = 'lz4'
     repository = '<<host>>:<<path>>/{host_name}-{user_name}-{config_name}'
-    archive = '{host_name}-{{now}}'
-        # These may contain {<name>} where name is any of host_name, user_name,
+    prefix = '{host_name}-'
+        # These may contain {<name>} where <name> is any of host_name, user_name,
         # prog_name config_name, or any of the user specified settings.
         # Double up the braces to specify parameters that should be interpreted
-        # by borg.
+        # directly by borg, such as {{now}}.
+    compression = 'lz4'
 
     # filter settings
     exclude_if_present = '.nobackup'
-    one_file_system = False
+    one_file_system = True
     exclude_caches = True
 
     # prune settings
@@ -230,12 +242,13 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent("""
     keep_daily = 14                          # number of daily archives to keep
     keep_weekly = 8                          # number of weekly archives to keep
     keep_monthly = 24                        # number of monthly archives to keep
-    keep_yearly = 1                          # number of yearly archives to keep
+    keep_yearly = 2                          # number of yearly archives to keep
 """).lstrip()
 
 INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
     # Settings for root configuration
-    src_dirs = '/'.split()   # absolute paths to directories to be backed up
+    # use of absolute paths is recommended
+    src_dirs = '/'           # paths to directories to be backed up
     excludes = '''
         /dev
         /home/*/.cache
@@ -250,15 +263,19 @@ INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
         /var/lock
         /var/run
         /var/tmp
-    '''.split()              # list of files or directories to skip
+    '''                      # list of files or directories to skip
 """).lstrip()
 
 INITIAL_HOME_CONFIG_FILE_CONTENTS = dedent("""
-    src_dirs = '~'.split()   # absolute path to directory to be backed up
+    # Settings for home configuration
+    # use of absolute paths is recommended
+    src_dirs = '~'           # absolute path to directory to be backed up
     excludes = '''
-        ~/**/__pycache__
-        ~/**/*.pyc
-        ~/**/.*.swp
-        ~/**/.*.swo
-    '''.split()
+        ~/.cache
+        **/*~
+        **/__pycache__
+        **/*.pyc
+        **/.*.swp
+        **/.*.swo
+    '''                      # list of files or directories to skip
 """).lstrip()

@@ -12,7 +12,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see http://www.gnu.org/licenses/.
+# along with this program.  If not, see http://www.gnu.org/licenses.
 
 
 # Imports {{{1
@@ -23,14 +23,14 @@ from .preferences import (
     EMBORG_SETTINGS,
     PROGRAM_NAME,
 )
-from .utilities import two_columns, render_paths, gethostname
+from .utilities import two_columns, gethostname
 from inform import (
     Color, Error,
-    codicil, conjoin, cull, display, full_stop, is_str, narrate, os_error,
-    output, render, warn
+    codicil, conjoin, display, full_stop, is_str,
+    narrate, os_error, output, render, warn
 )
 from docopt import docopt
-from shlib import cd, mkdir, rm, to_path, Run, set_prefs
+from shlib import cd, cwd, mkdir, rm, to_path, Run, set_prefs
 from textwrap import dedent
 import arrow
 import json
@@ -99,7 +99,7 @@ def get_available_files(settings, archive):
 
 
 # Command base class {{{1
-class Command(object):
+class Command:
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = 'error'
         # possible values are:
@@ -336,6 +336,8 @@ class CreateCommand(Command):
 
         Options:
             -f, --fast    skip pruning and checking for a faster backup on a slow network
+            -l, --list    list the files and directories as they are processed
+            -s, --stats   show Borg statistics
 
         To see the files listed as they are backed up, use the Emborg -v option.
         This can help you debug slow create operations.
@@ -347,29 +349,24 @@ class CreateCommand(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
-
-        # check for required settings
-        src_dirs = render_paths(settings.src_dirs)
-        if not src_dirs:
-            raise Error('src_dirs: setting has no value.')
+        borg_opts = []
+        if cmdline['--stats'] or settings.show_stats:
+            borg_opts.append('--stats')
+        if cmdline['--list']:
+            borg_opts.append('--list')
 
         # check the dependencies are available
-        must_exist = settings.value('must_exist')
-        if is_str(must_exist):
-            must_exist = [must_exist]
-        for each in must_exist:
-            path = to_path(each)
+        must_exist = settings.as_paths('must_exist')
+        for path in must_exist:
             if not path.exists():
                 raise Error(
                     'does not exist, perform setup and restart.',
-                    culprit=each
+                    culprit=('must_exist', path)
                 )
 
         # run prerequisites
-        cmds = settings.value('run_before_backup')
-        if is_str(cmds):
-            cmds = [cmds]
-        for cmd in cull(cmds):
+        cmds = settings.values('run_before_backup')
+        for cmd in cmds:
             narrate('running pre-backup script:', cmd)
             try:
                 Run(cmd, 'SoEW')
@@ -377,11 +374,15 @@ class CreateCommand(Command):
                 e.reraise(culprit=('run_before_backup', cmd.split()[0]))
 
         # run borg
+        src_dirs = settings.src_dirs
         try:
             settings.run_borg(
                 cmd = 'create',
+                borg_opts = borg_opts,
                 args = [settings.destination(True)] + src_dirs,
                 emborg_opts = options,
+                show_borg_output = bool(borg_opts),
+                use_working_dir = True,
             )
         except Error as e:
             if e.stderr and 'is not a valid repository' in e.stderr:
@@ -397,10 +398,8 @@ class CreateCommand(Command):
         settings.date_file.write_text(str(now))
 
         # run any scripts specified to be run after a backup
-        cmds = settings.value('run_after_backup')
-        if is_str(cmds):
-            cmds = [cmds]
-        for cmd in cull(cmds):
+        cmds = settings.values('run_after_backup')
+        for cmd in cmds:
             narrate('running post-backup script:', cmd)
             try:
                 Run(cmd, 'SoEW')
@@ -410,7 +409,7 @@ class CreateCommand(Command):
         if cmdline['--fast']:
             return
 
-        # prune the archives if requested
+        # check and prune the archives if requested
         try:
             # check the archives if requested
             activity = 'checking'
@@ -437,7 +436,8 @@ class CreateCommand(Command):
             if settings.prune_after_create:
                 narrate('pruning archives')
                 prune = PruneCommand()
-                prune.run('prune', [], settings, options)
+                args = ['--stats'] if cmdline['--stats']  else []
+                prune.run('prune', args, settings, options)
         except Error as e:
             e.reraise(codicil=(
                 f'This error occurred while {activity} the archives.',
@@ -455,6 +455,7 @@ class DeleteCommand(Command):
 
         Options:
             -l, --latest   delete the most recently created archive
+            -s, --stats    show Borg statistics
     """).strip()
         # borg allows you to delete all archives by simply not specifying an
         # archive, but then it interactively asks the user to type YES if that
@@ -474,6 +475,7 @@ class DeleteCommand(Command):
             archive = get_name_of_latest_archive(settings)
         if not archive:
             raise Error('archive missing.')
+        show_stats = cmdline['--stats'] or settings.show_stats
 
         # run borg
         borg = settings.run_borg(
@@ -481,6 +483,7 @@ class DeleteCommand(Command):
             args = [settings.destination(archive)],
             emborg_opts = options,
             strip_prefix = True,
+            show_borg_output = show_stats,
         )
         out = borg.stdout
         if out:
@@ -661,15 +664,19 @@ class ExtractCommand(Command):
         Options:
             -a <archive>, --archive <archive>   name of the archive to use
             -d <date>, --date <date>            date of the desired version of paths
+            -f, --force                         extract even if it might overwrite
+                                                the original file
+            -l, --list                          list the files and directories as
+                                                they are processed
 
         You extract a file or directory using:
 
             emborg extract home/ken/src/verif/av/manpages/settings.py
 
         Use manifest to determine what path you should specify to identify the
-        desired file or directory (they will paths relative to /).
-        Thus, the paths should look like absolute paths with the leading slash
-        removed.  The paths may point to directories, in which case the entire
+        desired file or directory (they will paths relative to the working
+        directory, which defaults to / but can be overridden in a configuration
+        file).  The paths may point to directories, in which case the entire
         directory is extracted. It may also be a glob pattern.
 
         If you do not specify an archive or date, the most recent archive is
@@ -687,8 +694,11 @@ class ExtractCommand(Command):
 
             ./home/ken/src/verif/av/manpages/settings.py
 
-        For this reason the extract command is often run from the root directory
-        (/). Doing so causes the extracted files to replace the existing files.
+        Normally, extract refuses to run if your current directory is the
+        working directory used by Emborg so as to avoid overwriting an existing
+        file.  If your intent is to overwrite the existing file, you can specify
+        the --force option. Or, consider using the restore command; it
+        overwrites the existing file regardless of what directory you run from.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = 'first'
@@ -700,24 +710,27 @@ class ExtractCommand(Command):
         paths = cmdline['<path>']
         archive = cmdline['--archive']
         date = cmdline['--date']
+        borg_opts = []
+        if cmdline['--list']:
+            borg_opts.append('--list')
+        if not cmdline['--force']:
+            if cwd().samefile(settings.working_dir):
+                raise Error(
+                    'Running from the working directory risks',
+                    'over writing the existing file or files. ',
+                    'Use --force if this is desired.',
+                    wrap = True
+                )
 
-        # remove initial / from paths
-        src_dirs = [str(p).lstrip('/') for p in settings.src_dirs]
-        new_paths = [p.lstrip('/') for p in paths]
-        if paths != new_paths:
-            for path in paths:
-                if path.startswith('/'):
-                    narrate('removing initial /.', culprit=path)
-            paths = new_paths
-
-        # assure that paths correspond to src_dirs
-        unknown_path = False
-        for path in paths:
-            if not any([path.startswith(src_dir) for src_dir in src_dirs]):
-                unknown_path = True
-                warn('unknown path.', culprit=path)
-        if unknown_path:
-            codicil('Paths should start with:', conjoin(src_dirs, conj=', or '))
+        # convert absolute paths to paths relative to the working directory
+        paths = [to_path(p) for p in paths]
+        try:
+            paths = [
+                p.relative_to(settings.working_dir) if p.is_absolute() else p
+                for p in paths
+            ]
+        except ValueError as e:
+            raise Error(e)
 
         # get the desired archive
         if date and not archive:
@@ -729,8 +742,10 @@ class ExtractCommand(Command):
         # run borg
         borg = settings.run_borg(
             cmd = 'extract',
+            borg_opts = borg_opts,
             args = [settings.destination(archive)] + paths,
             emborg_opts = options,
+            show_borg_output = bool(borg_opts)
         )
         out = borg.stdout
         if out:
@@ -824,11 +839,6 @@ class InitializeCommand(Command):
         # read command line
         docopt(cls.USAGE, argv=[command] + args)
 
-        # warn user about relative source directories.
-        for src_dir in settings.src_dirs:
-            if not src_dir.is_absolute():
-                warn('relative source directory.', culprit=src_dir)
-
         # run borg
         borg = settings.run_borg(
             cmd = 'init',
@@ -900,19 +910,28 @@ class LogCommand(Command):
 
 # ManifestCommand command {{{1
 class ManifestCommand(Command):
-    NAMES = 'manifest m la'.split()
+    NAMES = 'manifest m la files f'.split()
     DESCRIPTION = 'list the files contained in an archive'
     USAGE = dedent("""
         Usage:
             emborg [options] manifest
             emborg [options] m
             emborg [options] la
+            emborg [options] files
+            emborg [options] f
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to use
             -d <date>, --date <date>            date of the desired archive
-            -n, --name                          output only the filename
-            -s, --sort                          sort by filename if -n specified
+            -l, --long                          use long listing format
+            -f, --full                          use full listing format
+            -n, --name-only                     use name only listing format
+            -N, --sort-by-name                  sort by filename
+            -D, --sort-by-date                  sort by date
+            -S, --sort-by-size                  sort by size
+            -O, --sort-by-owner                 sort by owner
+            -G, --sort-by-group                 sort by group
+            -r, --reverse-sort                  reverse the sort order
 
         Once a backup has been performed, you can list the files available in
         your archive using:
@@ -930,6 +949,11 @@ class ManifestCommand(Command):
             emborg manifest --date 2015/04/01
             emborg manifest --date 2015-04-01
             emborg manifest --date 2018-12-05T12:39
+
+        There are a variety of ways that you use to sort the output. For example,
+        sort by size, use:
+
+            emborg manifest -S
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = 'first'
@@ -940,8 +964,6 @@ class ManifestCommand(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         archive = cmdline['--archive']
         date = cmdline['--date']
-        filenames_only = cmdline['--name']
-        sort = cmdline['--sort'] and filenames_only
 
         # get the desired archive
         if date and not archive:
@@ -951,19 +973,98 @@ class ManifestCommand(Command):
         output('Archive:', archive)
 
         # run borg
-        list_opts = ['--short'] if filenames_only else []
         borg = settings.run_borg(
             cmd = 'list',
-            args = list_opts + [settings.destination(archive)],
+            args = [settings.destination(archive)],
             emborg_opts = options,
         )
         out = borg.stdout
-        if out:
-            out = out.rstrip()
-            if sort:
-                output('\n'.join(sorted(out.splitlines())))
-            else:
-                output(out)
+
+        # define available formats
+        formats = dict(
+            name = '{path}',
+            date = '{day} {date} {time} {path}',
+            size = '{Size:<5.2r} {path}',
+            owner = '{owner:<8} {path}',
+            group = '{group:<8} {path}',
+            long = '{Size:<5.2r} {date} {time} {path}',
+            full = '{permissions:<10} {owner:<6} {group:<6} {size:>8} {Date:YYMMDD HH:mm} {path}',
+        )
+        user_formats = settings.manifest_formats
+        if user_formats:
+            unknown = user_formats.keys() - formats.keys()
+            if unknown:
+                warn('unknown formats:', ', '.join(unknown), culprit='manifest_formats')
+            formats.update(user_formats)
+
+        # process sort options
+        if cmdline['--sort-by-name']:
+            fmt = 'name'
+            def get_key(columns):
+                return columns[7]
+        elif cmdline['--sort-by-date']:
+            fmt = 'date'
+            def get_key(columns):
+                date_time = ' '.join(columns[5:7])
+                return arrow.get(date_time, 'YYYY-MM-DD HH:mm:ss')
+        elif cmdline['--sort-by-size']:
+            fmt = 'size'
+            def get_key(columns):
+                return int(columns[3])
+        elif cmdline['--sort-by-owner']:
+            fmt = 'owner'
+            def get_key(columns):
+                return columns[1]
+        elif cmdline['--sort-by-group']:
+            fmt = 'group'
+            def get_key(columns):
+                return columns[2]
+        else:
+            fmt = None
+            get_key = None
+
+        # process format options
+        if cmdline['--name-only']:
+            fmt = 'name'
+        elif cmdline['--long']:
+            fmt = 'long'
+        elif cmdline['--full']:
+            fmt = 'full'
+
+        # sort the output
+        lines = [l.split(maxsplit=7) for l in out.rstrip().splitlines()]
+        if get_key:
+            lines = sorted(lines, key=get_key)
+        if cmdline['--reverse-sort']:
+            lines.reverse()
+
+        # echo borg output if no formatting is necessary
+        if not fmt:
+            output(out)
+            return
+
+        # import QuantiPhy
+        try:
+            from quantiphy import Quantity
+            Quantity.set_prefs(spacer='')
+        except ImportError:
+            comment('Could not import QuantiPhy.')
+            Quantity = lambda value, units: value
+
+        # generate formatted output
+        for columns in lines:
+            output(formats[fmt].format(
+                permissions = columns[0],
+                owner = columns[1],
+                group = columns[2],
+                size = columns[3],
+                Size = Quantity(columns[3], 'B'),
+                Date = arrow.get(' '.join(columns[5:7]), 'YYYY-MM-DD HH:mm:ss'),
+                day = columns[4].rstrip(','),
+                date = columns[5],
+                time = columns[6],
+                path = columns[7]
+            ), sep='\n')
 
 
 # MountCommand command {{{1
@@ -1015,13 +1116,13 @@ class MountCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         mount_point = cmdline['<mount_point>']
+        if mount_point:
+            mount_point = settings.to_path(mount_point, resolve=False)
+        else:
+            mount_point = settings.as_path('default_mount_point')
         if not mount_point:
-            mount_point = settings.value('default_mount_point')
-            if mount_point:
-                display('mount point is', mount_point)
-            else:
-                raise Error('must specify directory to use as mount point')
-        mount_point = to_path(mount_point)
+            raise Error('must specify directory to use as mount point')
+        display('mount point is:', mount_point)
         archive = cmdline['--archive']
         date = cmdline['--date']
         mount_all = cmdline['--all']
@@ -1063,6 +1164,7 @@ class PruneCommand(Command):
         Options:
             -e, --include-external   prune all archives in repository, not just
                                      those associated with this configuration
+            -s, --stats              show Borg statistics
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = 'all'
@@ -1072,6 +1174,7 @@ class PruneCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         include_external_archives = cmdline['--include-external']
+        show_stats = cmdline['--stats'] or settings.show_stats
 
         # checking the settings
         intervals = 'within last minutely hourly daily weekly monthly yearly'
@@ -1089,6 +1192,7 @@ class PruneCommand(Command):
             args = [settings.destination()],
             emborg_opts = options,
             strip_prefix = include_external_archives,
+            show_borg_output = show_stats,
         )
         out = borg.stdout
         if out:
@@ -1106,12 +1210,11 @@ class RestoreCommand(Command):
         Options:
             -a <archive>, --archive <archive>   name of the archive to use
             -d <date>, --date <date>            date of the desired version of paths
+            -l, --list                          list the files and directories
+                                                as they are processed
 
         This command is very similar to the extract command except that it is
-        meant to be run in place. Thus, the paths given are converted to
-        absolute paths and then the borg extract command is run from the root
-        directory (/) so that the existing files are replaced by the extracted
-        files.
+        meant to be replace files while in place.
     """).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = 'first'
@@ -1123,31 +1226,18 @@ class RestoreCommand(Command):
         paths = cmdline['<path>']
         archive = cmdline['--archive']
         date = cmdline['--date']
+        borg_opts = []
+        if cmdline['--list']:
+            borg_opts.append('--list')
 
-        # make sure source directories are given as absolute paths
-        for src_dir in settings.src_dirs:
-            if not src_dir.is_absolute():
-                raise Error(
-                    'restore command cannot be used',
-                    'with relative source directories',
-                    culprit=src_dir
-                )
-
-        # convert to absolute resolved paths
-        paths = [to_path(p).resolve() for p in paths]
-
-        # assure that paths correspond to src_dirs
-        src_dirs = settings.src_dirs
-        unknown_path = False
-        for path in paths:
-            if not any([str(path).startswith(str(sd)) for sd in src_dirs]):
-                unknown_path = True
-                warn('unknown path.', culprit=path)
-        if unknown_path:
-            codicil('Paths should start with:', conjoin(src_dirs, conj=', or '))
-
-        # remove leading / from paths
-        paths = [str(p).lstrip('/') for p in paths]
+        # convert to paths relative to the working directory
+        try:
+            paths = [
+                to_path(p).resolve().relative_to(settings.working_dir)
+                for p in paths
+            ]
+        except ValueError as e:
+            raise Error(e)
 
         # get the desired archive
         if date and not archive:
@@ -1157,11 +1247,13 @@ class RestoreCommand(Command):
         output('Archive:', archive)
 
         # run borg
-        cd('/')
         borg = settings.run_borg(
             cmd = 'extract',
+            borg_opts = borg_opts,
             args = [settings.destination(archive)] + paths,
             emborg_opts = options,
+            show_borg_output = bool(borg_opts),
+            use_working_dir = True,
         )
         out = borg.stdout
         if out:
@@ -1208,6 +1300,8 @@ class SettingsCommand(Command):
                 if k == 'passphrase':
                     v = '<set>'
                 output(f'{key:>33}: {render(v, level=6)}')
+                if is_str(v) and '{' in v:
+                    output(f'{"":>24}{render(settings.resolve(v), level=6)}')
 
     run_early = run
         # --avalable is handled in run_early
@@ -1230,11 +1324,12 @@ class UmountCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         mount_point = cmdline['<mount_point>']
+        if mount_point:
+            mount_point = settings.to_path(mount_point, resolve=False)
+        else:
+            mount_point = settings.as_path('default_mount_point')
         if not mount_point:
-            mount_point = settings.value('default_mount_point')
-            if not mount_point:
-                raise Error('must specify directory to use as mount point')
-        mount_point = to_path(mount_point)
+            raise Error('must specify directory to use as mount point')
 
         # run borg
         try:
@@ -1244,13 +1339,13 @@ class UmountCommand(Command):
                 emborg_opts = options,
             )
             try:
-                to_path(mount_point).rmdir()
+                mount_point.rmdir()
             except OSError as e:
                 warn(os_error(e))
         except Error as e:
             if 'busy' in str(e):
                 e.reraise(
-                    codicil=f"Try running 'lsof +D {mount_point}' to find culprit."
+                    codicil=f"Try running 'lsof +D {mount_point!s}' to find culprit."
                 )
 
 

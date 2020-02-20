@@ -9,7 +9,22 @@ Releases
     - :ref:`configs <configs>` command now outputs default configuration too.
     - some commands now use first subconfig when run with a composite config
       rather than terminating with an error.
-
+    - added :ref:`show_stats` setting.
+    - added ``--stats`` option to :ref:`create <create>`, :ref:`delete <delete>` 
+      and :ref:`prune <prune>` commands.
+    - added ``--list`` option to :ref:`create <create>`, :ref:`extract 
+      <extract>` and :ref:`restore <restore>` commands.
+    - added sorting and formatting options to :ref:`manifest` command.
+    - added :ref:`manifest_formats` setting.
+    - renamed ``--trial-run`` option to ``--dry-run`` to be more consistent with 
+      *Borg*.
+    - add *files* and *f* aliases to :ref:`manifest` command.
+    - added :ref:`working_dir` setting.
+    - added :ref:`do_not_expand` setting.
+    - added :ref:`exclude_nodump` setting
+    - added :ref:`patterns` and :ref:`patterns_from` settings.
+    - *Emborg* lock file is ignored if the process it references is no longer
+      running
 
 **1.14 (2019-12-31)**:
     - remove debug message accidentally left in *emborg-overdue*
@@ -31,7 +46,8 @@ Releases
 **1.9 (2019-11-08)**:
     - Added ability to check individual archives to the :ref:`check <check>` command.
     - Made latest archive the default for :ref:`check <check>` command.
-    - Allow :ref:`exclude_from <exclude_from>` setting to be a list of file names.
+    - Allow :ref:`exclude_from <exclude_from>` setting to be a list of file 
+      names.
 
 **1.8 (2019-10-12)**:
     - Remove duplicated commands.
@@ -47,7 +63,8 @@ Releases
 **1.5 (2019-09-30)**:
     - Added composite configurations.
     - Added support for multiple backup configurations in a single repository.
-    - Added :ref:`prefix <prefix>` and :ref:`exclude_from <exclude_from>` settings.
+    - Added :ref:`prefix <prefix>` and :ref:`exclude_from <exclude_from>` 
+      settings.
     - Provide default value for :ref:`archive <archive>` setting.
     - Add --all command line option to :ref:`mount <mount>` command.
     - Add --include-external command line option to :ref:`check <check>`, :ref:`list <list>`, 

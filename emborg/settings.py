@@ -14,10 +14,10 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see http://www.gnu.org/licenses/.
+# along with this program.  If not, see http://www.gnu.org/licenses.
 
 # Imports {{{1
-from .collection import Collection
+from .collection import Collection, split_lines
 from .preferences import (
     BORG,
     BORG_SETTINGS,
@@ -37,15 +37,22 @@ from .preferences import (
     PROGRAM_NAME,
     SETTINGS_FILE,
 )
+from .patterns import (
+    check_roots, check_excludes, check_patterns,
+    check_excludes_files, check_patterns_files
+)
 from .python import PythonFile
-from .utilities import gethostname, getfullhostname, getusername, render_paths
-from shlib import getmod, mv, rm, Run, to_path, render_command
+from .utilities import gethostname, getfullhostname, getusername
+from shlib import cd, cwd, getmod, mv, rm, Run, to_path, render_command
 from inform import (
-    Color, Error, codicil, comment, conjoin, display, done, full_stop,
-    get_informer, indent, is_str, join, narrate, output, render, warn,
+    Color, Error,
+    codicil, comment, conjoin, display, done, errors_accrued, full_stop,
+    get_informer, indent, is_collection, is_str, join, log, narrate, plural,
+    output, render, set_culprit, warn,
 )
 from textwrap import dedent
 import arrow
+import errno
 import os
 
 
@@ -54,13 +61,15 @@ hostname = gethostname()
 fullhostname = getfullhostname()
 username = getusername()
 
-borg_commands_with_dryrun = 'create extract delete prune upgrade recreate'
+borg_commands_with_dryrun = 'create extract delete prune upgrade recreate'.split()
 
 # borg_options_arg_count {{{2
 borg_options_arg_count = {
     'borg': 1,
     '--exclude': 1,
     '--exclude-from': 1,
+    '--pattern': 1,
+    '--patterns-from': 1,
     '--encryption': 1,
 }
 for name, attrs in BORG_SETTINGS.items():
@@ -106,13 +115,10 @@ def get_config(name, settings, composite_config_response, show_config_name):
         if name not in config_groups:
             raise Error('unknown configuration.', culprit=name)
     else:
-        if len(configs) > 1:
+        if len(configs) > 0:
             name = configs[0]
         else:
-            raise Error(
-                'no known configurations.',
-                culprit=(settings.settings_filename, CONFIGS_SETTING)
-            )
+            raise Error('no known configurations.', culprit = CONFIGS_SETTING)
     configs = list(config_groups[name])
     num_configs = len(configs)
     if num_configs > 1 and composite_config_response == 'error':
@@ -132,7 +138,7 @@ def get_config(name, settings, composite_config_response, show_config_name):
 # Settings class {{{1
 class Settings:
     # Constructor {{{2
-    def __init__(self, name=None, command=None, options=()):
+    def __init__(self, name=None, command=None, emborg_opts=()):
         if command:
             self.requires_exclusivity = command.REQUIRES_EXCLUSIVITY
             self.composite_config_response = command.COMPOSITE_CONFIGS
@@ -142,7 +148,8 @@ class Settings:
             self.composite_config_response = 'error'
             self.show_config_name = False
         self.settings = {}
-        self.options = options
+        self.do_not_expand = ()
+        self.emborg_opts = emborg_opts
         self.config_dir = to_path(CONFIG_DIR)
         self.read(name)
         self.check()
@@ -164,7 +171,10 @@ class Settings:
         if path:
             settings = PythonFile(path).run()
             parent = path.parent
-            includes = Collection(settings.get(INCLUDE_SETTING))
+            includes = Collection(
+                settings.get(INCLUDE_SETTING),
+                split_lines, comment='#', strip=True, cull=True
+            )
         else:
             # this is the generic settings file
             parent = self.config_dir
@@ -210,22 +220,20 @@ class Settings:
 
         self.settings.update(settings)
 
+        # read include files, if any are specified
         for include in includes:
             path = to_path(parent, include)
             self.read(path=path)
 
-        # default src_dirs if not given
-        if not self.settings.get('src_dirs'):
-            self.settings['src_dirs'] = []
-
-        # default archive if not given
-        if 'archive' not in self.settings:
-            if 'prefix' not in self.settings:
-                self.settings['prefix'] = '{host_name}-{user_name}-{config_name}-'
-            self.settings['archive'] = self.settings['prefix'] + '{{now}}'
-
     # check() {{{2
     def check(self):
+        # add some possibly useful placeholders into settings
+        home_dir = os.environ.get('HOME')
+        if home_dir and 'home_dir' not in self.settings:
+            self.settings['home_dir'] = home_dir
+        self.settings['config_dir'] = CONFIG_DIR
+        self.do_not_expand = Collection(self.settings.get('do_not_expand', ''))
+
         # gather the string valued settings together (can be used by resolve)
         self.str_settings = {k:v for k, v in self.settings.items() if is_str(v)}
 
@@ -236,11 +244,74 @@ class Settings:
             if not self.settings.get(each):
                 missing.append(each)
         if missing:
-            missing = conjoin(missing)
-            raise Error(f'{missing}: no value given for setting.')
+            m = conjoin(missing)
+            raise Error(f'{m}: no value given for {plural(m):setting}.')
+
+        self.working_dir = to_path(self.settings.get('working_dir', '/'))
+        if not self.working_dir.exists():
+            raise Error('not found.', culprit=('working_dir', self.working_dir))
+        if not self.working_dir.is_absolute():
+            raise Error('must be an absolute path.', culprit='working_dir')
+
+    # handle errors {{{2
+    def fail(self, *msg):
+        comment('failure detected:')
+        codicil(indent(join(*msg)))
+        msg = full_stop(' '.join(str(m) for m in msg))
+        try:
+            if self.notify and not Color.isTTY():
+                Run(
+                    ['mail', '-s', f'{PROGRAM_NAME} on {fullhostname}: {msg}'] + self.notify.split(),
+                    stdin=dedent(f'''
+                        {msg}
+                        config = {self.config_name}
+                        source = {username}@{hostname}:{', '.join(str(d) for d in self.src_dirs)}
+                        destination = {self.repository!s}
+                    ''').lstrip(),
+                    modes='soeW'
+                )
+        except Error:
+            pass
+        try:
+            notifier = self.settings.get('notifier')
+                # don't use self.value as we don't want arguments expanded yet
+            if notifier and not Color.isTTY():
+                Run(
+                    self.notifier.format(
+                        msg=msg, hostname=hostname,
+                        user_name=username, prog_name=PROGRAM_NAME,
+                    ),
+                    modes='SoeW'
+                        # need to use the shell as user will generally quote msg
+                )
+        except Error:
+            pass
+        except KeyError as e:
+            warn('unknown key.', culprit=(self.settings_file, 'notifier', e))
+
+    # get value {{{2
+    def value(self, name, default=''):
+        """Gets value of scalar setting."""
+        value = self.settings.get(name, default)
+        if not is_str(value) or name in self.do_not_expand:
+            return value
+        return self.resolve(value)
+
+    # get values {{{2
+    def values(self, name, default=()):
+        """Gets value of string setting."""
+        values = Collection(
+            self.settings.get(name, default),
+            split_lines, comment='#', strip=True, cull=True
+        )
+        if name in self.do_not_expand:
+            return values
+        return [self.resolve(v) for v in values]
 
     # resolve {{{2
     def resolve(self, value):
+        """Expand any embedded names in value"""
+
         # escape any double braces
         try:
             value = value.replace('{{', r'\b').replace('}}', r'\e')
@@ -263,93 +334,81 @@ class Settings:
         # restore escaped double braces with single braces
         return resolved.replace(r'\b', '{').replace(r'\e', '}')
 
-    # resolve_path {{{2
-    def resolve_path(self, value, parent_dir=None):
-        if parent_dir:
-            return to_path(parent_dir, self.resolve(value))
-        return to_path(self.resolve(value))
+    # to_path() {{{2
+    def to_path(self, s, resolve=True, culprit=None):
+        """Converts a string to a path."""
+        p = to_path(s)
+        if resolve:
+            p = to_path(self.working_dir, p)
+        if culprit:
+            if not p.exists():
+                 raise Error('not found.', culprit=culprit)
+        return p
 
-    # handle errors {{{2
-    def fail(self, *msg, comment=''):
-        comment('failure detected:')
-        codicil(indent(join(*msg)))
-        msg = full_stop(' '.join(str(m) for m in msg))
-        try:
-            if self.notify and not Color.isTTY():
-                Run(
-                    ['mail', '-s', f'{PROGRAM_NAME} on {fullhostname}: {msg}'] + self.notify.split(),
-                    stdin=dedent(f'''
-                        {msg}
-                        {comment}
-                        config = {self.config_name}
-                        source = {username}@{hostname}:{', '.join(str(d) for d in self.src_dirs)}
-                        destination = {self.repository}
-                    ''').lstrip(),
-                    modes='soeW'
-                )
-        except Error:
-            pass
-        try:
-            if self.notifier and not Color.isTTY():
-                Run(
-                    self.notifier.format(
-                        msg=msg, hostname=hostname,
-                        user_name=username, prog_name=PROGRAM_NAME,
-                    ),
-                    modes='soeW'
-                )
-        except Error:
-            pass
-        except KeyError as e:
-            warn('unknown key.', culprit=(self.settings_file, 'notifier', e))
+    # as_path() {{{2
+    def as_path(self, name, resolve=True, must_exist=False, default=None):
+        """Converts a setting to a path, without resolution."""
+        s = self.value(name, default)
+        if s:
+            return self.to_path(s, resolve, name if must_exist else None)
 
-    # get resolved value {{{2
-    def value(self, name, default=''):
-        """Gets fully resolved value of string setting."""
-        return self.resolve(self.settings.get(name, default))
-
-    # get resolved values {{{2
-    def values(self, name):
-        """Iterate though fully resolved values of a collection setting."""
-        for value in Collection(self.settings.get(name)):
-            yield self.resolve(value)
+    # as_paths() {{{2
+    def as_paths(self, name, resolve=True, must_exist=False):
+        """Convert setting to paths, without resolution."""
+        return [
+            self.to_path(s, resolve, name if must_exist else None)
+            for s in self.values(name)
+        ]
 
     # borg_options() {{{2
-    def borg_options(self, cmd, options, strip_prefix=True):
+    def borg_options(self, cmd, borg_opts, emborg_opts, strip_prefix=True):
+        if not borg_opts:
+            borg_opts = []
+
         # handle special cases first {{{3
-        args = []
         if self.value('verbose'):
-            options = list(options)
-            options.append('verbose')
-        if 'verbose' in options:
-            args.append('--verbose')
-        if 'trial-run' in options and cmd in borg_commands_with_dryrun.split():
-            args.append('--dry-run')
+            emborg_opts = list(emborg_opts)
+            emborg_opts.append('verbose')
+        if 'verbose' in emborg_opts:
+            borg_opts.append('--verbose')
+        if 'dry-run' in emborg_opts and cmd in borg_commands_with_dryrun:
+            borg_opts.append('--dry-run')
+
         if cmd == 'create':
-            if 'verbose' in options:
-                args.append('--list')
-                if 'trial-run' not in options:
-                    args.append('--stats')
-            for path in render_paths(self.values('excludes')):
-                args.extend(['--exclude', path])
-            exclude_from = self.value('exclude_from')
-            if exclude_from:
-                if is_str(exclude_from):
-                    exclude_from = [exclude_from]
-                for each in exclude_from:
-                    path = to_path(self.config_dir, each)
-                    if not path.exists():
-                        raise Error('--exclude-from file does not exist.', culprit=path)
-                    args.extend(['--exclude-from', str(path)])
+            if 'verbose' in emborg_opts and '--list' not in borg_opts:
+                borg_opts.append('--list')
+            roots = self.src_dirs
+            patterns = self.values('patterns')
+            if patterns:
+                for pattern in check_patterns(patterns, roots, self.working_dir, 'patterns'):
+                    borg_opts.extend(['--pattern', pattern])
+            excludes = self.values('excludes')
+            if excludes:
+                for exclude in check_excludes(excludes, roots, 'excludes'):
+                    borg_opts.extend(['--exclude', exclude])
+            patterns_froms = self.as_paths('patterns_from', must_exist=True)
+            if patterns_froms:
+                check_patterns_files(patterns_froms, roots, self.working_dir)
+                for patterns_from in patterns_froms:
+                    borg_opts.extend(['--patterns-from', patterns_from])
+            exclude_froms = self.as_paths('exclude_from', must_exist=True)
+            if exclude_froms:
+                check_excludes_files(exclude_froms, roots, self.working_dir)
+                for exclude_from in exclude_froms:
+                    borg_opts.extend(['--excludes-from', exclude_from])
+            check_roots(roots, self.working_dir)
+            if errors_accrued():
+                raise Error('stopping due to previously reported errors.')
+            self.roots = roots
 
-        if cmd == 'extract':
-            if 'verbose' in options:
-                args.append('--list')
+        elif cmd == 'extract':
+            if 'verbose' in emborg_opts:
+                borg_opts.append('--list')
 
-        if cmd == 'init':
+        elif cmd == 'init':
             if self.passphrase or self.avendesora_account:
                 encryption = self.encryption if self.encryption else 'repokey'
-                args.append(f'--encryption={encryption}')
+                borg_opts.append(f'--encryption={encryption}')
                 if encryption == 'none':
                     warn('passphrase given but not needed as encryption set to none.')
                 if encryption.startswith('keyfile'):
@@ -367,7 +426,18 @@ class Settings:
                 encryption = self.encryption if self.encryption else 'none'
                 if encryption != 'none':
                     raise Error('passphrase not specified.')
-                args.append(f'--encryption={encryption}')
+                borg_opts.append(f'--encryption={encryption}')
+
+        if (
+            cmd in ['create', 'delete', 'prune'] and
+            'dry-run' not in emborg_opts and
+            '--list' not in borg_opts
+        ):
+            # By default we ask for stats to go in the log file.  However if
+            # opts contains --list, then the stats will be displayed to user
+            # rather than going to logfile, in this case, do not request stats
+            # automatically, require user to do it manually.
+            borg_opts.append('--stats')
 
         # add the borg command line options appropriate to this command {{{3
         for name, attrs in BORG_SETTINGS.items():
@@ -378,10 +448,10 @@ class Settings:
                 val = self.value(name)
                 if val:
                     if 'arg' in attrs and attrs['arg']:
-                        args.extend([opt, str(val)])
+                        borg_opts.extend([opt, str(val)])
                     else:
-                        args.extend([opt])
-        return args
+                        borg_opts.extend([opt])
+        return borg_opts
 
     # publish_passcode() {{{2
     def publish_passcode(self):
@@ -416,27 +486,27 @@ class Settings:
         if self.encryption is None:
             self.encryption = 'none'
         if self.encryption == 'none':
-            narrate('passphrase is not available, encryption disabled.')
+            comment('passphrase is not available, encryption disabled.')
             return {}
         raise Error('Cannot determine the encryption passphrase.')
 
     # run_borg() {{{2
-    def run_borg(self, cmd, args='', borg_opts=None, emborg_opts=(), strip_prefix=False):
-
+    def run_borg(self, cmd,
+        args = (),
+        borg_opts = None,
+        emborg_opts = (),
+        strip_prefix = False,
+        show_borg_output = False,
+        use_working_dir = False,
+    ):
         # prepare the command
         os.environ.update(self.publish_passcode())
         os.environ['BORG_DISPLAY_PASSPHRASE'] = 'no'
         if self.ssh_command:
             os.environ['BORG_RSH'] = self.ssh_command
         executable = self.value('borg_executable', BORG)
-        if borg_opts is None:
-            borg_opts = self.borg_options(cmd, emborg_opts, strip_prefix)
-        command = (
-            [executable] +
-            cmd.split() +
-            borg_opts +
-            (args.split() if is_str(args) else args)
-        )
+        borg_opts = self.borg_options(cmd, borg_opts, emborg_opts, strip_prefix)
+        command = ([executable] + cmd.split() + borg_opts + args)
         environ = {k:v for k, v in os.environ.items() if k.startswith('BORG_')}
         if 'BORG_PASSPHRASE' in environ:
             environ['BORG_PASSPHRASE'] = '<redacted>'
@@ -455,18 +525,36 @@ class Settings:
         narrate('running:\n{}'.format(
             indent(render_command(command, borg_options_arg_count))
         ))
-        starts_at = arrow.now()
-        narrate('starts at: {!s}'.format(starts_at))
-        narrating = (
-            '--verbose' in borg_opts or
-            'verbose' in emborg_opts or
-            'narrate' in emborg_opts
-        ) and '--json' not in command
-        modes = 'soeW' if narrating else 'sOEW'
-        borg = Run(command, modes=modes, stdin='', env=os.environ, log=False)
-        ends_at = arrow.now()
-        narrate('ends at: {!s}'.format(ends_at))
-        narrate('elapsed = {!s}'.format(ends_at - starts_at))
+        with cd(self.working_dir if use_working_dir else '.'):
+            narrate('running in:', cwd())
+            starts_at = arrow.now()
+            log('starts at: {!s}'.format(starts_at))
+            narrating = (
+                show_borg_output or
+                '--verbose' in borg_opts or
+                'verbose' in emborg_opts or
+                'narrate' in emborg_opts
+            ) and '--json' not in command
+            if narrating:
+                modes = 'soeW'
+                display('\nRunning Borg {} command ...'.format(cmd))
+            else:
+                modes = 'sOEW'
+            try:
+                borg = Run(command, modes=modes, stdin='', env=os.environ, log=False)
+            except Error as e:
+                e.reraise(culprit=f'borg {cmd}')
+            ends_at = arrow.now()
+            log('ends at: {!s}'.format(ends_at))
+            log('elapsed = {!s}'.format(ends_at - starts_at))
+        if borg.stdout:
+            narrate('Borg stdout:')
+            narrate(indent(borg.stdout))
+        if borg.stderr:
+            narrate('Borg stderr:')
+            narrate(indent(borg.stderr))
+        if borg.status:
+            narrate('Borg exit status:', borg.status)
         return borg
 
     # run_borg_raw() {{{2
@@ -478,10 +566,9 @@ class Settings:
         executable = self.value('borg_executable', BORG)
         remote_path = self.value('remote_path')
         remote_path = ['--remote-path', remote_path] if remote_path else []
-        repository = str(self.repository)
         command = (
             [executable] + remote_path + [
-                (repository if a == '@repo' else a) for a in args
+                (self.repository if a == '@repo' else a) for a in args
             ]
         )
 
@@ -489,25 +576,34 @@ class Settings:
         narrate('running:\n{}'.format(
             indent(render_command(command, borg_options_arg_count))
         ))
-        starts_at = arrow.now()
-        narrate('starts at: {!s}'.format(starts_at))
-        borg = Run(command, modes='soeW', env=os.environ, log=False)
-        ends_at = arrow.now()
-        narrate('ends at: {!s}'.format(ends_at))
-        narrate('elapsed = {!s}'.format(ends_at - starts_at))
+        with cd(self.working_dir):
+            narrate('running in:', cwd())
+            starts_at = arrow.now()
+            log('starts at: {!s}'.format(starts_at))
+            borg = Run(command, modes='soeW', env=os.environ, log=False)
+            ends_at = arrow.now()
+            log('ends at: {!s}'.format(ends_at))
+            log('elapsed = {!s}'.format(ends_at - starts_at))
+        if borg.stdout:
+            narrate('Borg stdout:')
+            narrate(indent(borg.stdout))
+        if borg.stderr:
+            narrate('Borg stderr:')
+            narrate(indent(borg.stderr))
+        if borg.status:
+            narrate('Borg exit status:', borg.status)
+
         return borg
 
     # destination() {{{2
     def destination(self, archive=None):
-        repository = str(self.repository)
         if archive is True:
             archive = self.value('archive')
             if not archive:
-                raise Error('archive: setting value not given.')
+                raise Error('setting value not available.', culprit='archive')
         if archive:
-            return f'{repository}::{archive}'
-        else:
-            return repository
+            return f'{self.repository!s}::{archive}'
+        return self.repository
 
     # get attribute {{{2
     def __getattr__(self, name):
@@ -521,35 +617,57 @@ class Settings:
     # enter {{{2
     def __enter__(self):
         # resolve src directories
-        self.src_dirs = [self.resolve_path(d) for d in self.src_dirs]
+        self.src_dirs = self.as_paths('src_dirs', resolve=False)
 
-        # resolve repository
-        self.repository = self.resolve_path(self.repository)
+        # set repository
+        repository = self.value('repository')
+        if ':' not in repository:
+            # is a local repository
+            repository = to_path(repository)
+            if not repository.is_absolute():
+                raise Error(
+                    'local repository must be specified using an absolute path.',
+                    culprit = repository
+                )
+        self.repository = repository
+
+        # default archive if not given
+        if 'archive' not in self.settings:
+            if 'prefix' not in self.settings:
+                self.settings['prefix'] = '{host_name}-{user_name}-{config_name}-'
+            self.settings['archive'] =self.prefix + '{{now}}'
 
         # resolve other files and directories
-        data_dir = self.resolve_path(DATA_DIR)
-        self.data_dir = data_dir
-
+        data_dir = to_path(DATA_DIR)
         if not data_dir.exists():
             # data dir does not exist, create it
-            self.data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
-
-        self.logfile = self.resolve_path(LOG_FILE, data_dir)
-
-        if 'no-log' not in self.options:
-            self.prev_logfile = self.resolve_path(PREV_LOG_FILE, data_dir)
-            rm(self.prev_logfile)
-            if self.logfile.exists():
-                mv(self.logfile, self.prev_logfile)
-
-        self.date_file = self.resolve_path(DATE_FILE, data_dir)
+            data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+        self.date_file = data_dir / self.resolve(DATE_FILE)
+        self.data_dir = data_dir
 
         # perform locking
-        lockfile = self.lockfile = self.resolve_path(LOCK_FILE, data_dir)
+        lockfile = self.lockfile = data_dir / self.resolve(LOCK_FILE)
         if self.requires_exclusivity:
             # check for existence of lockfile
             if lockfile.exists():
-                raise Error(f'currently running (see {lockfile} for details).')
+                report = True
+                try:
+                    lock_contents = lockfile.read_text()
+                    pid = None
+                    for l in lock_contents.splitlines():
+                        name, _, value = l.partition('=')
+                        if name.strip().lower() == 'pid':
+                            pid = int(value.strip())
+                    assert pid > 0
+                    os.kill(pid, 0)
+                except ProcessLookupError as e:
+                    if e.errno == errno.ESRCH:
+                        report = False  # process no longer exists
+                except Exception as e:
+                    log('garbled lock file:', e)
+
+                if report:
+                    raise Error(f'currently running (see {lockfile} for details).')
 
             # create lockfile
             now = arrow.now()
@@ -560,13 +678,22 @@ class Settings:
             ''').lstrip())
 
         # open logfile
-        if 'no-log' not in self.options:
+        # do this after checking lock so we do not overwrite logfile
+        # of emborg process that is currently running
+        self.logfile = data_dir / self.resolve(LOG_FILE)
+        if 'no-log' not in self.emborg_opts:
+            self.prev_logfile = data_dir / self.resolve(PREV_LOG_FILE)
+            rm(self.prev_logfile)
+            if self.logfile.exists():
+                mv(self.logfile, self.prev_logfile)
             get_informer().set_logfile(self.logfile)
 
+        log('working dir =', self.working_dir)
         return self
 
     # exit {{{2
     def __exit__(self, exc_type, exc_val, exc_tb):
+
         # delete lockfile
         if self.requires_exclusivity:
             self.lockfile.unlink()
