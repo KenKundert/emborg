@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.14.3
-    | Released: 2020-01-22
+    | Version: 1.14.4
+    | Released: 2020-02-20
 
     - improve messaging from *emborg-overdue*
     - :ref:`configs <configs>` command now outputs default configuration too.
