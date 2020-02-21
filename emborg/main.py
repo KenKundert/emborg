@@ -14,7 +14,7 @@ Options:
     -m, --mute                        Suppress all output.
     -n, --narrate                     Send emborg and Borg narration to stdout.
     -q, --quiet                       Suppress optional output.
-    -t, --dry-run                     Run Borg in dry run mode.
+    -d, --dry-run                     Run Borg in dry run mode.
     -v, --verbose                     Make Borg more verbose.
     --no-log                          Do not create log file.
 """

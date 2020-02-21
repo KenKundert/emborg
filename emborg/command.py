@@ -1300,8 +1300,11 @@ class SettingsCommand(Command):
                 if k == 'passphrase':
                     v = '<set>'
                 output(f'{key:>33}: {render(v, level=6)}')
-                if is_str(v) and '{' in v:
-                    output(f'{"":>24}{render(settings.resolve(v), level=6)}')
+                try:
+                    if is_str(v) and '{' in v:
+                        output(f'{"":>24}{render(settings.resolve(v), level=6)}')
+                except Error as e:
+                    pass
 
     run_early = run
         # --avalable is handled in run_early

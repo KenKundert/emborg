@@ -14,6 +14,8 @@ You can get a complete list of available configuration settings by running::
     emborg settings --available
 
 
+.. _shared_settings:
+
 Shared Settings
 ---------------
 
@@ -72,6 +74,8 @@ replacing :ref:`repository` and adding :ref:`prefix` like so:
     repository = 'archives:/mnt/backups/{host_name}/{user_name}'
     prefix = '{config_name}-'
 
+
+.. _individual_configurations:
 
 Configurations
 --------------
@@ -135,6 +139,8 @@ as are empty lines.  For example:
     '''
 
 
+.. _paths:
+
 Paths
 -----
 
@@ -188,6 +194,9 @@ Paths specified directly to *Emborg* are processed and any leading tildes
 specified in :ref:`exclude_from` and :ref:`patterns_from` files are processed 
 directly by *Borg*, which does not expand tildes to a user's home directory.
 
+
+.. _includes:
+
 Includes
 --------
 
@@ -211,6 +220,8 @@ or:
 If you specify a relative path for an include file, it it relative to the file 
 that includes it.
 
+
+.. _composite_configurations:
 
 Composite Configurations
 ------------------------
@@ -270,6 +281,8 @@ version     does not use any configs
 ==========  ============================
 
 
+.. _patterns_intro:
+
 Patterns
 --------
 
@@ -308,12 +321,49 @@ features are described in the `Borg patterns documentation
 <https://borgbackup.readthedocs.io/en/stable/usage/help.html>`_.
 
 
+.. _confirming_configuration:
+
+Confirming Your Configuration
+-----------------------------
+
+Once you have specified your configuration you should carefully check it to make 
+sure you are backing up the files you need and not backing up the files you 
+don't need.  It is important to do this in the beginning, otherwise you might 
+find your self with a bloated repository that does not contain the files you 
+require.
+
+There are a number of ways that *Emborg* can help you check your work.
+
+1. You can run ``emborg settings`` to see the values used by *Emborg* for all 
+   settings.
+
+2. You can use *Borg*'s ``--dry-run`` option to perform a practice run and see 
+   what will happen.  For example::
+
+       emborg --dry-run create --list
+
+   will show you all of the files that are to be backed up and which of those 
+   files have changed since the last time you created an archive.
+
+3. After running *Emborg* you can run ``emborg log`` to see what *Emborg* did in 
+   detail and what it asked *Borg* to do.  The log contains the full *Borg* 
+   command invocation and *Borg*'s response.
+
+4. Once you have created your repository and created your first archive, you can 
+   use the ``--sort-by-size`` option of the :ref:`manifest command <manifest>` 
+   to find the largest files that were copied into the repository.  If they are 
+   not needed, you can add them to your exclude list, delete the archive, and 
+   then recreate the archive, this time without the large unnecessary files.
+
+
+.. _emborg_settings:
+
 Emborg Settings
 ---------------
 
 These settings control the behavior of *Emborg*.
 
-.. code-block:: python
+
 .. _archive:
 
 archive
@@ -639,6 +689,7 @@ making backups of their files.
 May be specified as a list of strings or as a multi-line string with one path 
 per line.
 
+
 .. _needs_ssh_agent:
 
 needs_ssh_agent
@@ -713,6 +764,7 @@ prune_after_create
 
 A boolean. If true the :ref:`prune command <prune>` is run after creating an 
 archive.
+
 
 .. _repository:
 
