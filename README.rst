@@ -8,7 +8,7 @@ Emborg — Front-End to Borg Backup
     :target: https://pypi.python.org/pypi/emborg/
 
 :Author: Ken Kundert
-:Version: 1.14.4
+:Version: 1.14.5
 :Released: 2020-02-20
 
 *Emborg* is a simple command line utility to orchestrate backups. It is built as 

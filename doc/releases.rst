@@ -2,7 +2,7 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.14.4
+    | Version: 1.14.5
     | Released: 2020-02-20
 
     - improve messaging from *emborg-overdue*
