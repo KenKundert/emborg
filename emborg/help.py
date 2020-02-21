@@ -19,10 +19,12 @@
 
 
 # Imports {{{1
+from textwrap import dedent
+
+from inform import Error, error, output
+
 from .command import Command
 from .utilities import pager, two_columns
-from inform import error, output, Error
-from textwrap import dedent
 
 
 # HelpMessage base class {{{1
@@ -60,9 +62,10 @@ class HelpMessage(object):
                 if name == topic.get_name():
                     return pager(topic.help())
 
-            error('topic not found.', culprit=name)
+            error("topic not found.", culprit=name)
         else:
             from .main import synopsis
+
             cls.help(synopsis)
 
     # summarize {{{2
@@ -71,18 +74,18 @@ class HelpMessage(object):
         summaries = []
         for topic in sorted(cls.topics(), key=lambda topic: topic.get_name()):
             summaries.append(two_columns(topic.get_name(), topic.DESCRIPTION))
-        return '\n'.join(summaries)
+        return "\n".join(summaries)
 
     # help {{{2
     @classmethod
     def help(cls, desc):
         if desc:
-            output(desc.strip() + '\n')
+            output(desc.strip() + "\n")
 
-        output('Available commands:')
+        output("Available commands:")
         output(Command.summarize())
 
-        output('\nAvailable topics:')
+        output("\nAvailable topics:")
         output(cls.summarize())
 
 
@@ -92,7 +95,8 @@ class Overview(HelpMessage):
 
     @staticmethod
     def help():
-        text = dedent("""
+        text = dedent(
+            """
             Emborg is a simple command line utility to orchestrate backups.  It
             is built on Borg, which is a powerful and fast de-duplicating backup
             utility for managing encrypted backups, however it can be rather
@@ -108,7 +112,8 @@ class Overview(HelpMessage):
             you would use often and in an interactive manner with the
             expectation that you would use Borg directly for the remaining
             commands.
-        """).strip()
+            """
+        ).strip()
         return text
 
 
@@ -118,7 +123,8 @@ class Precautions(HelpMessage):
 
     @staticmethod
     def help():
-        text = dedent("""
+        text = dedent(
+            """
             You should assure you have a backup copy of the encryption
             passphrase in a safe place.  This is very important. If the only
             copy of the passphrase is on the disk being backed up and that disk
@@ -163,5 +169,6 @@ class Precautions(HelpMessage):
             have lost all your files and then see if you can do a restore from
             backup. Doing this and working out the kinks before you lose your
             files can save you if you ever do lose your files.
-        """).strip()
+            """
+        ).strip()
         return text

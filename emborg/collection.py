@@ -22,11 +22,12 @@
 # along with this program.  If not, see http://www.gnu.org/licenses.
 
 # Imports {{{1
-from inform import is_str, is_collection
+from inform import is_collection, is_str
 
 # Globals {{{1
-__version__ = '0.3.0'
-__released__ = '2020-02-18'
+__version__ = "0.3.0"
+__released__ = "2020-02-18"
+
 
 # Utilities {{{1
 def split_lines(text, comment=None, strip=False, cull=False):
@@ -51,8 +52,8 @@ def split_lines(text, comment=None, strip=False, cull=False):
 # Collection {{{1
 class Collection(object):
     fmt = {}  # default value format
-    sep = ' ' # default separator
-    splitter = '|'  # default format splitter (goes between fmt and sep)
+    sep = " "  # default separator
+    splitter = "|"  # default format splitter (goes between fmt and sep)
 
     """Collection
 
@@ -68,6 +69,7 @@ class Collection(object):
     be split into a list to form the collection.  You can also pass in a
     splitting function.
     """
+
     def __init__(self, collection, splitter=None, **kwargs):
         if is_str(collection):
             if callable(splitter):
@@ -103,7 +105,7 @@ class Collection(object):
         except AttributeError:
             return enumerate(self.collection)
 
-    def render(self, fmt='{v}', sep=', '):
+    def render(self, fmt="{v}", sep=", "):
         """Convert the collection into a string
 
         fmt (str):
@@ -126,7 +128,7 @@ class Collection(object):
 
         """
         if not fmt:
-            fmt = '{}'
+            fmt = "{}"
 
         return sep.join(fmt.format(v, k=k, v=v) for k, v in self.items())
 
@@ -148,11 +150,11 @@ class Collection(object):
             if len(components) == 2:
                 fmt, sep = components
             else:
-                fmt, sep = components[0], ' '
+                fmt, sep = components[0], " "
         else:
             fmt, sep = self.fmt, self.sep
         if not fmt:
-            fmt = '{}'
+            fmt = "{}"
 
         if callable(fmt):
             return sep.join(fmt(k, v) for k, v in self.items())

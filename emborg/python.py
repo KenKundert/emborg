@@ -21,8 +21,9 @@
 
 
 # Imports {{{1
-from shlib import to_path, cp
-from inform import display, Error, narrate, os_error, full_stop
+from inform import Error, display, full_stop, narrate, os_error
+
+from shlib import cp, to_path
 
 
 # PythonFile class {{{1
@@ -38,11 +39,11 @@ class PythonFile:
 
     def save(self, contents):
         path = self.path
-        path.write_text(contents, encoding='utf-8')
+        path.write_text(contents, encoding="utf-8")
 
     def read(self):
         path = self.path
-        return path.read_text(encoding='utf-8')
+        return path.read_text(encoding="utf-8")
 
     def remove(self):
         self.path.unlink()
@@ -55,8 +56,8 @@ class PythonFile:
         """
         # prepend extension to list of suffixes
         suffixes = self.path.suffixes
-        stem = self.path.stem.partition('.')[0]  # remove all suffixes
-        new = to_path(self.path.parent, ''.join([stem, extension] + suffixes))
+        stem = self.path.stem.partition(".")[0]  # remove all suffixes
+        new = to_path(self.path.parent, "".join([stem, extension] + suffixes))
         self.backup_path = new
 
         cp(self.path, new)
@@ -69,23 +70,26 @@ class PythonFile:
     def run(self):
         self.ActivePythonFile = self.path
         path = self.path
-        narrate('reading:', path)
+        narrate("reading:", path)
         try:
             self.code = self.read()
-                # need to save the code for the new command
+            # need to save the code for the new command
         except OSError as err:
             raise Error(os_error(err))
 
         try:
-            compiled = compile(self.code, str(path), 'exec')
+            compiled = compile(self.code, str(path), "exec")
         except SyntaxError as err:
             culprit = (err.filename, err.lineno)
             if err.text is None or err.offset is None:
                 raise Error(full_stop(err.msg), culprit=culprit)
             else:
                 raise Error(
-                    err.msg + ':', err.text.rstrip(), (err.offset-1)*' ' + '^',
-                    culprit=culprit, sep='\n'
+                    err.msg + ":",
+                    err.text.rstrip(),
+                    (err.offset - 1) * " " + "^",
+                    culprit=culprit,
+                    sep="\n",
                 )
 
         contents = {}
@@ -93,10 +97,11 @@ class PythonFile:
             exec(compiled, contents)
         except Exception as err:
             from .utilities import error_source
+
             raise Error(full_stop(err), culprit=error_source())
         self.ActivePythonFile = None
         # strip out keys that start with '__' and return them
-        return {k: v for k, v in contents.items() if not k.startswith('__')}
+        return {k: v for k, v in contents.items() if not k.startswith("__")}
 
     def create(self, contents):
         path = self.path
@@ -108,10 +113,10 @@ class PythonFile:
                 display("%s: already exists." % path)
                 return
             # create the file
-            display('%s: creating.' % path)
+            display("%s: creating." % path)
             # file is not encrypted
-            with path.open('wb') as f:
-                f.write(contents.encode('utf-8'))
+            with path.open("wb") as f:
+                f.write(contents.encode("utf-8"))
         except OSError as err:
             raise Error(os_error(err))
 

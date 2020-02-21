@@ -15,16 +15,17 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-from shlib import Run, to_path
 import os
-import socket
 import pwd
+import socket
+
+from shlib import Run
 
 
 # gethostname {{{1
 # returns short version of the hostname (the hostname without any domain name)
 def gethostname():
-    return socket.gethostname().split('.')[0]
+    return socket.gethostname().split(".")[0]
 
 
 def getfullhostname():
@@ -38,19 +39,17 @@ def getusername():
 
 # pager {{{1
 def pager(text):
-    program = os.environ.get('PAGER', 'less')
-    Run([program], stdin=text, modes='Woes')
+    program = os.environ.get("PAGER", "less")
+    Run([program], stdin=text, modes="Woes")
 
 
 # two_columns {{{1
 def two_columns(col1, col2, width=16, indent=True):
-    indent = '    '
+    indent = "    "
     if len(col1) > width:
-        return '%s%s\n%s%s%s' % (
-            indent, col1, indent, '  '+width*' ', col2
-        )
+        return "%s%s\n%s%s%s" % (indent, col1, indent, "  " + width * " ", col2)
     else:
-        return '%s%-*s  %s' % (indent, width, col1, col2)
+        return "%s%-*s  %s" % (indent, width, col1, col2)
 
 
 # error_source {{{1
@@ -59,10 +58,12 @@ def error_source():
     Reads stack trace to determine filename and line number of error.
     """
     import traceback
+
     try:
         # return filename and lineno
         # context and content are also available
         import sys
+
         exc_cls, exc, tb = sys.exc_info()
         trace = traceback.extract_tb(tb)
         filename, line, context, text = trace[-1]
@@ -74,8 +75,7 @@ def error_source():
         # code, which is gibberish, but does not require an encoding. In this
         # case, extract the line number from the trace.
         from .gpg import get_active_python_file
+
         filename = get_active_python_file()
         line = tb.tb_next.tb_lineno
-    return filename, 'line %s' % line
-
-
+    return filename, "line %s" % line

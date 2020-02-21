@@ -34,15 +34,17 @@ Options:
 # along with this program.  If not, see http://www.gnu.org/licenses.
 
 
-# Imports {{{1
-from . import __version__, __released__
-from .command import Command
-from .settings import Settings, NoMoreConfigs
-from inform import Inform, Error, cull, display, fatal, terminate, os_error
 from docopt import docopt
 
+from inform import Error, Inform, cull, display, fatal, os_error, terminate
+
+# Imports {{{1
+from . import __released__, __version__
+from .command import Command
+from .settings import NoMoreConfigs, Settings
+
 # Globals {{{1
-version = f'{__version__} ({__released__})'
+version = f"{__version__} ({__released__})"
 commands = """
 Commands:
 {commands}
@@ -59,20 +61,22 @@ def main():
     with Inform(error_status=2, flush=True, version=version) as inform:
         # read command line
         cmdline = docopt(expanded_synopsis, options_first=True, version=version)
-        config = cmdline['--config']
-        command = cmdline['<command>']
-        args = cmdline['<args>']
-        if cmdline['--mute']:
+        config = cmdline["--config"]
+        command = cmdline["<command>"]
+        args = cmdline["<args>"]
+        if cmdline["--mute"]:
             inform.mute = True
-        if cmdline['--quiet']:
+        if cmdline["--quiet"]:
             inform.quiet = True
-        emborg_opts = cull([
-            'verbose' if cmdline['--verbose'] else '',
-            'narrate' if cmdline['--narrate'] else '',
-            'dry-run' if cmdline['--dry-run'] else '',
-            'no-log' if cmdline['--no-log'] else '',
-        ])
-        if cmdline['--narrate']:
+        emborg_opts = cull(
+            [
+                "verbose" if cmdline["--verbose"] else "",
+                "narrate" if cmdline["--narrate"] else "",
+                "dry-run" if cmdline["--dry-run"] else "",
+                "no-log" if cmdline["--no-log"] else "",
+            ]
+        )
+        if cmdline["--narrate"]:
             inform.narrate = True
 
         try:
@@ -89,7 +93,9 @@ def main():
                 while True:
                     with Settings(config, cmd, emborg_opts) as settings:
                         try:
-                            exit_status = cmd.execute(cmd_name, args, settings, emborg_opts)
+                            exit_status = cmd.execute(
+                                cmd_name, args, settings, emborg_opts
+                            )
                         except Error as e:
                             settings.fail(e)
                             e.terminate()
@@ -105,7 +111,7 @@ def main():
                 worst_exit_status = exit_status
 
         except KeyboardInterrupt:
-            display('Terminated by user.')
+            display("Terminated by user.")
         except Error as e:
             e.terminate()
         except OSError as e:
