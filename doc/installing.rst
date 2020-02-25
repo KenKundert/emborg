@@ -246,8 +246,8 @@ command::
     $ emborg log
 
 
-Configuring Emborg to Backup A Machine
---------------------------------------
+Configuring Emborg to Backup an Entire Machine
+----------------------------------------------
 
 The primary difference between this example and the previous is that *Emborg* 
 needs to be configured and run by *root*. This allows all the files on the 
@@ -310,4 +310,4 @@ To assure that the backups are run daily, the following is added to
     emborg --mute --config root create
 
 This is preferred for laptops because cron.daily is guaranteed to run each day 
-as long as machine is turned on for any length of time.
+as long as machine is turned on for any reasonable length of time.
