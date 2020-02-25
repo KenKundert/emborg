@@ -254,6 +254,7 @@ class Settings:
         if home_dir and "home_dir" not in self.settings:
             self.settings["home_dir"] = home_dir
         self.settings["config_dir"] = CONFIG_DIR
+        self.settings["log_dir"] = DATA_DIR
         self.do_not_expand = Collection(self.settings.get("do_not_expand", ""))
 
         # gather the string valued settings together (can be used by resolve)

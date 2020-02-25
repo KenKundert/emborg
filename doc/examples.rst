@@ -63,7 +63,7 @@ And here is the contents of the *root* configuration file: /root/.config/emborg/
     encryption = 'repokey'
     one_file_system = False
 
-    src_dirs = '/'.split()      # absolute paths to directories to be backed up
+    src_dirs = '/'              # absolute paths to directories to be backed up
     excludes = '''
         /dev
         /mnt
@@ -75,7 +75,7 @@ And here is the contents of the *root* configuration file: /root/.config/emborg/
         /var/lock
         /var/run
         /var/tmp
-    '''.split()                 # list of files or directories to skip
+    '''                         # list of files or directories to skip
 
 This file contains the passphrase, and so you should be careful to set its 
 permissions so that nobody but root can see its contents. Also, this 
@@ -113,15 +113,15 @@ User
 The *home* configuration is a suitable starting point for someone that just 
 wants to backup their home directory on their laptop.  In this example, two 
 configurations are created, one to be run manually that copies all files to 
-a remote repository, and a second that runs every few minutes and backs up key 
-working directories as a cache.  This second allows you to quickly recover from 
-mistakes you make during the day without having to go back to yesterday's copy 
-of a file as a starting point.
+a remote repository, and a second that runs every few minutes and creates 
+snapshots of key working directories.  This second allows you to quickly recover 
+from mistakes you make during the day without having to go back to yesterday's 
+copy of a file as a starting point.
 
 Here is the contents of the settings file: /root/.config/emborg/settings::
 
     # configurations
-    configurations = 'home cache'
+    configurations = 'home snapshots'
     default_configuration = 'home'
 
     # basic settings
@@ -148,18 +148,17 @@ Here is the contents of the *home* configuration file: ~/.config/emborg/home::
     prune_after_create = True
     check_after_create = 'latest'
 
-    src_dirs = '~'.split()              # paths to be backed up
+    src_dirs = '~'                      # paths to be backed up
     excludes = '''
         ~/.cache
-        ~/tmp
-        ~/**/.hg
-        ~/**/.git
-        ~/**/__pycache__
-        ~/**/*.pyc
-        ~/**/.*.swp
-        ~/**/.*.swo
-        ~/**/.~
-    '''.split()
+        **/.hg
+        **/.git
+        **/__pycache__
+        **/*.pyc
+        **/.*.swp
+        **/.*.swo
+        **/*~
+    '''
 
     run_before_backup = '(cd ~/src; ./clean)'
 
@@ -196,41 +195,44 @@ would simply run *Emborg* on your own at a convenient time using::
 You can use the *Emborg due* command to remind you if a backup is overdue. You 
 can wire it into status bar programs, such as *i3status* to give you a visual 
 reminder, or you can configure cron to check every hour and notify you if they 
-are overdue::
+are overdue. This one triggers a notification::
 
     0 * * * * emborg --mute due --days 1 || notify-send 'Backups are overdue'
 
+And this one sends an email::
 
-Cache
-^^^^^
+    0 * * * * emborg --mute due --days 1 --mail me@myhost.com
 
-And finally, here is the contents of the *cache* configuration file: 
-~/.config/emborg/cache::
+Alternately, you can use :ref:`emborg-overdue <client_overdue>`.
 
-    repository = '/home/ken/.cache/backups/{user_name}'
+
+Snap Shots
+^^^^^^^^^^
+
+And finally, here is the contents of the *snapshots* configuration file: 
+~/.config/emborg/snapshots::
+
+    repository = '/home/adelle/.cache/snapshots'
     encryption = 'none'
 
-    src_dirs = '~'.split()   # absolute paths to directories to be backed up
+    src_dirs = '~'           # absolute paths to directories to be backed up
     excludes = '''
         ~/.cache
         ~/media
-        ~/tmp
-        ~/**/.hg
-        ~/**/.git
-        ~/**/__pycache__
-        ~/**/*.pyc
-        ~/**/.*.swp
-        ~/**/.*.swo
-        ~/**/.~
-    '''.split()
+        **/.hg
+        **/.git
+        **/__pycache__
+        **/*.pyc
+        **/.*.swp
+        **/.*.swo
+        **/.~
+    '''
 
     # prune settings
-    keep_within = '1d'
-    keep_hourly = 24
+    keep_hourly = 12
     prune_after_create = True
-    check_after_create = 'latest'
 
 To run this configuration every 10 minutes, add the following entry to your 
 crontab file using 'crontab -e'::
 
-    0,10,20,30,40,50 * * * * emborg --config cache create
+    0,10,20,30,40,50 * * * * emborg --mute --config snapshots create

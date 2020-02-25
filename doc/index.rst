@@ -69,12 +69,14 @@ The first two issues can be reduced with frequent full backups, but this greatly
 increases the space you need to hold your backups.
 
 *Borg* works in a very different way. When *Borg* encounters a file, it first 
-determines whether it is new or not. If it is new it copies it into the 
-repository. Then, either way, it associates a pointer to the file's contents 
-with the filepath. This makes it naturally de-duplicating. When it comes time to 
-recover a file, it simply uses the file path to find the contents. In this way, 
-it only retrieves the data it needs. There is no complicated and fragile process 
-needed to reconstruct the file from a long string of differences.
+determines whether it is new or not. The file is determined to be new if the 
+contents of that file do not already exist in the repository, in which case it 
+copies the contents into the repository.  Then, either way, it associates 
+a pointer to the file's contents with the filepath.  This makes it naturally 
+de-duplicating.  When it comes time to recover a file, it simply uses the file 
+path to find the contents.  In this way, it only retrieves the data it needs.  
+There is no complicated and fragile process needed to reconstruct the file from 
+a long string of differences.
 
 After living with Duplicity for many years, I now find the Borg recovery process 
 stunningly fast and extremely reliable.  I am completely sold on Borg and will 
@@ -152,15 +154,22 @@ extracts a file or directory from the most recent archive.
 
 ::
 
-    emborg mount restore
+    cd ~/bin
+    emborg restore vu
 
-creates a directory 'restore' and then mounts the repository on this directory.  
+restores files or directories in place.
+
+::
+
+    emborg mount BACKUPS
+
+creates a directory 'BACKUPS' and then mounts the repository on this directory.  
 This allows you to move into the repository, navigating, examining, and 
 retrieving files as if it were a file system.
 
 ::
 
-    emborg umount restore
+    emborg umount BACKUPS
 
 unmounts the repository after you are done with it.
 
@@ -185,6 +194,12 @@ performs internal consistency checking on your repository.
 
 ::
 
+    emborg prune
+
+Removes unneed archives.
+
+::
+
     emborg help
 
 show you information on how to use *Emborg*.
@@ -205,7 +220,7 @@ Precautions
 You should assure you have a backup copy of the encryption key and its
 passphrase in a safe place (run 'borg key export' to extract the encryption
 keys).  This is very important.  If the only copy of the encryption credentials
-are on the disk being backed up, then if that disk were to fail you would not be
+are on the disk being backed up and if that disk were to fail you would not be
 able to access your backups. I recommend the use of `SpareKeys
 <https://github.com/kalekundert/sparekeys>`_ as a way of assuring that you
 always have access to the essential information, such as your Borg passphrase

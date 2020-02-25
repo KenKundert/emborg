@@ -20,7 +20,7 @@ Shared Settings
 ---------------
 
 Shared settings go in ~/.config/emborg/settings.  This is a Python file that 
-contains values needed by all of your configurations.  It might look like the 
+contains values shared by all of your configurations.  It might look like the 
 following:
 
 .. code-block:: python
@@ -32,7 +32,7 @@ following:
     encryption = 'keyfile'                # encryption method
     prune_after_create = True             # run prune as the last step of an archive creation
     check_after_create = 'latest'         # run check as the last step of an archive creation
-    notify = "me@mydomain.com"            # email address to notify when things go wrong
+    #notify = "me@mydomain.com"            # email address to notify when things go wrong
     notifier = 'notify-send -u normal {prog_name} "{msg}"'
                                           # program used to send realtime notifications
                                           # generally you use notify or notifier, but not both
@@ -98,14 +98,14 @@ the following:
     one_file_system = False  # okay to traverse filesystems
 
     # commands to be run before and after backups (run from working directory)
-    run_before_backup = [
+    run_before_backup = '''
+        # remove the detritus before backing up
         './clean-home >& clean-home.log',
-            # remove the detritus before backing up
-    ]
-    run_after_backup = [
+    '''
+    run_after_backup = '''
+        # rebuild my man pages, they were deleted by clean-home
         './rebuild-manpages > /dev/null',
-            # rebuild my man pages, they were deleted by clean-home
-    ]
+    '''
 
     # if set, this file or these files must exist or backups will quit with an error
     must_exist = '~/doc/thesis'
@@ -113,12 +113,12 @@ the following:
 String values may incorporate other string valued settings. Use braces to 
 interpolate another setting. In addition, you may interpolate the configuration 
 name ('config_name'), the host name ('host_name'), the user name ('user_name'), 
-Emborg's program name ('prog_name'), your home directory ('home_dir') or the 
-configuration directory ('config_dir').  An example of this is shown in both
-:ref:`repository` and :ref:`archive` above.  Doubling up the braces acts to 
-escape them.  In this way you gain access to *Borg* placeholders. :ref:`archive` 
-shows an example of that.  Interpolation is not performed on any setting whose 
-name is given in :ref:`do_not_expand`.
+Emborg's program name ('prog_name'), your home directory ('home_dir'), the 
+configuration directory ('config_dir') or the output directory ('log_dir').  An 
+example of this is shown in both :ref:`repository` and :ref:`archive` above.  
+Doubling up the braces acts to escape them.  In this way you gain access to 
+*Borg* placeholders. :ref:`archive` shows an example of that.  Interpolation is 
+not performed on any setting whose name is given in :ref:`do_not_expand`.
 
 Settings that take lists of strings can be specified as a single multi-line 
 string where one item is given per line.  Lines that begin with # are ignored, 
@@ -227,8 +227,9 @@ Composite Configurations
 ------------------------
 
 It is possible to define composite configurations that allow you to run several 
-configurations at once.  This might be useful if you have files that benefit, 
-for example, from different prune schedules.
+configurations at once.  This might be useful if you want to backup to more than 
+one repository for redundancy.  Or perhaps you have files that benefit from 
+different prune schedules.
 
 As an example, consider having three configurations that you would like to run 
 all at once. You can specify these configurations as follows:
@@ -289,7 +290,7 @@ Patterns
 Patterns are a relatively new feature of *Borg*. They are an alternate way of 
 specifying which files are backed up, and which are not.  Patterns can be 
 specified in conjunction with, or instead of, :ref:`src_dirs` and 
-:ref:`excludes`.  One powerful feature of patterns is that it allow you to 
+:ref:`excludes`.  One powerful feature of patterns is that they allow you to 
 specify that a directory or file should be backed up even if it is contained 
 within a directory that is being excluded.
 

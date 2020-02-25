@@ -172,7 +172,10 @@ has not been performed within the specified number of days. Adding the --email
 option results in the message being sent to the specified address rather than 
 printed.  This allows you to run the :ref:`due <due>` command from a cron script 
 in order to send your self reminders to do a backup if one has not occurred for 
-a while.
+a while.  In these case it is often run with the --no-log option to avoid 
+replacing the log file with one that is inherently uninteresting::
+
+    emborg --no-log due --days 1 --email me@myhost.com
 
 You can specify a specific message to be printed with --message. In this case, 
 {days} is replaced by the number of days since the last backup. You can add 
@@ -195,7 +198,7 @@ Extract
 
 You extract a file or directory from an archive using::
 
-   > emborg extract home/ken/bin
+   > emborg extract home/shaunte/bin
 
 Use manifest to determine what path you should specify to identify the desired 
 file or directory.  You can specify more than one path. Usually, they will be 
@@ -207,16 +210,16 @@ If you do not specify an archive or date, the most recent archive is used.  You
 can extract the version of a file or directory that existed on a particular date 
 using::
 
-   > emborg extract --date 2015-04-01 home/ken/bin
+   > emborg extract --date 2015-04-01 home/shaunte/bin
 
 Or, you can extract the version from a particular archive using::
 
-   > emborg extract --archive continuum-2018-12-05T12:54:26 home/ken/bin
+   > emborg extract --archive continuum-2018-12-05T12:54:26 home/shaunte/bin
 
 The extracted files are placed in the current working directory with
 the original hierarchy. Thus, the above commands create the directory::
 
-    ./home/ken/bin
+    ./home/shaunte/bin
 
 For this reason the :ref:`extract <extract>` command is often run from the root 
 directory (/). Doing so causes the extracted files to replace the existing 

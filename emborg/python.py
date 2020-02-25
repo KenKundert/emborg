@@ -22,7 +22,6 @@
 
 # Imports {{{1
 from inform import Error, display, full_stop, narrate, os_error
-
 from shlib import cp, to_path
 
 

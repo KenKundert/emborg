@@ -7,6 +7,8 @@ Utilities
 Overdue
 -------
 
+.. _server_overdue:
+
 Checking for Overdue Backups from the Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -98,6 +100,8 @@ send mail to the maintainer when backups are found to be overdue.
 The second example is similar except the output is suppressed rather than being 
 saved to a file.
 
+
+.. _client_overdue:
 
 Checking for Overdue Backups from the Client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
