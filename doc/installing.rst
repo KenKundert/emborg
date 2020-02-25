@@ -38,11 +38,11 @@ Or, if you want the development version, use::
 Configuring Emborg to Backup A Home Directory
 ----------------------------------------------
 
-The basic idea behind *Emborg* is that you place all information relavant to 
+The basic idea behind *Emborg* is that you place all information relevant to 
 your backups in two configuration files, which allows you to use *Emborg* to 
 perform tasks without re-specifying that information.  Emborg allows you to have 
 any number of setups, which you might want if you wanted to backup to multiple 
-respositories for redundancy or if you want to use different rules for different 
+repositories for redundancy or if you want to use different rules for different 
 sets of files. Regardless, you use a separate configuration for each set up, 
 plus there is a common configuration file shared by all setups. You are free to 
 place most settings in either file, which ever is most convenient.  All the 
@@ -214,8 +214,8 @@ using a configuration file: ~/.config/emborg/overdue.conf.  For example:
 
 .. code-block:: python
 
-    default_maintainer = 'me@myhost.com'
-    dumper = 'me@myhost.com'
+    default_maintainer = 'me@mydomain.com'
+    dumper = 'me@mydomain.com'
     default_max_age = 36 # hours
     root = '~/.local/share/emborg'
     repositories = [

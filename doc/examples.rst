@@ -8,6 +8,8 @@ two configurations that you can use as starting points. Those two configurations
 make up our first two examples.
 
 
+.. _root example:
+
 Root
 ----
 
@@ -22,7 +24,9 @@ configuration, it is largely arbitrary which file each setting resides in,
 however both files must exist, and the *settings* file must contain 
 *configurations* and *default_configuration*.
 
-Here is the contents of the settings file: /root/.config/emborg/settings::
+Here is the contents of the settings file: /root/.config/emborg/settings:
+
+.. code-block:: python
 
     configurations = 'root'
     default_configuration = 'root'
@@ -56,16 +60,19 @@ in your SSH config file that points to the server that stores your repository.
 To be able to run this configuration autonomously from cron, *backups* must be 
 configured to use a private key that does not have a passphrase.
 
-And here is the contents of the *root* configuration file: /root/.config/emborg/root::
+And here is the contents of the *root* configuration file: /root/.config/emborg/root:
+
+.. code-block:: python
 
     # Settings for root configuration
     passphrase = 'carvery overhang vignette platitude pantheon sissy toddler truckle'
     encryption = 'repokey'
     one_file_system = False
 
-    src_dirs = '/'              # absolute paths to directories to be backed up
+    src_dirs = '/'
     excludes = '''
         /dev
+        /home/*/.cache
         /mnt
         /proc
         /run
@@ -100,12 +107,14 @@ contains the following::
 Assume that this file is named *emborg*. Then after creating it, you would make 
 it executable with::
 
-    chmod a+x /etc/cron.daily/emborg
+    $ chmod a+x /etc/cron.daily/emborg
 
 Scripts in /etc/cron.daily are one once a day, either at a fixed time generally 
 early in the morning or, if not powered up at that time, shortly after being 
 powered up.
 
+
+.. _user examples:
 
 User
 ----
@@ -118,7 +127,9 @@ snapshots of key working directories.  This second allows you to quickly recover
 from mistakes you make during the day without having to go back to yesterday's 
 copy of a file as a starting point.
 
-Here is the contents of the settings file: /root/.config/emborg/settings::
+Here is the contents of the shared settings file: ~/.config/emborg/settings.
+
+.. code-block:: python
 
     # configurations
     configurations = 'home snapshots'
@@ -135,12 +146,19 @@ Here is the contents of the settings file: /root/.config/emborg/settings::
     exclude_caches = True
 
 
+.. _home example:
+
 Home
 ^^^^
 
-Here is the contents of the *home* configuration file: ~/.config/emborg/home::
+Here is the contents of the *home* configuration file: ~/.config/emborg/home.
+This configuration backs up to a remote untrusted repository and is expected to 
+be run interactively, perhaps once per day.
+
+.. code-block:: python
 
     repository = 'backups:/mnt/borg-backups/repositories/{host_name}-{user_name}-{config_name}'
+    prefix = '{config_name}-'
     encryption = 'keyfile'
     avendesora_account = 'laptop-borg'
     needs_ssh_agent = True
@@ -172,9 +190,8 @@ Here is the contents of the *home* configuration file: ~/.config/emborg/home::
 
 In this case we are assuming that *backups* (used in *repository*) is an entry 
 in your SSH config file that points to the server that stores your repository.  
-Since you are running this configuration interactively, *backups* should be 
-configured to use a private key and that key should be preloaded into your SSH 
-agent.
+*backups* should be configured to use a private key and that key should be 
+preloaded into your SSH agent.
 
 This passphrase for this configuration is kept in `Avendesora 
 <https://avendesora.readthedocs.io>`_, and the encryption method is *keyfile*.  
@@ -184,13 +201,13 @@ are available if you lose your disk. You can use `SpareKeys
 <https://github.com/kalekundert/sparekeys>`_ to do this for you. Otherwise 
 extract the keyfile using::
 
-    emborg borg key export @repo key.borg
+    $ emborg borg key export @repo key.borg
 
 *cron* is not used for this configuration because the machine, being a laptop, 
 is not guaranteed to be on at any particular time of the day. So instead, you 
 would simply run *Emborg* on your own at a convenient time using::
 
-    emborg
+    $ emborg
 
 You can use the *Emborg due* command to remind you if a backup is overdue. You 
 can wire it into status bar programs, such as *i3status* to give you a visual 
@@ -201,21 +218,25 @@ are overdue. This one triggers a notification::
 
 And this one sends an email::
 
-    0 * * * * emborg --mute due --days 1 --mail me@myhost.com
+    0 * * * * emborg --mute due --days 1 --mail me@mydomain.com
 
 Alternately, you can use :ref:`emborg-overdue <client_overdue>`.
 
+
+.. _snapshot example:
 
 Snap Shots
 ^^^^^^^^^^
 
 And finally, here is the contents of the *snapshots* configuration file: 
-~/.config/emborg/snapshots::
+~/.config/emborg/snapshots.
 
-    repository = '/home/adelle/.cache/snapshots'
+.. code-block:: python
+
+    repository = '~/.cache/snapshots'
     encryption = 'none'
 
-    src_dirs = '~'           # absolute paths to directories to be backed up
+    src_dirs = '~'
     excludes = '''
         ~/.cache
         ~/media

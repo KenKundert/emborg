@@ -6,7 +6,9 @@ Python API
 *Emborg* has a simple API that allows you to run borg commands. Here is an 
 example taken from `sparekeys <https://github.com/kalekundert/sparekeys>`_ that 
 exports the keys from your *Borg* repository so then can be backed up 
-separately::
+separately:
+
+.. code-block:: python
 
     from emborg import Emborg
 

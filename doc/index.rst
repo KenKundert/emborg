@@ -112,56 +112,56 @@ you can use *Emborg* to perform common tasks that involve you backups.
 
 For example::
 
-    emborg init
+    $ emborg init
 
 initializes a repository, which is necessary before it can be used.
 
 ::
 
-    emborg create
+    $ emborg create
 
 create an archive, meaning that it backs up your current files.
 
 ::
 
-    emborg list
+    $ emborg list
 
 shows a list of all existing archives.
 
 ::
 
-    emborg manifest
+    $ emborg manifest
 
 shows all the files in the most recent archive.
 
 ::
 
-    emborg manifest continuum-2019-04-23T18:35:33
+    $ emborg manifest continuum-2019-04-23T18:35:33
 
 shows all the files in a particular archive.
 
 ::
 
-    emborg diff continuum-2019-04-23T18:35:33 continuum-2019-04-22T17:24:06
+    $ emborg diff continuum-2019-04-23T18:35:33 continuum-2019-04-22T17:24:06
 
 shows you the difference between two archives.
 
 ::
 
-    emborg extract home/seven/bin/vu
+    $ emborg extract home/seven/bin/vu
 
 extracts a file or directory from the most recent archive.
 
 ::
 
-    cd ~/bin
-    emborg restore vu
+    $ cd ~/bin
+    $ emborg restore vu
 
 restores files or directories in place.
 
 ::
 
-    emborg mount BACKUPS
+    $ emborg mount BACKUPS
 
 creates a directory 'BACKUPS' and then mounts the repository on this directory.  
 This allows you to move into the repository, navigating, examining, and 
@@ -169,38 +169,38 @@ retrieving files as if it were a file system.
 
 ::
 
-    emborg umount BACKUPS
+    $ emborg umount BACKUPS
 
 unmounts the repository after you are done with it.
 
 ::
 
-    emborg due
+    $ emborg due
 
 tells you when the last successful backup was performed.
 
 ::
 
-    emborg info
+    $ emborg info
 
 shows you information about your repository such as where it is located and how 
 large it is.
 
 ::
 
-    emborg check
+    $ emborg check
 
 performs internal consistency checking on your repository.
 
 ::
 
-    emborg prune
+    $ emborg prune
 
-Removes unneed archives.
+Removes unneeded archives.
 
 ::
 
-    emborg help
+    $ emborg help
 
 show you information on how to use *Emborg*.
 

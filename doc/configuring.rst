@@ -11,7 +11,7 @@ found in both files, the version in the configuration specific file dominates.
 
 You can get a complete list of available configuration settings by running::
 
-    emborg settings --available
+    $ emborg settings --available
 
 
 .. _shared_settings:
@@ -245,29 +245,29 @@ without spaces.
 
 You can run a specific configuration with::
 
-    emborg -c home extract ~/bin
+    $ emborg -c home extract ~/bin
 
 You can run all three configurations with::
 
-    emborg -c all create
+    $ emborg -c all create
 
 Only certain commands support composite configurations, and if a command does 
-support composite configs it may either apply each subconfig in sequence, or 
-only the first subconfig.
+support composite configurations it may either apply each subconfig in sequence, 
+or only the first subconfig.
 
-==========  ============================
+==========  ===============================
 Command     Response to Composite Config
-==========  ============================
+==========  ===============================
 borg        error
 breaklock   error
 check       run on each subconfig
-configs     does not use any configs
+configs     does not use any configurations
 create      run on each subconfig
 delete      error
 diff        error
 due         run on each subconfig
 extract     run only on first subconfig
-help        does not use any configs
+help        does not use any configurations
 info        run on each subconfig
 initialize  run on each subconfig
 list        run only on first subconfig
@@ -278,8 +278,8 @@ prune       run on each subconfig
 restore     run only on first subconfig
 settings    error
 umount      run only on first subconfig
-version     does not use any configs
-==========  ============================
+version     does not use any configurations
+==========  ===============================
 
 
 .. _patterns_intro:
@@ -533,6 +533,8 @@ All settings that are specified as strings or lists of strings may contain
 placeholders that are expanded before use. The placeholder is replaced by the 
 value it names.  For example, in::
 
+.. code-block:: python
+
     archive = '{host_name}-{{now}}'
 
 *host_name* is a placeholder that is replaced by the host name of your computer 
@@ -696,7 +698,7 @@ per line.
 needs_ssh_agent
 ~~~~~~~~~~~~~~~
 
-A boolean. If true, *Emborg* will issue an error message and refuse to run if an 
+A Boolean. If true, *Emborg* will issue an error message and refuse to run if an 
 SSH agent is not available.
 
 
@@ -763,7 +765,7 @@ nobody else.
 prune_after_create
 ~~~~~~~~~~~~~~~~~~
 
-A boolean. If true the :ref:`prune command <prune>` is run after creating an 
+A Boolean. If true the :ref:`prune command <prune>` is run after creating an 
 archive.
 
 
@@ -874,7 +876,7 @@ This can be used to specify SSH options.
 verbose
 ~~~~~~~
 
-A boolean. If true *Borg* is run in verbose mode and the output from *Borg* is 
+A Boolean. If true *Borg* is run in verbose mode and the output from *Borg* is 
 output by *Emborg*.
 
 
@@ -1021,7 +1023,7 @@ be:
         - /home/*/.cache
         - /home/*/Downloads
 
-        # include susans home
+        # include susan's home
         + /home/susan
 
         # don't backup the other home directories

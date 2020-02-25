@@ -7,8 +7,8 @@ Releases
 
     - improve messaging from *emborg-overdue*
     - :ref:`configs <configs>` command now outputs default configuration too.
-    - some commands now use first subconfig when run with a composite config
-      rather than terminating with an error.
+    - some commands now use first subconfig when run with a composite 
+      configuration rather than terminating with an error.
     - added :ref:`show_stats` setting.
     - added ``--stats`` option to :ref:`create <create>`, :ref:`delete <delete>` 
       and :ref:`prune <prune>` commands.
@@ -53,7 +53,7 @@ Releases
     - Remove duplicated commands.
 
 **1.7 (2019-10-07)**:
-    - Fixed bug that involved the boolean Borg settings
+    - Fixed bug that involved the Boolean Borg settings
       (:ref:`one_file_system <one_file_system>`, :ref:`exclude_caches <exclude_caches>`, ...)
 
 **1.6 (2019-10-04)**:

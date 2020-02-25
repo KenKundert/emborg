@@ -21,9 +21,11 @@ is also a Python file and may contain the following settings::
     default_max_age (hours)
     dumper (email address -- mail is sent from this person)
     root (default directory for repositories)
-    repositories (string or array of dicts)
+    repositories (string or array of dictionaries)
 
-Here is an example config file::
+Here is an example config file:
+
+.. code-block:: python
 
     default_maintainer = 'root@continuum.com'
     dumper = 'dumper@continuum.com'
@@ -52,7 +54,9 @@ If *path* is an absolute path, it is used, otherwise it is added to the end of
 there is an issue.  *max_age* is the number of hours that may pass before an 
 archive is considered overdue.
 
-*repositories* can also be specified as multi-line string::
+*repositories* can also be specified as multi-line string:
+
+.. code-block:: python
 
     repositories = """
         # HOST      | NAME or PATH      | MAINTAINER           | MAXIMUM AGE (hours)
@@ -76,12 +80,12 @@ is not given, the *default_maintainer* is used. If *max_age* is not given, the
 To run the program interactively, just make sure *emborg-overdue* has been 
 installed and is on your path. Then type::
 
-    emborg-overdue
+    $ emborg-overdue
 
 It is also common to run *emborg-overdue* on a fixed schedule from cron. To do 
 so, run::
 
-    crontab -e
+    $ crontab -e
 
 and add something like the following::
 
@@ -93,12 +97,15 @@ or::
 
 to your crontab.
 
-The first example runs emborg-overdue at 5:04 AM every day while saving the 
+The first example runs emborg-overdue at 5:34 AM every day while saving the 
 output into a file.  The use of the ``--mail`` option causes *emborg-overdue* to 
 send mail to the maintainer when backups are found to be overdue.
 
 The second example is similar except the output is suppressed rather than being 
 saved to a file.
+
+Alternately you can run *emborg-overdue* from cron.daily (described in the 
+:ref:`root example <root example>`.
 
 
 .. _client_overdue:
@@ -109,7 +116,9 @@ Checking for Overdue Backups from the Client
 *emborg-overdue* can also be configured to run on the client.  This can be used 
 when you do not control the server and so cannot run *emborg-overdue* there.  
 The configuration is identical, except you give the path to the *lastbackup* 
-file.  For example::
+file.  For example:
+
+.. code-block:: python
 
     default_maintainer = 'me@continuum.com'
     dumper = 'me@continuum.com'
@@ -120,5 +129,4 @@ file.  For example::
         dict(host='earth (home)', path='home.lastbackup'),
     ]
 
-Again, you can 
-
+Again, *emborg-overdue* is generally run from cron.
