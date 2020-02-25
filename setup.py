@@ -9,7 +9,7 @@ with open("README.rst", encoding="utf-8") as file:
 
 setup(
     name="emborg",
-    version="1.14.7",
+    version="1.14.8",
     author="Ken Kundert",
     author_email="emborg@nurdletech.com",
     description="Borg front end.",
