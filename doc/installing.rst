@@ -81,7 +81,7 @@ interactively and *snapshots* will be run on a schedule by *cron*, so the
 default is set to *backups* to make it easier to run interactively.
 
 
-Configuration for a Remote Repository; *backups*
+Configuration for a Remote Repository: *backups*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The second file is the configuration file for *backups*:
