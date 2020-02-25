@@ -340,6 +340,11 @@ The first sorts the files by size. It uses the *size* format, which by default
 contains only the size and the path.
 The second sorts the files by modification date. It uses the *date* format, 
 which by default contains the day, date, time and the path.
+More choices are available; run ``emborg help manifest`` for the details.
+
+You can use ``files`` as an alias for ``manifest``.
+
+    $ emborg files
 
 
 .. _mount:

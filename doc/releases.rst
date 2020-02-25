@@ -14,17 +14,18 @@ Releases
       and :ref:`prune <prune>` commands.
     - added ``--list`` option to :ref:`create <create>`, :ref:`extract 
       <extract>` and :ref:`restore <restore>` commands.
-    - added sorting and formatting options to :ref:`manifest` command.
+    - added sorting and formatting options to :ref:`manifest <manifest>` 
+      command.
     - added :ref:`manifest_formats` setting.
     - renamed ``--trial-run`` option to ``--dry-run`` to be more consistent with 
       *Borg*.
-    - add *files* and *f* aliases to :ref:`manifest` command.
+    - add *files* and *f* aliases to :ref:`manifest <manifest>` command.
     - added :ref:`working_dir` setting.
     - added :ref:`do_not_expand` setting.
     - added :ref:`exclude_nodump` setting
     - added :ref:`patterns` and :ref:`patterns_from` settings.
-    - *Emborg* lock file is ignored if the process it references is no longer
-      running
+    - *Emborg* lock file is now ignored if the process it references is no 
+      longer running
 
 **1.14 (2019-12-31)**:
     - remove debug message accidentally left in *emborg-overdue*
