@@ -17,6 +17,7 @@
 
 # Imports {{{1
 import json
+import os
 import sys
 from textwrap import dedent
 
@@ -99,6 +100,16 @@ def get_available_files(settings, archive):
     except json.decoder.JSONDecodeError as e:
         raise Error("Could not decode output of Borg list command.", codicil=e)
 
+# require_env_variable() {{{2
+def require_env_var(var, feature, command, args):
+    val = os.environ.get(var)
+    if val != 'YES':
+        cmd = f"emborg {command} {' '.join(args)}"
+        raise Error(
+            f"environment variable must be set to YES to use {' '.join(feature)}.",
+            culprit=var,
+            codicil=f"TO use, try:\n    {var}=YES {cmd}",
+        )
 
 # Command base class {{{1
 class Command:
@@ -259,6 +270,7 @@ class CheckCommand(Command):
             -A, --all                           check all available archives
             -e, --include-external              check all archives in repository, not just
                                                 those associated with this configuration
+            -r, --repair                        attempt to repair any inconsistencies found
             -v, --verify-data                   perform a full integrity verification (slow)
 
         The most recently created archive is checked if one is not specified
@@ -274,13 +286,13 @@ class CheckCommand(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         archive = cmdline["<archive>"]
         check_all = cmdline["--all"]
-        verify = ["--verify-data"] if cmdline["--verify-data"] else []
-        # repair = ['--repair'] if cmdline['--repair'] else []
-        repair = []
-        # repair has been deleted because it requires the user to
-        # interactively respond to a query, and emborg does not support that
-        # yet.
         include_external_archives = cmdline["--include-external"]
+        verify = ["--verify-data"] if cmdline["--verify-data"] else []
+        repair = ['--repair'] if cmdline['--repair'] else []
+        if repair:
+            require_env_var(
+                'BORG_CHECK_I_KNOW_WHAT_I_AM_DOING', repair, command, args
+            )
 
         # identify archive or archives to check
         if check_all:

@@ -26,6 +26,8 @@ Releases
     - added :ref:`patterns` and :ref:`patterns_from` settings.
     - *Emborg* lock file is now ignored if the process it references is no 
       longer running
+    - support ``--repair`` option on :ref:`check command <check>`.
+    - *Emborg* lock file is now ignored if the process it references is no 
 
 **1.14 (2019-12-31)**:
     - remove debug message accidentally left in *emborg-overdue*

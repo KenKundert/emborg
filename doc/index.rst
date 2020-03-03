@@ -114,95 +114,114 @@ For example::
 
     $ emborg init
 
-initializes a repository, which is necessary before it can be used.
+The :ref:`init command <init>` initializes a repository, which is necessary 
+before it can be used.
 
 ::
 
     $ emborg create
 
-create an archive, meaning that it backs up your current files.
+The :ref:`create command <create>` creates an archive, meaning that it backs up 
+your current files.
 
 ::
 
     $ emborg list
 
-shows a list of all existing archives.
+The :ref:`list command <list>` displays a list of all existing archives.
 
 ::
 
     $ emborg manifest
+    $ emborg files
 
-shows all the files in the most recent archive.
+The :ref:`manifest or files command <manifest>` displays all the files in the 
+most recent archive.
 
 ::
 
     $ emborg manifest continuum-2019-04-23T18:35:33
 
-shows all the files in a particular archive.
+If you give the name of an archive, it displays all the files in the specified 
+archive.
 
 ::
 
     $ emborg diff continuum-2019-04-23T18:35:33 continuum-2019-04-22T17:24:06
 
-shows you the difference between two archives.
+The :ref:`diff command <diff>` shows you the difference between two archives.
 
 ::
 
     $ emborg extract home/seven/bin/vu
 
-extracts a file or directory from the most recent archive.
+The :ref:`extract command <extract>` extracts a file or directory from the most 
+recent archive.
 
 ::
 
     $ cd ~/bin
     $ emborg restore vu
 
-restores files or directories in place.
+The :ref:`restore command <restore>` restores files or directories in place, 
+meaning it replaces the current version with the one from the archive.
 
 ::
 
     $ emborg mount BACKUPS
 
-creates a directory 'BACKUPS' and then mounts the repository on this directory.  
-This allows you to move into the repository, navigating, examining, and 
-retrieving files as if it were a file system.
+The :ref:`mount command <mount>` creates a directory 'BACKUPS' and then mounts 
+an archive or the whold repository on this directory.  This allows you to move 
+into the archive or repository, navigating, examining, and retrieving files as 
+if it were a file system.
 
 ::
 
     $ emborg umount BACKUPS
 
-unmounts the repository after you are done with it.
+The :ref:`umount command <umount>` un-mounts the archive or repository after you 
+are done with it.
 
 ::
 
     $ emborg due
 
-tells you when the last successful backup was performed.
+The :ref:`due command <due>` tells you when the last successful backup was 
+performed.
 
 ::
 
     $ emborg info
 
-shows you information about your repository such as where it is located and how 
-large it is.
+The :ref:`info command <info>` shows you information about your repository such 
+as where it is located and how large it is.
 
 ::
 
     $ emborg check
 
-performs internal consistency checking on your repository.
+The :ref:`check command <check>` performs internal consistency checking on your 
+repository.
 
 ::
 
     $ emborg prune
 
-Removes unneeded archives.
+The :ref:`prune command <prune>` removes redundant archives.
+
+::
+
+    $ emborg borg check --repair @repo
+
+The :ref:`borg command <borg>` runs a raw *Borg* command for you.  The benefit 
+of having *Emborg* run *Borg* for you is that it automatically sets the 
+passphrase and the path to the repository so you do not need to remember them.
 
 ::
 
     $ emborg help
 
-show you information on how to use *Emborg*.
+The :ref:`help command <help>` shows you information on how to use *Emborg*.
 
 
 Borg
@@ -242,8 +261,8 @@ It is also best, if it can be arranged, to keep your backups at a remote site so
 that your backups do not get destroyed in the same disaster, such as a fire or
 flood, that claims your original files. One option is `rsync.net
 <https://www.rsync.net/products/attic.html>`_. Another is `BorgBase
-<https://www.borgbase.com>`_. I have not tried either, and so offer no
-recommendation.
+<https://www.borgbase.com>`_. I have experience with both, and both seem quite 
+good.
 
 Finally, it is a good idea to practice a recovery. Pretend that you have lost
 all your files and then see if you can do a restore from backup. Doing this and

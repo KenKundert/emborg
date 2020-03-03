@@ -39,7 +39,8 @@ The available commands are:
     :umount:     :ref:`un-mount a previously mounted repository or archive <umount>`
     :version:    :ref:`display emborg version <version>`
 
-These commands are described in more detail below.
+These commands are described in more detail below.  Not everything is described 
+here. Run ``emborg help <cmd>`` for the details.
 
 
 .. _borg:
