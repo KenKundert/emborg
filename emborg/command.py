@@ -340,7 +340,7 @@ class ConfigsCommand(Command):
 
         default_config = settings.default_configuration
         if default_config:
-            output("Default Configurations:", default_config, sep="\n    ")
+            output("Default Configuration:", default_config, sep="\n    ")
         else:
             output("No default configuration available.")
 
