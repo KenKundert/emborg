@@ -5,6 +5,7 @@ Releases
     | Version: 1.15.0
     | Released: 2020-03-06
 
+**1.15 (2020-03-06)**:
     - improve messaging from *emborg-overdue*
     - :ref:`configs <configs>` command now outputs default configuration too.
     - some commands now use first subconfig when run with a composite 
@@ -27,7 +28,6 @@ Releases
     - *Emborg* lock file is now ignored if the process it references is no 
       longer running
     - support ``--repair`` option on :ref:`check command <check>`.
-    - *Emborg* lock file is now ignored if the process it references is no 
 
 **1.14 (2019-12-31)**:
     - remove debug message accidentally left in *emborg-overdue*

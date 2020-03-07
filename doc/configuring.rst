@@ -100,11 +100,11 @@ the following:
     # commands to be run before and after backups (run from working directory)
     run_before_backup = '''
         # remove the detritus before backing up
-        './clean-home >& clean-home.log',
+        ./clean-home >& clean-home.log
     '''
     run_after_backup = '''
         # rebuild my man pages, they were deleted by clean-home
-        './rebuild-manpages > /dev/null',
+        ./rebuild-manpages > /dev/null
     '''
 
     # if set, this file or these files must exist or backups will quit with an error
