@@ -34,11 +34,10 @@ Options:
 # along with this program.  If not, see http://www.gnu.org/licenses.
 
 
-from docopt import docopt
-
-from inform import Error, Inform, cull, display, fatal, os_error, terminate
-
 # Imports {{{1
+import sys
+from docopt import docopt
+from inform import Error, Inform, cull, display, fatal, os_error, terminate
 from . import __released__, __version__
 from .command import Command
 from .settings import NoMoreConfigs, Settings
@@ -97,7 +96,7 @@ def main():
                                 cmd_name, args, settings, emborg_opts
                             )
                         except Error as e:
-                            settings.fail(e)
+                            settings.fail(e, cmd=' '.join(sys.argv))
                             e.terminate()
 
                     if exit_status and exit_status > worst_exit_status:

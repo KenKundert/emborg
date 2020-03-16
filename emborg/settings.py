@@ -277,24 +277,30 @@ class Settings:
             raise Error("must be an absolute path.", culprit="working_dir")
 
     # handle errors {{{2
-    def fail(self, *msg):
-        comment("failure detected:")
-        codicil(indent(join(*msg)))
-        msg = full_stop(" ".join(str(m) for m in msg))
+    def fail(self, *msg, cmd='<unknown>'):
+        msg = join(*msg)
+        try:
+            msg = msg.decode('ascii', errors='replace')
+        except AttributeError:
+            pass
         try:
             if self.notify and not Color.isTTY():
                 Run(
-                    ["mail", "-s", f"{PROGRAM_NAME} on {fullhostname}: {msg}"]
+                    ["mail", "-s", f"{PROGRAM_NAME} failed on {username}@{hostname}"]
                     + self.notify.split(),
                     stdin=dedent(
-                        f"""
-                        {msg}
-                        config = {self.config_name}
-                        source = {username}@{hostname}:{', '.join(str(d) for d in self.src_dirs)}
-                        destination = {self.repository!s}
+                        f"""\
+                        {PROGRAM_NAME} fails.
+
+                        command: {cmd}
+                        config: {self.config_name}
+                        source: {username}@{fullhostname}:{', '.join(str(d) for d in self.src_dirs)}
+                        destination: {self.repository!s}
+                        error message:
                         """
-                    ).lstrip(),
+                    ) + indent(msg) + "\n",
                     modes="soeW",
+                    encoding="ascii",
                 )
         except Error:
             pass
@@ -304,6 +310,7 @@ class Settings:
             if notifier and not Color.isTTY():
                 Run(
                     self.notifier.format(
+                        cmd=cmd,
                         msg=msg,
                         hostname=hostname,
                         user_name=username,
