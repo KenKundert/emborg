@@ -499,7 +499,7 @@ class Settings:
 
     # publish_passcode() {{{2
     def publish_passcode(self):
-        passcommand = self.passcommand
+        passcommand = self.value('passcommand')
         passcode = self.passphrase
 
         # process passcomand

@@ -5,6 +5,8 @@ Releases
     | Version: 1.15.2
     | Released: 2020-03-17
 
+    - refinements and bug fixes.
+
 **1.15 (2020-03-06)**:
     - improve messaging from *emborg-overdue*
     - :ref:`configs <configs>` command now outputs default configuration too.
