@@ -272,7 +272,7 @@ class Settings:
 
         self.working_dir = to_path(self.settings.get("working_dir", "/"))
         if not self.working_dir.exists():
-            raise Error("not found.", culprit=("working_dir", self.working_dir))
+            raise Error("{self.working_dir!s} not found.", culprit="working_dir")
         if not self.working_dir.is_absolute():
             raise Error("must be an absolute path.", culprit="working_dir")
 
@@ -382,7 +382,7 @@ class Settings:
             p = to_path(self.working_dir, p)
         if culprit:
             if not p.exists():
-                raise Error("not found.", culprit=culprit)
+                raise Error(f"{p!s} not found.", culprit=culprit)
         return p
 
     # as_path() {{{2
@@ -435,9 +435,9 @@ class Settings:
                     borg_opts.extend(["--patterns-from", patterns_from])
             exclude_froms = self.as_paths("exclude_from", must_exist=True)
             if exclude_froms:
-                check_excludes_files(exclude_froms, roots, self.working_dir)
+                check_excludes_files(exclude_froms, roots)
                 for exclude_from in exclude_froms:
-                    borg_opts.extend(["--excludes-from", exclude_from])
+                    borg_opts.extend(["--exclude-from", exclude_from])
             check_roots(roots, self.working_dir)
             if errors_accrued():
                 raise Error("stopping due to previously reported errors.")
@@ -448,7 +448,7 @@ class Settings:
                 borg_opts.append("--list")
 
         elif cmd == "init":
-            if self.passphrase or self.avendesora_account:
+            if self.passphrase or self.passcommand or self.avendesora_account:
                 encryption = self.encryption if self.encryption else "repokey"
                 borg_opts.append(f"--encryption={encryption}")
                 if encryption == "none":
@@ -506,7 +506,7 @@ class Settings:
         if passcommand:
             if passcode:
                 warn("passphrase unneeded.", culprit="passcommand")
-                return dict(BORG_PASSCOMMAND=passcommand)
+            return dict(BORG_PASSCOMMAND=passcommand)
 
         # get passphrase from avendesora
         if not passcode and self.avendesora_account:
@@ -561,12 +561,11 @@ class Settings:
 
         # check if ssh agent is present
         if self.needs_ssh_agent:
-            for ssh_var in "SSH_AGENT_PID SSH_AUTH_SOCK".split():
-                if ssh_var not in os.environ:
-                    warn(
-                        "environment variable not found, is ssh-agent running?",
-                        culprit=ssh_var,
-                    )
+            if "SSH_AUTH_SOCK" not in os.environ:
+                warn(
+                    "SSH_AUTH_SOCK environment variable not found.",
+                    "Is ssh-agent running?",
+                )
 
         # run the command
         narrate(
