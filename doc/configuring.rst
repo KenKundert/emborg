@@ -606,11 +606,17 @@ exclude_from
 
 An alternative to :ref:`excludes`.  You can list your excludes in one or more 
 files, one per line, and then specify the file or files using the *exclude_from* 
-setting.  The value of *exclude_from* may either be a multi-line string, one 
-file per line, or a list of strings. The string or strings would be the paths to 
-the file or files that contain the list of files or directories to exclude. If 
-given as relative paths, they are relative to :ref:`working_dir`.  These files 
-are processed directly by *Borg*, which does not allow ``~`` to represent users' 
+setting:
+
+.. code-block:: python
+
+    exclude_from = '{config_dir}/excludes'
+
+The value of *exclude_from* may either be a multi-line string, one file per 
+line, or a list of strings. The string or strings would be the paths to the file 
+or files that contain the list of files or directories to exclude. If given as 
+relative paths, they are relative to :ref:`working_dir`.  These files are 
+processed directly by *Borg*, which does not allow ``~`` to represent users' 
 home directories, unlike the patterns specified using :ref:`patterns`.
 
 
@@ -746,8 +752,18 @@ A string that specifies a command to be run by *BORG* to determine the pass
 phrase for the encryption key. The standard out of this command is used as the 
 pass phrase.  This string is passed to *Borg*, which executes the command.
 
+Here is an example of a passcommand that you can use if your GPG agent is 
+available when *Emborg* is run. This works if you are running it interactively, 
+or in a cron script if you are using `keychain 
+<https://www.funtoo.org/Keychain>`_ to provide you access to your GPG agent:
+
+.. code-block:: python
+
+    passcommand = 'gpg -qd /home/user/.store-auth.gpg'
+
 This is used as an alternative to :ref:`passphrase` when it is desirable to keep 
 the passphrase out of your configuration file.
+
 
 .. _passphrase:
 
@@ -1054,12 +1070,18 @@ patterns_from
 
 An alternative to :ref:`patterns`.  You can list your patterns in one or more 
 files, one per line, and then specify the file or files using the *exclude_from* 
-setting.  The value of *exclude_from* may either be a multi-line string, one 
-file per line, or a list of strings. The string or strings would be the paths to 
-the file or files that contain the patterns. If given as relative paths, they 
-are relative to :ref:`working_dir`.  These files are processed directly by 
-*Borg*, which does not allow ``~`` to represent users' home directories, unlike 
-the patterns specified using :ref:`patterns`.
+setting.
+
+.. code-block:: python
+
+    patterns_from = '{config_dir}/patterns'
+
+The value of *patterns_from* may either be a multi-line string, one file per 
+line, or a list of strings. The string or strings would be the paths to the file 
+or files that contain the patterns. If given as relative paths, they are 
+relative to :ref:`working_dir`.  These files are processed directly by *Borg*, 
+which does not allow ``~`` to represent users' home directories, unlike the 
+patterns specified using :ref:`patterns`.
 
 
 .. _prefix:
