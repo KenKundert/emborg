@@ -5,6 +5,7 @@ Releases
     | Version: 1.15.3
     | Released: 2020-03-17
 
+**1.16 (2020-03-17)**:
     - refinements and bug fixes.
 
 **1.15 (2020-03-06)**:
