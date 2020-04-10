@@ -14,6 +14,7 @@ setup(
     author_email="emborg@nurdletech.com",
     description="Borg front end.",
     long_description=readme,
+    long_description_content_type='text/x-rst',
     url="https://emborg.readthedocs.io",
     download_url="https://github.com/kenkundert/emborg/tarball/master",
     license="GPLv3+",
