@@ -614,10 +614,11 @@ class Settings:
         executable = self.value("borg_executable", BORG)
         remote_path = self.value("remote_path")
         remote_path = ["--remote-path", remote_path] if remote_path else []
+        repository = str(self.repository)
         command = (
             [executable]
             + remote_path
-            + [(self.repository if a == "@repo" else a) for a in args]
+            + [a.replace('@repo', repository) for a in args]
         )
 
         # run the command

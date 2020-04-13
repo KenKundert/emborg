@@ -55,12 +55,7 @@ the repository.
 ::
 
     $ emborg borg key export @repo key.borg
-
-The following example access the new '--repair' option of *check*.  This is an 
-experimental feature and so is not yet supported in *emborg*, but you can try it 
-out using::
-
-    $ emborg borg check --repair @repo
+    $ emborg borg list @repo::root-2020-04-11T23:38:37
 
 
 .. _breaklock:
