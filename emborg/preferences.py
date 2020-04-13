@@ -25,7 +25,6 @@ from appdirs import user_config_dir, user_data_dir
 # Constants {{{2
 PROGRAM_NAME = "emborg"
 DEFAULT_COMMAND = "create"
-ENCODING = "utf-8"
 INDENT = "    "
 BORG = "borg"
 
@@ -43,6 +42,7 @@ DATE_FILE = "{config_name}.lastbackup"
 CONFIGS_SETTING = "configurations"
 DEFAULT_CONFIG_SETTING = "default_configuration"
 INCLUDE_SETTING = "include"
+DEFAULT_ENCODING = "utf-8"
 
 # Emborg settings {{{2
 EMBORG_SETTINGS = dict(
@@ -57,6 +57,7 @@ EMBORG_SETTINGS = dict(
     default_configuration="default Emborg configuration",
     default_mount_point="directory to use as mount point if one is not specified",
     do_not_expand="names of settings that must not undergo setting evaluation",
+    encoding="encoding when talking to borg",
     encryption="encryption method (see Borg documentation)",
     excludes="list of glob strings of files or directories to skip",
     exclude_from="file that contains exclude patterns",

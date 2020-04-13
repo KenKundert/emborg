@@ -546,6 +546,15 @@ placeholder replacement.  The value may be specified as a list of strings or
 just as a string. If specified as a string, it is split on white space to form 
 the list.
 
+.. _encoding:
+
+encoding
+~~~~~~~~
+
+The encoding used when communicating with Borg. The default is utf-8, which is 
+generally suitable for Linux systems.
+
+
 .. _encryption:
 
 encryption

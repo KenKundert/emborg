@@ -44,7 +44,10 @@ from inform import (
     render,
     warn,
 )
-from shlib import Run, cd, cwd, getmod, mv, render_command, rm, to_path
+from shlib import (
+    Run, cd, cwd, getmod, mv, render_command, rm, to_path,
+    set_prefs as set_shlib_prefs
+)
 
 from .collection import Collection, split_lines
 from .patterns import (
@@ -62,6 +65,7 @@ from .preferences import (
     DATA_DIR,
     DATE_FILE,
     DEFAULT_CONFIG_SETTING,
+    DEFAULT_ENCODING,
     INCLUDE_SETTING,
     INITIAL_HOME_CONFIG_FILE_CONTENTS,
     INITIAL_ROOT_CONFIG_FILE_CONTENTS,
@@ -173,6 +177,7 @@ class Settings:
         self.config_dir = to_path(CONFIG_DIR)
         self.read(name)
         self.check()
+        set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)
 
     # read() {{{2
     def read(self, name=None, path=None):
