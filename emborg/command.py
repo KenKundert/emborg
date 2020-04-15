@@ -1444,7 +1444,7 @@ class VersionCommand(Command):
         )
 
         # output the Emborg version along with the Python version
-        from .__init__ import __version__, __released__
+        from . import __version__, __released__
 
         output("emborg version: %s (%s) [%s]." % (__version__, __released__, python))
 
