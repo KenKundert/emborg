@@ -5,6 +5,10 @@ Releases
     | Version: 1.16.2
     | Released: 2020-04-13
 
+**1.17 (2020-04-15)**:
+    - :ref:`borg <borg>` command allows archive to be added to ``@repo``.
+    - added :ref:`encoding` setting.
+
 **1.16 (2020-03-17)**:
     - refinements and bug fixes.
 
