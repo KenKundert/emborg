@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.17.0
-    | Released: 2020-04-15
+    | Version: 1.17.1
+    | Released: 2020-04-28
 
 **1.17 (2020-04-15)**:
     - :ref:`borg <borg>` command allows archive to be added to ``@repo``.
