@@ -835,9 +835,11 @@ class InfoCommand(Command):
         fast = cmdline["--fast"]
 
         # report local information
-        src_dirs = (str(d) for d in settings.src_dirs)
+        # run borg_options('create') to populate settings.roots
+        settings.borg_options('create', None, (), False)
+        roots = (str(r) for r in settings.roots)
         output(f"              config: {settings.config_name}")
-        output(f'              source: {", ".join(src_dirs)}')
+        output(f'               roots: {", ".join(roots)}')
         output(f"         destination: {settings.destination()}")
         output(f"  settings directory: {settings.config_dir}")
         output(f"              logile: {settings.logfile}")

@@ -406,7 +406,7 @@ class Settings:
         ]
 
     # borg_options() {{{2
-    def borg_options(self, cmd, borg_opts, emborg_opts, strip_prefix=True):
+    def borg_options(self, cmd, borg_opts, emborg_opts, strip_prefix):
         if not borg_opts:
             borg_opts = []
 
@@ -422,7 +422,7 @@ class Settings:
         if cmd == "create":
             if "verbose" in emborg_opts and "--list" not in borg_opts:
                 borg_opts.append("--list")
-            roots = self.src_dirs
+            roots = self.src_dirs[:]
             patterns = self.values("patterns")
             if patterns:
                 for pattern in check_patterns(

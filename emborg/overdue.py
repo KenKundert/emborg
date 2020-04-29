@@ -16,6 +16,7 @@ Options:
     -m, --mail       Send mail message if backup is overdue
     -p, --no-passes  Do not show hosts that are not overdue
     -q, --quiet      Suppress output to stdout
+    -v, --verbose    Give more information about each host
 """
 
 # License {{{1
@@ -48,6 +49,7 @@ from inform import (
     Inform,
     display,
     error,
+    fmt,
     get_prog_name,
     is_str,
     os_error,
@@ -66,7 +68,16 @@ username = pwd.getpwuid(os.getuid()).pw_name
 hostname = socket.gethostname()
 now = arrow.now()
 
-overdue_message = dedent(
+verbose_overdue_message = dedent("""\
+    HOST: {host}
+        sentinel file: {path!s}
+        last modified: {mtime}
+        since last change: {age:0.1f} hours
+        maximum age: {max_age} hours
+        overdue: {report}
+""")
+terse_overdue_message = "{host}: {age:0.1f} hours{overdue}"
+mail_overdue_message = dedent(
     f"""
     Backup of {{host}} is overdue:
        from: {username}@{hostname} at {now}
@@ -93,6 +104,10 @@ def main():
     use_color = Color.isTTY() and not cmdline["--no-color"]
     passes = Color("green", enable=use_color)
     fails = Color("red", enable=use_color)
+    if cmdline["--verbose"]:
+        overdue_message = verbose_overdue_message
+    else:
+        overdue_message = terse_overdue_message
 
     # prepare to create logfile
     log = to_path(DATA_DIR, OVERDUE_LOG_FILE) if OVERDUE_LOG_FILE else False
@@ -143,7 +158,8 @@ def main():
 
         def send_mail(recipient, subject, message):
             if cmdline["--mail"]:
-                display(f"Reporting to {recipient}.\n")
+                if cmdline['--verbose']:
+                    display(f"Reporting to {recipient}.\n")
                 mail_cmd = ["mailx", "-r", dumper, "-s", subject, recipient]
                 Run(mail_cmd, stdin=message, modes="soeW0")
 
@@ -164,27 +180,15 @@ def main():
                 delta = now - mtime
                 age = 24 * delta.days + delta.seconds / 3600
                 report = age > max_age
+                overdue = ' -- overdue' if report else ''
                 color = fails if report else passes
                 if report or not cmdline["--no-passes"]:
-                    display(
-                        color(
-                            dedent(
-                                f"""
-                                HOST: {host}
-                                    sentinel file: {path!s}
-                                    last modified: {mtime}
-                                    since last change: {age:0.1f} hours
-                                    maximum age: {max_age} hours
-                                    overdue: {report}
-                                """
-                            ).lstrip()
-                        )
-                    )
+                    display(color(fmt(overdue_message)))
 
                 if report:
                     problem = True
                     subject = f"backup of {host} is overdue"
-                    msg = overdue_message.format(host=host, path=path, age=age)
+                    msg = fmt(mail_overdue_message)
                     send_mail(maintainer, subject, msg)
             except OSError as e:
                 problem = True
