@@ -257,3 +257,63 @@ To run this configuration every 10 minutes, add the following entry to your
 crontab file using 'crontab -e'::
 
     0,10,20,30,40,50 * * * * emborg --mute --config snapshots create
+
+
+.. _rsync.net example:
+
+Rsync.net
+---------
+
+*Rsync.net* is a commercial option for off-site storage. In fact, they give you 
+a discount if you use `Borg Backup <https://www.rsync.net/products/attic.html>`_.
+
+Once you sign up for *Rsync.net* you can access your storage using *sftp*, 
+*scp*, *rsync* or *borg* of course.  *ssh* access is also available, but only 
+for a limited set of commands.
+
+You would configure *Emborg* for *Rsync.net* in much the same way you would for 
+any remote server.  Of course, you should use some form of *keyfile* based 
+encryption to keep your files secure.  The only thing to be aware of is that by 
+default they provide a old version of borg. To use a newer version, set the 
+``remote_path`` to ``borg1``.
+
+.. code-block:: python
+
+    repository = '78548@ch-s012.rsync.net:repo'
+    encryption = 'keyfile'
+    remote_path = 'borg1'
+
+    ...
+
+In this example, ``78548`` is the user name and ``ch-s012.rsync.net`` is the 
+server they assign to you.  ``repo`` is the name of the directory that is to 
+contain your *Borg* repository. You are free to name it whatever you like and 
+you can have as many as you like, with the understanding that you are 
+constrained in the total amount of storage you consume.
+
+
+.. _borgbase example:
+
+BorgBase
+--------
+
+`BorgBase <https://www.borgbase.com>`_ is another commercial alternative for 
+*Borg Backups*.  It allows full *Borg* access, append-only *Borg* access, and 
+*rsync* access, though each form of access requires its own unique SSH key.
+
+Again, you should use some form of *keyfile* encryption to keep your files 
+secure, and *BorgBase* recommends *Blake2* encryption as being the fastest 
+alternative.
+
+.. code-block:: python
+
+    repository = 'zMNZCv4B@zMNZCv4B.repo.borgbase.com:repo'
+    encryption = 'keyfile-blake2'
+
+    ...
+
+In this example, ``zMNZCv4B`` is the user name and 
+``zMNZCv4B.repo.borgbase.com`` is the server they assign to you.  You may 
+request any number of repositories, with each repository getting its own 
+username and hostname. ``repo`` is the name of the directory that is to contain 
+your *Borg* repository and cannot be changed.
