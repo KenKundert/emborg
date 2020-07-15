@@ -82,6 +82,10 @@ Check the integrity of the repository and its archives.  The most recently
 created archive is checked if one is not specified unless ``--all`` is given, in 
 which case all archives are checked.
 
+The ``--repair`` option will attempt to repair any damage found. Be aware that 
+this is considered an *experimental* feature in *Borg* and so carries extra risk 
+due to its immaturity.
+
 
 .. _configs:
 
@@ -138,8 +142,10 @@ Delete an archive currently contained in the repository::
 
     $ emborg delete continuum-2018-12-05T19:23:09
 
-Only one archive can be deleted per command invocation. Add ``--latest`` to 
-delete the most recent archive.
+Only one archive can be deleted per command invocation. If an archive is not 
+given, the latest is deleted.
+
+Specifying ``--repo`` results in the entire repository being deleted.
 
 
 .. _diff:

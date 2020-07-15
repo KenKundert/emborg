@@ -580,8 +580,6 @@ class Settings:
         )
         with cd(self.working_dir if use_working_dir else "."):
             narrate("running in:", cwd())
-            starts_at = arrow.now()
-            log("starts at: {!s}".format(starts_at))
             narrating = (
                 show_borg_output
                 or "--verbose" in borg_opts
@@ -593,10 +591,19 @@ class Settings:
                 display("\nRunning Borg {} command ...".format(cmd))
             else:
                 modes = "sOEW"
+            starts_at = arrow.now()
+            log("starts at: {!s}".format(starts_at))
             try:
                 borg = Run(command, modes=modes, stdin="", env=os.environ, log=False)
             except Error as e:
-                e.reraise(culprit=f"borg {cmd}")
+                narrate('Borg terminates with exist status:', e.status)
+                codicil = None
+                if e.stderr and 'previously located at' in e.stderr:
+                    codicil = dedent(f'''
+                        If repository was intentionally relocated, re-run with --relocated:
+                            emborg --relocated {cmd} ...
+                    ''')
+                e.reraise(culprit=f"borg {cmd}", codicil=codicil)
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))

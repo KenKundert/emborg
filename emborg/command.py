@@ -100,17 +100,6 @@ def get_available_files(settings, archive):
     except json.decoder.JSONDecodeError as e:
         raise Error("Could not decode output of Borg list command.", codicil=e)
 
-# require_env_variable() {{{2
-def require_env_var(var, feature, command, args):
-    val = os.environ.get(var)
-    if val != 'YES':
-        cmd = f"emborg {command} {' '.join(args)}"
-        raise Error(
-            f"environment variable must be set to YES to use {' '.join(feature)}.",
-            culprit=var,
-            codicil=f"TO use, try:\n    {var}=YES {cmd}",
-        )
-
 # Command base class {{{1
 class Command:
     REQUIRES_EXCLUSIVITY = True
@@ -290,9 +279,7 @@ class CheckCommand(Command):
         verify = ["--verify-data"] if cmdline["--verify-data"] else []
         repair = ['--repair'] if cmdline['--repair'] else []
         if repair:
-            require_env_var(
-                'BORG_CHECK_I_KNOW_WHAT_I_AM_DOING', repair, command, args
-            )
+            os.environ['BORG_CHECK_I_KNOW_WHAT_I_AM_DOING'] = 'YES'
 
         # identify archive or archives to check
         if check_all:
@@ -356,9 +343,9 @@ class CreateCommand(Command):
             emborg backup [options]
 
         Options:
-            -f, --fast    skip pruning and checking for a faster backup on a slow network
-            -l, --list    list the files and directories as they are processed
-            -s, --stats   show Borg statistics
+            -f, --fast       skip pruning and checking for a faster backup on a slow network
+            -l, --list       list the files and directories as they are processed
+            -s, --stats      show Borg statistics
 
         To see the files listed as they are backed up, use the Emborg -v option.
         This can help you debug slow create operations.
@@ -477,16 +464,12 @@ class DeleteCommand(Command):
             emborg [options] delete [<archive>]
 
         Options:
-            -l, --latest   delete the most recently created archive
+            -r, --repo     delete entire repository
             -s, --stats    show Borg statistics
+
+        If no archive is specified, the latest is deleted.
         """
     ).strip()
-    # borg allows you to delete all archives by simply not specifying an
-    # archive, but then it interactively asks the user to type YES if that
-    # deletes all archives from repository. Emborg currently does not have
-    # the ability support this and there appears to be no way of stopping
-    # borg from asking for confirmation, so just limit user to deleting one
-    # archive at a time.
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "error"
 
@@ -495,10 +478,15 @@ class DeleteCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         archive = cmdline["<archive>"]
-        if not archive:
-            archive = get_name_of_latest_archive(settings)
-        if not archive:
-            raise Error("archive missing.")
+        if cmdline['--repo']:
+            if archive:
+                raise Error("must not specify an archive along with --repo.")
+            os.environ['BORG_DELETE_I_KNOW_WHAT_I_AM_DOING'] = 'YES'
+        else:
+            if not archive:
+                archive = get_name_of_latest_archive(settings)
+                if not archive:
+                    raise Error("no archives available.")
         show_stats = cmdline["--stats"] or settings.show_stats
 
         # run borg

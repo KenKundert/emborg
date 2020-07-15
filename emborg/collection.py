@@ -25,35 +25,42 @@
 from inform import is_collection, is_str
 
 # Globals {{{1
-__version__ = "0.3.1"
-__released__ = "2020-02-21"
+__version__ = "0.4.1"
+__released__ = "2020-07-12"
 
 
 # Utilities {{{1
-def split_lines(text, comment=None, strip=False, cull=False):
+def split_lines(text, comment=None, strip=False, cull=False, sep=None):
     """Split lines
 
-    Can be passed as a splitter to Collection. Takes a multiline string,
-    converts it to individual lines where each line is stripped (if strip is
-    True), comments are removed (if comment string is provided, and empty lines
-    are culled (if cull is True).
+    Can be passed as a splitter to Collection. Takes a multi-line string,
+    converts it to individual lines where comments are removed (if comment
+    string is provided), each line is stripped (if strip is True), and empty
+    lines are culled (if cull is True).  If sep is specified, the line is
+    partitioned into a key and value (everything before sep is the key,
+    everything after is value). In this case a dictionary is returned. Otherwise
+    a list is returned.
+
     """
     lines = text.splitlines()
     if comment:
-        lines = (l.partition(comment)[0] for l in lines)
+        lines = list(l.partition(comment)[0] for l in lines)
     if strip:
-        lines = (l.strip() for l in lines)
+        lines = list(l.strip() for l in lines)
     if cull:
-        return (l for l in lines if l)
-    else:
-        return lines
+        lines = list(l for l in lines if l)
+    if sep:
+        pairs = dict(l.partition(sep)[::2] for l in lines)
+        if strip:
+            lines = {k.strip():v.strip() for k, v in pairs.items()}
+    return lines
 
 
 # Collection {{{1
 class Collection(object):
-    fmt = {}  # default value format
-    sep = " "  # default separator
-    splitter = "|"  # default format splitter (goes between fmt and sep)
+    fmt = '{v}'     # default value format
+    sep = " "       # default separator
+    splitter = "|"  # default format splitter (goes between fmt and sep in template)
 
     """Collection
 
@@ -89,23 +96,23 @@ class Collection(object):
 
     def keys(self):
         try:
-            return self.collection.keys()
+            return list(self.collection.keys())
         except AttributeError:
-            return range(len(self.collection))
+            return list(range(len(self.collection)))
 
     def values(self):
         try:
             return [self.collection[k] for k in self.collection.keys()]
         except AttributeError:
-            return self.collection
+            return list(self.collection)
 
     def items(self):
         try:
             return [(k, self.collection[k]) for k in self.collection.keys()]
         except AttributeError:
-            return enumerate(self.collection)
+            return list(enumerate(self.collection))
 
-    def render(self, fmt="{v}", sep=", "):
+    def render(self, fmt=None, sep=None):
         """Convert the collection into a string
 
         fmt (str):
@@ -128,8 +135,12 @@ class Collection(object):
 
         """
         if not fmt:
-            fmt = "{}"
+            fmt = self.fmt
+        if not sep:
+            sep = self.sep
 
+        if callable(fmt):
+            return sep.join(fmt(k, v) for k, v in self.items())
         return sep.join(fmt.format(v, k=k, v=v) for k, v in self.items())
 
     def __format__(self, template):
@@ -152,9 +163,11 @@ class Collection(object):
             else:
                 fmt, sep = components[0], " "
         else:
-            fmt, sep = self.fmt, self.sep
+            fmt, sep = None, None
         if not fmt:
-            fmt = "{}"
+            fmt = self.fmt
+        if not sep:
+            sep = self.sep
 
         if callable(fmt):
             return sep.join(fmt(k, v) for k, v in self.items())

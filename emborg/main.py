@@ -10,11 +10,12 @@ Usage:
 
 Options:
     -c <cfgname>, --config <cfgname>  Specifies the configuration to use.
+    -d, --dry-run                     Run Borg in dry run mode.
     -h, --help                        Output basic usage information.
     -m, --mute                        Suppress all output.
     -n, --narrate                     Send emborg and Borg narration to stdout.
     -q, --quiet                       Suppress optional output.
-    -d, --dry-run                     Run Borg in dry run mode.
+    -r, --relocated                   Acknowledge that repository was relocated.
     -v, --verbose                     Make Borg more verbose.
     --no-log                          Do not create log file.
 """
@@ -35,6 +36,7 @@ Options:
 
 
 # Imports {{{1
+import os
 import sys
 from docopt import docopt
 from inform import Error, Inform, cull, display, fatal, os_error, terminate
@@ -67,6 +69,8 @@ def main():
             inform.mute = True
         if cmdline["--quiet"]:
             inform.quiet = True
+        if cmdline["--relocated"]:
+            os.environ['BORG_RELOCATED_REPO_ACCESS_IS_OK'] = 'YES'
         emborg_opts = cull(
             [
                 "verbose" if cmdline["--verbose"] else "",

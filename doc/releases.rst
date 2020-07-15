@@ -5,6 +5,11 @@ Releases
     | Version: 1.17.1
     | Released: 2020-04-28
 
+    - added --repo option to :ref:`delete <delete>` command.
+    - added --relocated global command-line option.
+    - *Emborg* now automatically confirms to *Borg* that you know what you are 
+      doing when you delete a repository or repair an archive.
+
 **1.17 (2020-04-15)**:
     - :ref:`borg <borg>` command allows archive to be added to ``@repo``.
     - added :ref:`encoding` setting.
