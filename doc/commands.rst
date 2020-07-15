@@ -344,7 +344,7 @@ The second sorts the files by modification date. It uses the *date* format,
 which by default contains the day, date, time and the path.
 More choices are available; run ``emborg help manifest`` for the details.
 
-You can use ``files`` as an alias for ``manifest``.
+You can use ``files`` as an alias for ``manifest``::
 
     $ emborg files
 
