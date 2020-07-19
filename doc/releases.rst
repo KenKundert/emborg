@@ -5,6 +5,7 @@ Releases
     | Version: 1.17.2
     | Released: 2020-07-15
 
+**1.18 (2020-07-19)**:
     - added --repo option to :ref:`delete <delete>` command.
     - added --relocated global command-line option.
     - *Emborg* now automatically confirms to *Borg* that you know what you are 
