@@ -2,10 +2,10 @@
 """
 Overdue Emborg Backups
 
-This program, run on the repository server, notifies you if backups have not
-been run recently.  It either does it by simply listing those archives that are
-out-of-date, or if you specify --mail, email is sent that describes the
-situation if a backup is overdue.
+This program notifies you if backups have not been run recently.  It can be run
+either from the server (the destination) or from the client (the source). It
+simply lists those archives that are out-of-date.  If you specify --mail, email
+is sent that describes the situation if a backup is overdue.
 
 Usage:
     emborg-overdue [options]
@@ -17,6 +17,11 @@ Options:
     -p, --no-passes  Do not show hosts that are not overdue
     -q, --quiet      Suppress output to stdout
     -v, --verbose    Give more information about each host
+    --version        Show software version
+
+The program requires a configuration file: ~/.config/emborg/overdue.conf. The
+contents are described here:
+    https://emborg.readthedocs.io/en/stable/utilities.html#overdue
 """
 
 # License {{{1
