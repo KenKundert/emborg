@@ -184,3 +184,9 @@ class Collection(object):
 
     def __getitem__(self, key):
         return self.collection[key]
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.collection!r})'
+
+    def __str__(self):
+        return str(self.collection)
