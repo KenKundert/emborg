@@ -289,10 +289,10 @@ class CheckCommand(Command):
 
         # run borg
         borg = settings.run_borg(
-            cmd="check",
-            args=verify + repair + [settings.destination(archive)],
-            emborg_opts=options,
-            strip_prefix=include_external_archives,
+            cmd = "check",
+            args = verify + repair + [settings.destination(archive)],
+            emborg_opts = options,
+            strip_prefix = include_external_archives,
         )
         out = borg.stdout
         if out:
@@ -370,7 +370,7 @@ class CreateCommand(Command):
             if not path.exists():
                 raise Error(
                     "does not exist, perform setup and restart.",
-                    culprit=("must_exist", path),
+                    culprit = ("must_exist", path),
                 )
 
         # run prerequisites
@@ -386,12 +386,12 @@ class CreateCommand(Command):
         src_dirs = settings.src_dirs
         try:
             settings.run_borg(
-                cmd="create",
-                borg_opts=borg_opts,
-                args=[settings.destination(True)] + src_dirs,
-                emborg_opts=options,
-                show_borg_output=bool(borg_opts),
-                use_working_dir=True,
+                cmd = "create",
+                borg_opts = borg_opts,
+                args = [settings.destination(True)] + src_dirs,
+                emborg_opts = options,
+                show_borg_output = bool(borg_opts),
+                use_working_dir = True,
             )
         except Error as e:
             if e.stderr and "is not a valid repository" in e.stderr:
@@ -433,7 +433,7 @@ class CreateCommand(Command):
                         "unknown value: {}, checking latest.".format(
                             settings.check_after_create
                         ),
-                        cuplrit="check_after_create",
+                        cuplrit = "check_after_create",
                     )
                     args = []
                 check = CheckCommand()
@@ -447,7 +447,7 @@ class CreateCommand(Command):
                 prune.run("prune", args, settings, options)
         except Error as e:
             e.reraise(
-                codicil=(
+                codicil = (
                     f"This error occurred while {activity} the archives.",
                     "No error was reported while creating the archive.",
                 )
@@ -491,11 +491,11 @@ class DeleteCommand(Command):
 
         # run borg
         borg = settings.run_borg(
-            cmd="delete",
-            args=[settings.destination(archive)],
-            emborg_opts=options,
-            strip_prefix=True,
-            show_borg_output=show_stats,
+            cmd = "delete",
+            args = [settings.destination(archive)],
+            emborg_opts = options,
+            strip_prefix = True,
+            show_borg_output = show_stats,
         )
         out = borg.stdout
         if out:
@@ -524,9 +524,9 @@ class DiffCommand(Command):
 
         # run borg
         borg = settings.run_borg(
-            cmd="diff",
-            args=[settings.destination(archive1), archive2],
-            emborg_opts=options,
+            cmd = "diff",
+            args = [settings.destination(archive1), archive2],
+            emborg_opts = options,
         )
         out = borg.stdout
         if out:
@@ -597,8 +597,8 @@ class DueCommand(Command):
                 except KeyError as e:
                     raise Error(
                         "unknown key in:",
-                        culprit=e.args[0],
-                        codicil=cmdline["--message"],
+                        culprit = e.args[0],
+                        codicil = cmdline["--message"],
                     )
             else:
                 return f"The latest {settings.config_name} archive was created {date.humanize()}."
@@ -668,8 +668,8 @@ class DueCommand(Command):
         if email:
             Run(
                 ["mail", "-s", f"{PROGRAM_NAME}: backup is overdue", email],
-                stdin=message,
-                modes="soeW",
+                stdin = message,
+                modes = "soeW",
             )
         else:
             output(message)
@@ -743,7 +743,7 @@ class ExtractCommand(Command):
                     "Running from the working directory risks",
                     "over writing the existing file or files. ",
                     "Use --force if this is desired.",
-                    wrap=True,
+                    wrap = True,
                 )
 
         # convert absolute paths to paths relative to the working directory
@@ -765,11 +765,11 @@ class ExtractCommand(Command):
 
         # run borg
         borg = settings.run_borg(
-            cmd="extract",
-            borg_opts=borg_opts,
-            args=[settings.destination(archive)] + paths,
-            emborg_opts=options,
-            show_borg_output=bool(borg_opts),
+            cmd = "extract",
+            borg_opts = borg_opts,
+            args = [settings.destination(archive)] + paths,
+            emborg_opts = options,
+            show_borg_output = bool(borg_opts),
         )
         out = borg.stdout
         if out:
@@ -843,10 +843,10 @@ class InfoCommand(Command):
 
         # now output the information from borg about the repository
         borg = settings.run_borg(
-            cmd="info",
-            args=[settings.destination()],
-            emborg_opts=options,
-            strip_prefix=True,
+            cmd = "info",
+            args = [settings.destination()],
+            emborg_opts = options,
+            strip_prefix = True,
         )
         out = borg.stdout
         if out:
@@ -908,10 +908,10 @@ class ListCommand(Command):
 
         # run borg
         borg = settings.run_borg(
-            cmd="list",
-            args=["--short", settings.destination()],
-            emborg_opts=options,
-            strip_prefix=include_external_archives,
+            cmd = "list",
+            args = ["--short", settings.destination()],
+            emborg_opts = options,
+            strip_prefix = include_external_archives,
         )
         out = borg.stdout
         if out:
@@ -1017,13 +1017,13 @@ class ManifestCommand(Command):
 
         # define available formats
         formats = dict(
-            name="{path}",
-            date="{day} {date} {time} {path}",
-            size="{Size:<5.2r} {path}",
-            owner="{owner:<8} {path}",
-            group="{group:<8} {path}",
-            long="{Size:<5.2r} {date} {time} {path}",
-            full="{permissions:<10} {owner:<6} {group:<6} {size:>8} {Date:YYMMDD HH:mm} {path}",
+            name = "{path}",
+            date = "{day} {date} {time} {path}",
+            size = "{Size:<5.2r} {path}",
+            owner = "{owner:<8} {path}",
+            group = "{group:<8} {path}",
+            long = "{Size:<5.2r} {date} {time} {path}",
+            full = "{permissions:<10} {owner:<6} {group:<6} {size:>8} {Date:YYMMDD HH:mm} {path}",
         )
         user_formats = settings.manifest_formats
         if user_formats:
@@ -1103,18 +1103,18 @@ class ManifestCommand(Command):
         for columns in lines:
             output(
                 formats[fmt].format(
-                    permissions=columns[0],
-                    owner=columns[1],
-                    group=columns[2],
-                    size=columns[3],
-                    Size=Quantity(columns[3], "B"),
-                    Date=arrow.get(" ".join(columns[5:7]), "YYYY-MM-DD HH:mm:ss"),
-                    day=columns[4].rstrip(","),
-                    date=columns[5],
-                    time=columns[6],
-                    path=columns[7],
+                    permissions = columns[0],
+                    owner = columns[1],
+                    group = columns[2],
+                    size = columns[3],
+                    Size = Quantity(columns[3], "B"),
+                    Date = arrow.get(" ".join(columns[5:7]), "YYYY-MM-DD HH:mm:ss"),
+                    day = columns[4].rstrip(","),
+                    date = columns[5],
+                    time = columns[6],
+                    path = columns[7],
                 ),
-                sep="\n",
+                sep = "\n",
             )
 
 
@@ -1196,10 +1196,10 @@ class MountCommand(Command):
 
         # run borg
         borg = settings.run_borg(
-            cmd="mount",
-            args=[settings.destination(archive), mount_point],
-            emborg_opts=options,
-            strip_prefix=include_external_archives,
+            cmd = "mount",
+            args = [settings.destination(archive), mount_point],
+            emborg_opts = options,
+            strip_prefix = include_external_archives,
         )
         out = borg.stdout
         if out:
@@ -1218,6 +1218,7 @@ class PruneCommand(Command):
         Options:
             -e, --include-external   prune all archives in repository, not just
                                      those associated with this configuration
+            -l, --list               show fate of each archive
             -s, --stats              show Borg statistics
         """
     ).strip()
@@ -1229,7 +1230,11 @@ class PruneCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         include_external_archives = cmdline["--include-external"]
-        show_stats = cmdline["--stats"] or settings.show_stats
+        borg_opts = []
+        if cmdline["--stats"] or settings.show_stats:
+            borg_opts.append("--stats")
+        if cmdline["--list"]:
+            borg_opts.append("--list")
 
         # checking the settings
         intervals = "within last minutely hourly daily weekly monthly yearly"
@@ -1238,16 +1243,17 @@ class PruneCommand(Command):
             prune_settings = conjoin(prune_settings, ", or ")
             raise Error(
                 "No prune settings available",
-                codicil=f"At least one of {prune_settings} must be specified.",
+                codicil = f"At least one of {prune_settings} must be specified.",
             )
 
         # run borg
         borg = settings.run_borg(
-            cmd="prune",
-            args=[settings.destination()],
-            emborg_opts=options,
-            strip_prefix=include_external_archives,
-            show_borg_output=show_stats,
+            cmd = "prune",
+            borg_opts = borg_opts,
+            args = [settings.destination()],
+            emborg_opts = options,
+            strip_prefix = include_external_archives,
+            show_borg_output = bool(borg_opts),
         )
         out = borg.stdout
         if out:
@@ -1304,12 +1310,12 @@ class RestoreCommand(Command):
 
         # run borg
         borg = settings.run_borg(
-            cmd="extract",
-            borg_opts=borg_opts,
-            args=[settings.destination(archive)] + paths,
-            emborg_opts=options,
-            show_borg_output=bool(borg_opts),
-            use_working_dir=True,
+            cmd = "extract",
+            borg_opts = borg_opts,
+            args = [settings.destination(archive)] + paths,
+            emborg_opts = options,
+            show_borg_output = bool(borg_opts),
+            use_working_dir = True,
         )
         out = borg.stdout
         if out:
@@ -1406,7 +1412,7 @@ class UmountCommand(Command):
         except Error as e:
             if "busy" in str(e):
                 e.reraise(
-                    codicil=f"Try running 'lsof +D {mount_point!s}' to find culprit."
+                    codicil = f"Try running 'lsof +D {mount_point!s}' to find culprit."
                 )
 
 
@@ -1427,7 +1433,7 @@ class VersionCommand(Command):
     def run_early(cls, command, args, settings, options):
 
         # get the Python version
-        python = "Python %s.%s.%s" % (
+        python = "Python {}.{}.{}".format(
             sys.version_info.major,
             sys.version_info.minor,
             sys.version_info.micro,
