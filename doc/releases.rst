@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.18.0
-    | Released: 2020-07-19
+    | Version: 1.18.1
+    | Released: 2020-12-31
 
 **1.18 (2020-07-19)**:
     - added --repo option to :ref:`delete <delete>` command.

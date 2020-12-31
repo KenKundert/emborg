@@ -1,4 +1,4 @@
-__version__ = "1.18.0"
-__released__ = "2020-07-19"
+__version__ = "1.18.1"
+__released__ = "2020-12-31"
 
 from .settings import Settings as Emborg
