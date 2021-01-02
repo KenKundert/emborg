@@ -5,6 +5,9 @@ Releases
     | Version: 1.18.1
     | Released: 2020-12-31
 
+**1.19 (2021-01-02)**:
+    - added --list option to :ref:`prune <prune>` command.
+
 **1.18 (2020-07-19)**:
     - added --repo option to :ref:`delete <delete>` command.
     - added --relocated global command-line option.
