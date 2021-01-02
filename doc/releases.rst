@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.18.1
-    | Released: 2020-12-31
+    | Version: 1.19.0
+    | Released: 2021-01-02
 
 **1.19 (2021-01-02)**:
     - added --list option to :ref:`prune <prune>` command.
