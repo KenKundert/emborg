@@ -1356,7 +1356,6 @@ class SettingsCommand(Command):
         width = 22
         color_adjust = len(known('x')) - 1
         leader = (width+2)*' '
-        debug(width)
 
         if show_available:
             def show_setting(name, desc):
