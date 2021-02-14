@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.19.0
-    | Released: 2021-01-02
+    | Version: 1.19.1
+    | Released: 2021-02-13
 
     - add ``--progress`` command-line option and :ref:`show_progress` option to 
       the :ref:`create <create>` command.
