@@ -76,6 +76,7 @@ EMBORG_SETTINGS = dict(
     repository="path to remote directory that contains repository",
     run_after_backup="command to run after archive has been created",
     run_before_backup="command to run before archive is to be created",
+    show_progress="show borg progress when running create command",
     show_stats="show borg statistics when running create, delete, and prune commands",
     src_dirs="the directories to archive",
     ssh_command="command to use for ssh, can be used to specify ssh options",

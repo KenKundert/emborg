@@ -480,7 +480,7 @@ class Settings:
         if (
             cmd in ["create", "delete", "prune"]
             and "dry-run" not in emborg_opts
-            and "--list" not in borg_opts
+            and not ("--list" in borg_opts or "--progress" in borg_opts)
         ):
             # By default we ask for stats to go in the log file.  However if
             # opts contains --list, then the stats will be displayed to user
@@ -583,6 +583,7 @@ class Settings:
             narrating = (
                 show_borg_output
                 or "--verbose" in borg_opts
+                or "--progress" in borg_opts
                 or "verbose" in emborg_opts
                 or "narrate" in emborg_opts
             ) and "--json" not in command

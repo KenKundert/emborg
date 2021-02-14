@@ -19,7 +19,7 @@
 import json
 import os
 import sys
-from textwrap import dedent
+from textwrap import dedent, fill
 
 import arrow
 from docopt import docopt
@@ -31,6 +31,7 @@ from inform import (
     conjoin,
     display,
     full_stop,
+    indent,
     is_str,
     narrate,
     os_error,
@@ -345,6 +346,7 @@ class CreateCommand(Command):
         Options:
             -f, --fast       skip pruning and checking for a faster backup on a slow network
             -l, --list       list the files and directories as they are processed
+            -p, --progress   shows Borg progress
             -s, --stats      show Borg statistics
 
         To see the files listed as they are backed up, use the Emborg -v option.
@@ -363,6 +365,11 @@ class CreateCommand(Command):
             borg_opts.append("--stats")
         if cmdline["--list"]:
             borg_opts.append("--list")
+        if cmdline["--progress"] or settings.show_progress:
+            borg_opts.append("--progress")
+            announce = display
+        else:
+            announce = narrate
 
         # check the dependencies are available
         must_exist = settings.as_paths("must_exist")
@@ -421,7 +428,7 @@ class CreateCommand(Command):
             # check the archives if requested
             activity = "checking"
             if settings.check_after_create:
-                narrate("checking archive")
+                announce("Checking archive ...")
                 if settings.check_after_create == "latest":
                     args = []
                 elif settings.check_after_create in [True, "all"]:
@@ -441,7 +448,7 @@ class CreateCommand(Command):
 
             activity = "pruning"
             if settings.prune_after_create:
-                narrate("pruning archives")
+                announce("Pruning archives ...")
                 prune = PruneCommand()
                 args = ["--stats"] if cmdline["--stats"] else []
                 prune.run("prune", args, settings, options)
@@ -1345,16 +1352,30 @@ class SettingsCommand(Command):
         show_available = cmdline["--available"]
         unknown = Color("yellow")
         known = Color("cyan")
+        resolved = Color("magenta")
+        width = 22
+        color_adjust = len(known('x')) - 1
+        leader = (width+2)*' '
+        debug(width)
 
         if show_available:
+            def show_setting(name, desc):
+                desc = fill(desc, 70-width-2)
+                text = indent(
+                    f"{known(name):>{width + color_adjust}}: {desc}",
+                    leader = leader,
+                    first = -1
+                )
+                output(text)
+
             output("Emborg settings:")
             for name, desc in EMBORG_SETTINGS.items():
-                output(f"{known(name):>33s}: {desc}")
+                show_setting(name, desc)
 
             output()
             output("Borg settings:")
             for name, attrs in BORG_SETTINGS.items():
-                output(f"{known(name):>33s}: {attrs['desc']}")
+                show_setting(name, attrs['desc'])
             return 0
 
         if settings:
@@ -1363,15 +1384,17 @@ class SettingsCommand(Command):
                 key = known(k) if is_known else unknown(k)
                 if k == "passphrase":
                     v = "<set>"
-                output(f"{key:>33}: {render(v, level=6)}")
+                output(f"{key:>{width + color_adjust}}: {render(v, level=6)}")
                 try:
                     if is_str(v) and "{" in v:
-                        output(f'{"":>24}{render(settings.resolve(v), level=6)}')
+                        output(resolved(
+                            f'{leader}{render(settings.resolve(v), level=6)}'
+                        ))
                 except Error:
                     pass
 
     run_early = run
-    # --avalable is handled in run_early
+    # --available is handled in run_early
 
 
 # UmountCommand command {{{1

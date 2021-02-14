@@ -5,12 +5,15 @@ Releases
     | Version: 1.19.0
     | Released: 2021-01-02
 
+    - add ``--progress`` command-line option and :ref:`show_progress` option to 
+      the :ref:`create <create>` command.
+
 **1.19 (2021-01-02)**:
-    - added --list option to :ref:`prune <prune>` command.
+    - added ``--list`` command-line option to the :ref:`prune <prune>` command.
 
 **1.18 (2020-07-19)**:
-    - added --repo option to :ref:`delete <delete>` command.
-    - added --relocated global command-line option.
+    - added ``--repo`` option to :ref:`delete <delete>` command.
+    - added ``--relocated`` global command-line option.
     - *Emborg* now automatically confirms to *Borg* that you know what you are 
       doing when you delete a repository or repair an archive.
 
@@ -85,12 +88,13 @@ Releases
     - Added :ref:`prefix <prefix>` and :ref:`exclude_from <exclude_from>` 
       settings.
     - Provide default value for :ref:`archive <archive>` setting.
-    - Add --all command line option to :ref:`mount <mount>` command.
-    - Add --include-external command line option to :ref:`check <check>`, :ref:`list <list>`, 
-      :ref:`mount <mount>`, and :ref:`prune <prune>` commands.
-    - Add --sort command line option to :ref:`manifest <manifest>` command.
-    - Add --latest command line option to :ref:`delete <delete>` command.
-    - Added --quiet command line option
+    - Add ``--all`` command line option to :ref:`mount <mount>` command.
+    - Add ``--include-external`` command line option to :ref:`check <check>`, 
+      :ref:`list <list>`, :ref:`mount <mount>`, and :ref:`prune <prune>` 
+      commands.
+    - Add ``--sort`` command line option to :ref:`manifest <manifest>` command.
+    - Add ``--latest`` command line option to :ref:`delete <delete>` command.
+    - Added ``--quiet`` command line option
     - :ref:`umount <umount>` command now deletes directory used as mount point.
     - Moved log files to ~/.local/share/emborg
       (run 'mv ~/.config/emborg/\*.{log,lastbackup}\* ~/.local/share/emborg' 
@@ -98,7 +102,7 @@ Releases
 
 **1.4 (2019-04-24)**:
     - Added *ssh_command* setting
-    - Added --fast option to :ref:`info <info>` command
+    - Added ``--fast`` option to :ref:`info <info>` command
     - Added *emborg-overdue* executable
     - Allow :ref:`run_before_backup <run_before_backup>` and :ref:`run_after_backup <run_after_backup>` to be simple 
       strings
@@ -112,7 +116,7 @@ Releases
 **1.1 (2019-01-13)**:
     - Improved and documented API.
     - Creates the settings directory if it is missing and add example files.
-    - Added --mute command line option.
+    - Added ``--mute`` command line option.
     - Support multiple email addresses in :ref:`notify <notify>`.
     - Added warning if settings file is world readable and contains a passphrase.
 

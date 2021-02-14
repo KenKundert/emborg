@@ -25,8 +25,8 @@
 from inform import is_collection, is_str
 
 # Globals {{{1
-__version__ = "0.4.1"
-__released__ = "2020-07-12"
+__version__ = "0.5.0"
+__released__ = "2021-01-27"
 
 
 # Utilities {{{1

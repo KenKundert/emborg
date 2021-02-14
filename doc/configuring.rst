@@ -858,6 +858,17 @@ from those files that are backed up.
 May be specified as a list of strings or as a multi-line string with one command 
 per line.
 
+.. _show_progress:
+
+show_progress
+~~~~~~~~~~~~~
+
+Show progress when running *Borg*'s *create* command.
+You also get this by adding the ``--progress`` command line option to the 
+*create* command, but if this option is set True then this command will always 
+show the progress.
+
+
 .. _show_stats:
 
 show_stats
@@ -865,7 +876,7 @@ show_stats
 
 Show statistics when running *Borg*'s *create*, *delete* and *prune* commands.
 You can always get this by adding the ``--stats`` command line option to the 
-appropriate commands, but if this options is set True then these commands will 
+appropriate commands, but if this option is set True then these commands will 
 always show the statistics.  If the statistics are not requested, they will be 
 recorded in the log file rather than being displayed.
 
