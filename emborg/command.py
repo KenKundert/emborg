@@ -33,6 +33,7 @@ from inform import (
     full_stop,
     indent,
     is_str,
+    log,
     narrate,
     os_error,
     output,
@@ -965,15 +966,19 @@ class ManifestCommand(Command):
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to use
+            -c, --no-color                      do not color based on health
             -d <date>, --date <date>            date of the desired archive
+            -s, --short                         use short listing format
             -l, --long                          use long listing format
-            -f, --full                          use full listing format
-            -n, --name-only                     use name only listing format
+            -n, --name                          use name only listing format
+            -f <fmt>, --format <fmt>            use <fmt> listing format
+                --show-formats                  show available formats and exit
             -N, --sort-by-name                  sort by filename
             -D, --sort-by-date                  sort by date
             -S, --sort-by-size                  sort by size
             -O, --sort-by-owner                 sort by owner
             -G, --sort-by-group                 sort by group
+            -F, --sort-by-field <name>          sort by field name
             -r, --reverse-sort                  reverse the sort order
 
         Once a backup has been performed, you can list the files available in
@@ -1014,88 +1019,92 @@ class ManifestCommand(Command):
             archive = get_name_of_nearest_archive(settings, date)
         if not archive:
             archive = get_name_of_latest_archive(settings)
-        output("Archive:", archive)
-
-        # run borg
-        borg = settings.run_borg(
-            cmd="list", args=[settings.destination(archive)], emborg_opts=options,
-        )
-        out = borg.stdout
 
         # define available formats
         formats = dict(
             name = "{path}",
-            date = "{day} {date} {time} {path}",
-            size = "{Size:<5.2r} {path}",
-            owner = "{owner:<8} {path}",
-            group = "{group:<8} {path}",
-            long = "{Size:<5.2r} {date} {time} {path}",
-            full = "{permissions:<10} {owner:<6} {group:<6} {size:>8} {Date:YYMMDD HH:mm} {path}",
+            short = "{path}{Type}",
+            date = "{MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}",
+            size = "{Size:<5.2r} {path}{Type}",
+            owner = "{user:<8} {path}{Type}",
+            group = "{group:<8} {path}{Type}",
+            long = '{mode:<10} {user:6} {group:6} {size:8d} {MTime:YYYY-MM-DD HH:mm:ss} {path}{extra}',
         )
+        default_format = settings.manifest_default_format
+        if not default_format:
+            default_format = 'short'
         user_formats = settings.manifest_formats
         if user_formats:
             unknown = user_formats.keys() - formats.keys()
             if unknown:
                 warn("unknown formats:", ", ".join(unknown), culprit="manifest_formats")
             formats.update(user_formats)
+        if cmdline["--show-formats"]:
+            for k, v in formats.items():
+                output(f'{k:>9}: {v!r}')
+            output()
+            output(f'default format: {default_format}')
+            return
 
         # process sort options
+        fmt = default_format
+        sort_key = None
         if cmdline["--sort-by-name"]:
-            fmt = "name"
-
-            def get_key(columns):
-                return columns[7]
-
+            fmt = "short"
+            sort_key = 'path'
         elif cmdline["--sort-by-date"]:
             fmt = "date"
-
-            def get_key(columns):
-                date_time = " ".join(columns[5:7])
-                return arrow.get(date_time, "YYYY-MM-DD HH:mm:ss")
-
+            sort_key = 'mtime'
         elif cmdline["--sort-by-size"]:
             fmt = "size"
-
-            def get_key(columns):
-                return int(columns[3])
-
+            sort_key = 'size'
         elif cmdline["--sort-by-owner"]:
             fmt = "owner"
-
-            def get_key(columns):
-                return columns[1]
-
+            sort_key = 'user'
         elif cmdline["--sort-by-group"]:
             fmt = "group"
-
-            def get_key(columns):
-                return columns[2]
-
-        else:
-            fmt = None
-            get_key = None
+            sort_key = 'group'
+        elif cmdline["--sort-by-field"]:
+            sort_key = cmdline["--sort-by-field"]
 
         # process format options
-        if cmdline["--name-only"]:
+        if cmdline["--name"]:
             fmt = "name"
         elif cmdline["--long"]:
             fmt = "long"
-        elif cmdline["--full"]:
-            fmt = "full"
+        elif cmdline["--short"]:
+            fmt = "short"
+        if cmdline['--format']:
+            fmt = cmdline['--format']
+            if fmt not in formats:
+                raise Error('unknown format.', culprit=fmt)
+
+        # run borg
+        output("Archive:", archive)
+        template = formats.get(fmt)
+        keys = template.lower()
+            # lower case it so we get size when user requests Size
+        if sort_key and '{' + sort_key not in keys:
+            keys = keys + '{' + sort_key + '}'
+        args = [
+            settings.destination(archive),
+            '--json-lines',
+            '--format', keys,
+        ]
+        borg = settings.run_borg(
+            cmd="list", args=args, emborg_opts=options,
+        )
+        # convert from JSON-lines to JSON
+        json_data = '[' + ','.join(borg.stdout.splitlines()) + ']'
+        lines = json.loads(json_data)
 
         # sort the output
-        lines = [l.split(maxsplit=7) for l in out.rstrip().splitlines()]
-        if get_key:
-            lines = sorted(lines, key=get_key)
+        if sort_key:
+            lines = sorted(lines, key=lambda x: x[sort_key])
         if cmdline["--reverse-sort"]:
             lines.reverse()
 
-        # echo borg output if no formatting is necessary
-        if not fmt:
-            output(out)
-            return
-
-        # import QuantiPhy
+        # import QuantiPhy for Size
         try:
             from quantiphy import Quantity
 
@@ -1107,22 +1116,57 @@ class ManifestCommand(Command):
                 return value
 
         # generate formatted output
-        for columns in lines:
-            output(
-                formats[fmt].format(
-                    permissions = columns[0],
-                    owner = columns[1],
-                    group = columns[2],
-                    size = columns[3],
-                    Size = Quantity(columns[3], "B"),
-                    Date = arrow.get(" ".join(columns[5:7]), "YYYY-MM-DD HH:mm:ss"),
-                    day = columns[4].rstrip(","),
-                    date = columns[5],
-                    time = columns[6],
-                    path = columns[7],
-                ),
-                sep = "\n",
-            )
+        if cmdline['--no-color']:
+            healthy_color = broken_color = lambda x: x
+        else:
+            healthy_color = Color("green", Color.isTTY())
+            broken_color = Color("red", Color.isTTY())
+        for values in lines:
+            # this loop can be quite slow. the biggest issue is arrow. parsing
+            # time is slow. also output() can be slow, so use print() instead.
+            if values['healthy']:
+                colorize = healthy_color
+            else:
+                colorize = broken_color
+            values['health'] = 'healthy' if values['healthy'] else 'broken'
+            type = values['mode'][0]
+            values['Type'] = ''
+            values['extra'] = ''
+            if type == 'd':
+                values['Type'] = '/'  # directory
+            elif type == 'l':
+                values['Type'] = '@'  # directory
+                values['extra'] = ' -> ' + values['source']
+            elif type == 'h':
+                values['extra'] = ' links to ' + values['source']
+            elif type == 'p':
+                values['Type'] = '|'
+            elif type != '-':
+                log('UNKNOWN TYPE:', type, values['path'])
+            if 'mtime' in values and 'MTime' in template:
+                values['MTime'] = arrow.get(values['mtime'])
+            if 'ctime' in values and 'CTime' in template:
+                values['CTime'] = arrow.get(values['ctime'])
+            if 'atime' in values and 'ATime' in template:
+                values['ATime'] = arrow.get(values['atime'])
+            if 'size' in values and '{Size' in template:
+                values['Size'] = Quantity(values['size'], "B")
+            if 'csize' in values and '{CSize' in template:
+                values['CSize'] = Quantity(values['csize'], "B")
+            if 'dsize' in values and '{DSize' in template:
+                values['DSize'] = Quantity(values['dsize'], "B")
+            if 'dcsize' in values and '{DCSize' in template:
+                values['DCSize'] = Quantity(values['dcsize'], "B")
+            try:
+                print(colorize(template.format(**values)))
+            except ValueError as e:
+                raise Error(
+                    full_stop(e),
+                    'Likely due to a bad format specification in manifest_formats:',
+                    codicil=template
+                )
+            except KeyError as e:
+                raise Error('Unknown key in:', culprit=e, codicil=template)
 
 
 # MountCommand command {{{1
@@ -1350,16 +1394,16 @@ class SettingsCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         show_available = cmdline["--available"]
-        unknown = Color("yellow")
-        known = Color("cyan")
-        resolved = Color("magenta")
-        width = 22
-        color_adjust = len(known('x')) - 1
+        width = 26
         leader = (width+2)*' '
+        unknown = Color("yellow", Color.isTTY())
+        known = Color("cyan", Color.isTTY())
+        resolved = Color("magenta", Color.isTTY())
+        color_adjust = len(known('x')) - 1
 
         if show_available:
             def show_setting(name, desc):
-                desc = fill(desc, 70-width-2)
+                desc = fill(desc, 74-width-2)
                 text = indent(
                     f"{known(name):>{width + color_adjust}}: {desc}",
                     leader = leader,
@@ -1383,7 +1427,7 @@ class SettingsCommand(Command):
                 key = known(k) if is_known else unknown(k)
                 if k == "passphrase":
                     v = "<set>"
-                output(f"{key:>{width + color_adjust}}: {render(v, level=6)}")
+                output(f"{key:>{width + color_adjust}}: {render(v, level=7)}")
                 try:
                     if is_str(v) and "{" in v:
                         output(resolved(

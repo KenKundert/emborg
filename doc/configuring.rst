@@ -486,6 +486,15 @@ the data you must explicitly run the :ref:`check command <check>`.  Regardless,
 the checking can be quite slow if ``"all"`` or ``"all in repository"`` are used.
 
 
+.. _colorsheme:
+
+A few commands colorize the text to convey extra information. You can optimize 
+the tints of those colors to make them more visible and attractive.  
+*colorscheme* should be set to "none", "light", or "dark".  With "none" the text 
+is not colored.  In general it is best to use the "light" colorscheme on dark 
+backgrounds and the "dark" colorscheme on light backgrounds.
+
+
 .. _configurations:
 
 configurations
@@ -639,6 +648,15 @@ The contents of that file are read into *Emborg*.  If the path is relative, it
 is relative to the file that includes it.
 
 
+.. _manifest_default_format:
+
+manifest_default_format
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A string that specifies the name of the default format.  The name must be a key 
+in :ref:`manifest_formats`.
+
+
 .. _manifest_formats:
 
 manifest_formats
@@ -650,44 +668,52 @@ formatted.  The default value for *manifest_formats* is:
 .. code-block:: python
 
         manifest_formats = dict(
-            name = '{path}',
-            date = '{day} {date} {time} {path}',
-            size = '{Size:<5.2r} {path}',
-            owner = '{owner:<8} {path}',
-            group = '{group:<8} {path}',
-            long = '{Size:<5.2r} {date} {time} {path}',
-            full = '{permissions:<10} {owner:<6} {group:<6} {size:>8} {Date:YYMMDD HH:mm} {path}',
+            name = "{path}",
+            short = "{path}{Type}",
+            date = "{MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}",
+            size = "{Size:<5.2r} {path}{Type}",
+            owner = "{user:<8} {path}{Type}",
+            group = "{group:<8} {path}{Type}",
+            long = '{mode:<10} {user:6} {group:6} {size:8d} {MTime:YYYY-MM-DD HH:mm:ss} {path}{extra}',
         )
+        manifest_default_format = 'short'
 
 Notice that 7 formats are defined:
 
- |  *name*: used by default when sorting by name or when ``--name-only`` is specified.
+ |  *name*: used when ``--name-only`` is specified.
+ |  *short*: used by when ``--short`` is specified and when sorting by name.
  |  *date*: used by default when sorting by date.
  |  *size*: used by default when sorting by size.
  |  *owner*: used by default when sorting by owner.
  |  *group*: used by default when sorting by group.
  |  *long*: used when ``--long`` is specified.
- |  *full*: used when ``--full`` is specified.
 
-Your *manifest_formats* need not define all or even any of these formats. The 
-default format is used for any not specified.
+Your *manifest_formats* need not define all or even any of these formats.
+The above example shows the formats that are predefined in *Emborg*. You do not 
+need to specify them again.  Anything you specify will override the predefined 
+versions, and you can add additional formats.
 
-The formats may contain the following fields:
+The formats may contain the fields supported by the `Borg list command 
+<https://borgbackup.readthedocs.io/en/stable/usage/list.html#borg-list>`_.  In 
+addition, Emborg provides some variants:
 
- | *permissions*: the file permission bits, ex: -rw-r--r-- (a string)
- | *owner* = the name of the owner (a string)
- | *group* = the name of the group (a string)
- | *size* = the size of the file in bytes (an integer)
- | *Size* = the size of the file in bytes (a `Quantity <https://quantiphy.readthedocs.io/en/stable/user.html#string-formatting>`_ object)
- | *Date* = the modification time for the file (an `Arrow <https://arrow.readthedocs.io/en/latest/#supported-tokens>`_ object)
- | *day* = the day the file was last modified, ex: Fri (a string)
- | *date* = the date the file was last modified, ex: 2019-03-21 (a string)
- | *time* = the time the file was last modified, ex: 17:50:14 (a string)
- | *path* = the path to the file (a string)
+ | *MTime*, *CTime*, *ATime*: the *Borg* *mtime*, *ctime*, and *atime* fields 
+   are simple strings, these variants are `Arrow objects 
+   <https://arrow.readthedocs.io/en/latest/#supported-tokens>`_ that support 
+   formatting options.
 
-Quantity objects allow you to format the size using SI scale factors (K, Ki, M, 
-Mi, etc.). Arrow objects allow you to format the date and time in a wide variety 
-of ways.
+ | *Size*, *CSize*, *DSize*, *DCSize*: the *Borg* *size*, *csize*, *dsize* and 
+   *dctime* fields are simple strings, these variants are `QuantiPhy objects 
+   <https://quantiphy.readthedocs.io/en/stable/user.html#string-formatting>`_ 
+   that support formatting options.
+
+ | *Type*: displays ``/`` for directories, ``@`` for symbolic links, and ``|`` 
+   for named pipes.
+
+*QuantiPhy* objects allow you to format the size using SI scale factors (K, Ki, 
+M, Mi, etc.). *Arrow* objects allow you to format the date and time in a wide 
+variety of ways.  Any used of *QuantiPhy* or *Arrow* can slow long listings 
+considerably.
 
 The fields support `Python format strings 
 <https://docs.python.org/3/library/string.html#formatstrings>`_, which allows 

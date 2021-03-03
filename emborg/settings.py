@@ -171,13 +171,23 @@ class Settings:
             self.requires_exclusivity = True
             self.composite_config_response = "error"
             self.show_config_name = False
-        self.settings = {}
+        self.settings = dict()
         self.do_not_expand = ()
         self.emborg_opts = emborg_opts
         self.config_dir = to_path(CONFIG_DIR)
         self.read(name)
         self.check()
         set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)
+
+        # set colorscheme
+        if self.colorscheme:
+            colorscheme = self.colorscheme.lower()
+            if colorscheme == 'none':
+                get_informer().colorscheme = None
+            elif colorscheme in ('light', 'dark'):
+                get_informer().colorscheme = colorscheme
+            else:
+                warn(f'unknown colorscheme: {self.colorscheme}.')
 
     # read() {{{2
     def read(self, name=None, path=None):

@@ -322,16 +322,18 @@ For example::
     $ emborg manifest
 
 This outputs the files in the order and with the format produced by Borg.
+The lines are green if the corresponding file is healthy, and red if it is 
+broken (see *Borg* for more information on broken files).
 
 ::
 
     $ emborg manifest -l
     $ emborg manifest -n
 
-These use the Borg order but shorten the lines by reducing the amount of fields 
-they contain. With ``-l`` the *long* format is used, which by default contains 
-the size, the date, and the path. With ``-n`` the *name* is used, which by 
-default contains only the path.
+These use the Borg order but change the amount of information shown.  With 
+``-l`` the *long* format is used, which by default contains the size, the date, 
+and the path. With ``-n`` the *name* is used, which by default contains 
+only the path.
 
 Finally::
 
@@ -339,10 +341,10 @@ Finally::
     $ emborg manifest -D
 
 The first sorts the files by size. It uses the *size* format, which by default 
-contains only the size and the path.
-The second sorts the files by modification date. It uses the *date* format, 
-which by default contains the day, date, time and the path.
-More choices are available; run ``emborg help manifest`` for the details.
+contains only the size and the path.  The second sorts the files by modification 
+date. It uses the *date* format, which by default contains the day, date, time 
+and the path.  More choices are available; run ``emborg help manifest`` for the 
+details.
 
 You can use ``files`` as an alias for ``manifest``::
 

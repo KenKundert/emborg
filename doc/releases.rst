@@ -5,6 +5,27 @@ Releases
     | Version: 1.20.0
     | Released: 2021-02-13
 
+    - made extensive changes to :ref:`manifest <manifest>` command to make it 
+      more flexible
+
+      - colorized the output based on file health (green implies healthy, red 
+        implies unhealthy)
+      - added ``--no-color`` option to :ref:`manifest <manifest>` to suppress 
+        colorization
+      - added :ref:`manifest_default_format` setting.
+      - added support for *Borg* *list* command field names for both reporting 
+        and sorting.
+      - added *Emborg* variants to some of the *Borg* field names.
+      - added ``--show-formats`` command line option.
+      - added ``--format`` command line option.
+      - added ``--sort-by-field`` command line option.
+
+      .. warn:
+          These changes are not backward compatible. If you have 
+          a :ref:`manifest_formats` setting from a previous version, it may need 
+          to be updated.
+
+
 **1.20 (2021-02-13)**:
     - add ``--progress`` command-line option and :ref:`show_progress` option to 
       the :ref:`create <create>` command.
