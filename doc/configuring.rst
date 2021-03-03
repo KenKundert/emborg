@@ -700,14 +700,14 @@ addition, Emborg provides some variants:
  | *MTime*, *CTime*, *ATime*: the *Borg* *mtime*, *ctime*, and *atime* fields 
    are simple strings, these variants are `Arrow objects 
    <https://arrow.readthedocs.io/en/latest/#supported-tokens>`_ that support 
-   formatting options.  For example:
+   formatting options.  For example::
 
             date = "{MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}",
 
  | *Size*, *CSize*, *DSize*, *DCSize*: the *Borg* *size*, *csize*, *dsize* and 
    *dctime* fields are simple integers, these variants are `QuantiPhy objects 
    <https://quantiphy.readthedocs.io/en/stable/user.html#string-formatting>`_ 
-   that support formatting options.  For example:
+   that support formatting options.  For example::
 
             size = "{Size:5.2r} {path}{Type}",
             size = "{Size:7.2b} {path}{Type}",
