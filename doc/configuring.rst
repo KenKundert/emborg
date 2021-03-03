@@ -697,23 +697,26 @@ The formats may contain the fields supported by the `Borg list command
 <https://borgbackup.readthedocs.io/en/stable/usage/list.html#borg-list>`_.  In 
 addition, Emborg provides some variants:
 
- | *MTime*, *CTime*, *ATime*: the *Borg* *mtime*, *ctime*, and *atime* fields 
-   are simple strings, these variants are `Arrow objects 
+*MTime*, *CTime*, *ATime*:
+   The *Borg* *mtime*, *ctime*, and *atime* fields are simple strings, these 
+   variants are `Arrow objects 
    <https://arrow.readthedocs.io/en/latest/#supported-tokens>`_ that support 
    formatting options.  For example::
 
             date = "{MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}",
 
- | *Size*, *CSize*, *DSize*, *DCSize*: the *Borg* *size*, *csize*, *dsize* and 
-   *dctime* fields are simple integers, these variants are `QuantiPhy objects 
+*Size*, *CSize*, *DSize*, *DCSize*:
+   The *Borg* *size*, *csize*, *dsize* and *dctime* fields are simple integers, 
+   these variants are `QuantiPhy objects 
    <https://quantiphy.readthedocs.io/en/stable/user.html#string-formatting>`_ 
    that support formatting options.  For example::
 
             size = "{Size:5.2r} {path}{Type}",
             size = "{Size:7.2b} {path}{Type}",
 
- | *Type*: displays ``/`` for directories, ``@`` for symbolic links, and ``|`` 
-   for named pipes.
+*Type*:
+   Displays ``/`` for directories, ``@`` for symbolic links, and ``|`` for named 
+   pipes.
 
 *QuantiPhy* objects allow you to format the size using SI scale factors (K, Ki, 
 M, Mi, etc.). *Arrow* objects allow you to format the date and time in a wide 
