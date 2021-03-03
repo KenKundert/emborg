@@ -19,6 +19,7 @@ Releases
       - added ``--show-formats`` command line option.
       - added ``--format`` command line option.
       - added ``--sort-by-field`` command line option.
+      - change predefined formats to use fields that render faster
 
       .. warn:
           These changes are not backward compatible. If you have 

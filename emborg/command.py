@@ -972,13 +972,13 @@ class ManifestCommand(Command):
             -l, --long                          use long listing format
             -n, --name                          use name only listing format
             -f <fmt>, --format <fmt>            use <fmt> listing format
-                --show-formats                  show available formats and exit
+            -F, --show-formats                  show available formats and exit
             -N, --sort-by-name                  sort by filename
             -D, --sort-by-date                  sort by date
             -S, --sort-by-size                  sort by size
             -O, --sort-by-owner                 sort by owner
             -G, --sort-by-group                 sort by group
-            -F, --sort-by-field <name>          sort by field name
+            -K <name>, --sort-by-key <name>     sort by key (the Borg field name)
             -r, --reverse-sort                  reverse the sort order
 
         Once a backup has been performed, you can list the files available in
@@ -1024,11 +1024,11 @@ class ManifestCommand(Command):
         formats = dict(
             name = "{path}",
             short = "{path}{Type}",
-            date = "{MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}",
-            size = "{Size:<5.2r} {path}{Type}",
-            owner = "{user:<8} {path}{Type}",
-            group = "{group:<8} {path}{Type}",
-            long = '{mode:<10} {user:6} {group:6} {size:8d} {MTime:YYYY-MM-DD HH:mm:ss} {path}{extra}',
+            date = "{mtime} {path}{Type}",
+            size = "{size:8} {path}{Type}",
+            owner = "{user:8} {path}{Type}",
+            group = "{group:8} {path}{Type}",
+            long = '{mode:10} {user:6} {group:6} {size:8} {mtime} {path}{extra}',
         )
         default_format = settings.manifest_default_format
         if not default_format:
@@ -1064,8 +1064,8 @@ class ManifestCommand(Command):
         elif cmdline["--sort-by-group"]:
             fmt = "group"
             sort_key = 'group'
-        elif cmdline["--sort-by-field"]:
-            sort_key = cmdline["--sort-by-field"]
+        elif cmdline["--sort-by-key"]:
+            sort_key = cmdline["--sort-by-key"]
 
         # process format options
         if cmdline["--name"]:
@@ -1100,7 +1100,10 @@ class ManifestCommand(Command):
 
         # sort the output
         if sort_key:
-            lines = sorted(lines, key=lambda x: x[sort_key])
+            try:
+                lines = sorted(lines, key=lambda x: x[sort_key])
+            except KeyError:
+                raise Error('unknown key.', culprit=sort_key)
         if cmdline["--reverse-sort"]:
             lines.reverse()
 

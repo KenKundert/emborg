@@ -670,11 +670,11 @@ formatted.  The default value for *manifest_formats* is:
         manifest_formats = dict(
             name = "{path}",
             short = "{path}{Type}",
-            date = "{MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}",
-            size = "{Size:<5.2r} {path}{Type}",
-            owner = "{user:<8} {path}{Type}",
-            group = "{group:<8} {path}{Type}",
-            long = '{mode:<10} {user:6} {group:6} {size:8d} {MTime:YYYY-MM-DD HH:mm:ss} {path}{extra}',
+            date = "{mtime} {path}{Type}",
+            size = "{size} {path}{Type}",
+            owner = "{user} {path}{Type}",
+            group = "{group} {path}{Type}",
+            long = '{mode} {user:6} {group:6} {size:8} {mtime} {path}{extra}',
         )
         manifest_default_format = 'short'
 
@@ -700,19 +700,24 @@ addition, Emborg provides some variants:
  | *MTime*, *CTime*, *ATime*: the *Borg* *mtime*, *ctime*, and *atime* fields 
    are simple strings, these variants are `Arrow objects 
    <https://arrow.readthedocs.io/en/latest/#supported-tokens>`_ that support 
-   formatting options.
+   formatting options.  For example:
+
+            date = "{MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}",
 
  | *Size*, *CSize*, *DSize*, *DCSize*: the *Borg* *size*, *csize*, *dsize* and 
-   *dctime* fields are simple strings, these variants are `QuantiPhy objects 
+   *dctime* fields are simple integers, these variants are `QuantiPhy objects 
    <https://quantiphy.readthedocs.io/en/stable/user.html#string-formatting>`_ 
-   that support formatting options.
+   that support formatting options.  For example:
+
+            size = "{Size:5.2r} {path}{Type}",
+            size = "{Size:7.2b} {path}{Type}",
 
  | *Type*: displays ``/`` for directories, ``@`` for symbolic links, and ``|`` 
    for named pipes.
 
 *QuantiPhy* objects allow you to format the size using SI scale factors (K, Ki, 
 M, Mi, etc.). *Arrow* objects allow you to format the date and time in a wide 
-variety of ways.  Any used of *QuantiPhy* or *Arrow* can slow long listings 
+variety of ways.  Any use of *QuantiPhy* or *Arrow* can slow long listings 
 considerably.
 
 The fields support `Python format strings 
