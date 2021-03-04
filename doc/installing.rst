@@ -18,21 +18,26 @@ Borg as an unprivileged user.  You can do so with following commands (they will
 need to be adjusted for to get the latest version)::
 
     $ cd ~/bin
-    $ wget https://github.com/borgbackup/borg/releases/download/1.1.10/borg-linux64
-    $ wget https://github.com/borgbackup/borg/releases/download/1.1.10/borg-linux64.asc
+    $ wget https://github.com/borgbackup/borg/releases/download/1.1.15/borg-linux64
+    $ wget https://github.com/borgbackup/borg/releases/download/1.1.15/borg-linux64.asc
     $ gpg --recv-keys "FAF7B393"
     $ gpg --verify borg-linux64.asc
     $ rm borg-linux64.asc
     $ chmod 755 borg-linux64
 
+Finally, you can install it using `pip 
+<https://pip.pypa.io/en/stable/installing>`_:
+
+    $ pip install --user borgbackup
+
 Download and install *Emborg* as follows (requires Python3.6 or better)::
 
-    $ pip3 install --user emborg
+    $ pip install --user emborg
 
 Or, if you want the development version, use::
 
     $ git clone https://github.com/KenKundert/emborg.git
-    $ pip3 install --user ./emborg
+    $ pip install --user ./emborg
 
 
 Configuring Emborg to Backup A Home Directory
