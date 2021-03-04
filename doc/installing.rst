@@ -26,7 +26,7 @@ need to be adjusted for to get the latest version)::
     $ chmod 755 borg-linux64
 
 Finally, you can install it using `pip 
-<https://pip.pypa.io/en/stable/installing>`_:
+<https://pip.pypa.io/en/stable/installing>`_::
 
     $ pip install --user borgbackup
 
