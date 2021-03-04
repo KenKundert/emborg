@@ -21,7 +21,7 @@ Releases
       - added ``--sort-by-field`` command line option.
       - change predefined formats to use fields that render faster
 
-      .. warn:
+      .. warning::
           These changes are not backward compatible. If you have 
           a :ref:`manifest_formats` setting from a previous version, it may need 
           to be updated.
