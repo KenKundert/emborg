@@ -19,6 +19,7 @@
 # Imports {{{1
 import errno
 import os
+import re
 from textwrap import dedent
 
 import arrow
@@ -710,6 +711,17 @@ class Settings:
             if "prefix" not in self.settings:
                 self.settings["prefix"] = "{host_name}-{user_name}-{config_name}-"
             self.settings["archive"] = self.prefix + "{{now}}"
+
+        # assure that prefix does not contain {{now}}
+        if "prefix" in self.settings:
+            match = re.search(
+                r'{{\s*((?:utc)?now)\s*[:}]',
+                self.settings["prefix"],
+                re.I
+            )
+            if match:
+                bad_key = '{{' + match.group(1) + '}}'
+                raise Error(f'prefix setting must not contain {bad_key}.')
 
         # resolve other files and directories
         data_dir = to_path(DATA_DIR)
