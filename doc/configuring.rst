@@ -486,7 +486,10 @@ the data you must explicitly run the :ref:`check command <check>`.  Regardless,
 the checking can be quite slow if ``"all"`` or ``"all in repository"`` are used.
 
 
-.. _colorsheme:
+.. _colorscheme:
+
+colorscheme
+~~~~~~~~~~~
 
 A few commands colorize the text to convey extra information. You can optimize 
 the tints of those colors to make them more visible and attractive.  

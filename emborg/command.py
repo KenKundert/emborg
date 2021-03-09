@@ -1296,8 +1296,9 @@ class PruneCommand(Command):
         if not any(settings.value(s) for s in prune_settings):
             prune_settings = conjoin(prune_settings, ", or ")
             raise Error(
-                "No prune settings available",
+                "No prune settings available.",
                 codicil = f"At least one of {prune_settings} must be specified.",
+                wrap = True,
             )
 
         # run borg
@@ -1378,12 +1379,13 @@ class RestoreCommand(Command):
 
 # SettingsCommand command {{{1
 class SettingsCommand(Command):
-    NAMES = "settings".split()
+    NAMES = "settings setting".split()
     DESCRIPTION = "list settings of chosen configuration"
     USAGE = dedent(
         """
         Usage:
-            emborg [options] settings
+            emborg [options] settings [<name>]
+            emborg [options] setting [<name>]
 
         Options:
             -a, --available   list available settings
@@ -1425,9 +1427,12 @@ class SettingsCommand(Command):
             return 0
 
         if settings:
+            requested = cmdline['<name>']
             for k, v in settings:
                 is_known = k in EMBORG_SETTINGS or k in BORG_SETTINGS
                 key = known(k) if is_known else unknown(k)
+                if requested and requested != k:
+                    continue
                 if k == "passphrase":
                     v = "<set>"
                 output(f"{key:>{width + color_adjust}}: {render(v, level=7)}")

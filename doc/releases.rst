@@ -5,6 +5,7 @@ Releases
     | Version: 1.20.3
     | Released: 2021-03-08
 
+**2.0 (2021-03-09)**:
     - made extensive changes to :ref:`manifest <manifest>` command to make it 
       more flexible
 
@@ -12,6 +13,7 @@ Releases
         implies unhealthy)
       - added ``--no-color`` option to :ref:`manifest <manifest>` to suppress 
         colorization
+      - added :ref:`colorscheme` setting.
       - added :ref:`manifest_default_format` setting.
       - added support for *Borg* *list* command field names for both reporting 
         and sorting.
@@ -25,6 +27,9 @@ Releases
           These changes are not backward compatible. If you have 
           a :ref:`manifest_formats` setting from a previous version, it may need 
           to be updated.
+    - it is now an error for :ref:`prefix` setting to contain ``{{now}}``.
+    - :ref:`settings <settings>` command will now print a single setting value 
+      if its name is given.
 
 
 **1.20 (2021-02-13)**:
