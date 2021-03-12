@@ -5,7 +5,7 @@ Releases
     | Version: 1.21.0
     | Released: 2021-03-11
 
-**2.0 (2021-03-11)**:
+**1.21 (2021-03-11)**:
     - made extensive changes to :ref:`manifest <manifest>` command to make it 
       more flexible
 
