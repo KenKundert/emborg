@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.21.0
-    | Released: 2021-03-11
+    | Version: 1.21.1
+    | Released: 2021-06-14
 
 **1.21 (2021-03-11)**:
     - made extensive changes to :ref:`manifest <manifest>` command to make it 
