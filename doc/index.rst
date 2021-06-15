@@ -231,7 +231,7 @@ Status
 on either the client or the server machine that notifies you if your back-ups 
 have not completed successfully in a specified period of time.  In addition, 
 *Emborg* can be configured to update monitoring services such as 
-`healthchecks.io`_ with the status of the backups.
+`healthchecks.io <https://healthchecks.io>`_ with the status of the backups.
 
 
 Borg

@@ -646,10 +646,16 @@ home directories, unlike the patterns specified using :ref:`patterns`.
 healthchecks_uuid
 ~~~~~~~~~~~~~~~~~
 
-If this setting is provided, *Emborg* notifies `healpthchecks.io`_ when the when 
-the archive is being created and whether it was successful.  The value of the 
-setting should be a UUID (a long hexidecimal number that contains 4 dashes), or 
-the URL associated with the health check (which ends with the UUID).
+If this setting is provided, *Emborg* notifies `healpthchecks.io`_ when the 
+archive is being created and whether the creation was successful.  The value of 
+the setting should be a UUID (a long hexidecimal number that contains 4 dashes), 
+or the URL associated with the health check (which ends with the UUID).  If 
+given, this setting should be specified on an individual configuration.  For 
+example:
+
+.. code-block:: python
+
+    healthchecks_uuid = '51cb35d8-2975-110b-67a7-11b65d432027'
 
 
 .. _include:
