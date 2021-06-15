@@ -2,8 +2,7 @@
 #
 # Provides common interface for dictionaries and lists. If a string is passed
 # in, it is split and then treated as a list. Optimized for convenience rather
-# than for large collections. Sorting versus the key is used to avoid randomness
-# in the ordering of the dictionary-based collections.
+# than for large collections.
 
 # License {{{1
 # Copyright (C) 2016-2021 Kenneth S. Kundert
@@ -126,9 +125,9 @@ class Collection(object):
 
             >>> from collection import Collection
 
-            >>> dogs = Collection({'collie': 3, 'beagle':1, 'sheppard': 2})
+            >>> dogs = Collection({'collie': 3, 'beagle':1, 'shepherd': 2})
             >>> print('dogs: {}.'.format(dogs.render('{k} ({v})', ', ')))
-            dogs: collie (3), beagle (1), sheppard (2).
+            dogs: collie (3), beagle (1), shepherd (2).
 
             >>> print('dogs: {}.'.format(dogs.render(sep=', ')))
             dogs: 3, 1, 2.
@@ -151,9 +150,9 @@ class Collection(object):
         value are interpolated using {{k}} to represent the key and {{v}} to
         represent the value.  The second component is the separator. Thus:
 
-            >>> dogs = Collection({'collie': 3, 'beagle':1, 'sheppard': 2})
+            >>> dogs = Collection({'collie': 3, 'beagle':1, 'shepherd': 2})
             >>> print('dogs: {:{{k}} ({{v}})|, }.'.format(dogs))
-            dogs: collie (3), beagle (1), sheppard (2).
+            dogs: collie (3), beagle (1), shepherd (2).
 
         """
         if template:

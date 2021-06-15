@@ -641,6 +641,17 @@ processed directly by *Borg*, which does not allow ``~`` to represent users'
 home directories, unlike the patterns specified using :ref:`patterns`.
 
 
+.. _healthchecks_uuid:
+
+healthchecks_uuid
+~~~~~~~~~~~~~~~~~
+
+If this setting is provided, *Emborg* notifies `healpthchecks.io`_ when the when 
+the archive is being created and whether it was successful.  The value of the 
+setting should be a UUID (a long hexidecimal number that contains 4 dashes), or 
+the URL associated with the health check (which ends with the UUID).
+
+
 .. _include:
 
 include

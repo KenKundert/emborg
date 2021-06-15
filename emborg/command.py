@@ -392,8 +392,9 @@ class CreateCommand(Command):
 
         # run borg
         src_dirs = settings.src_dirs
+        settings.hooks.backups_begin()
         try:
-            settings.run_borg(
+            borg = settings.run_borg(
                 cmd = "create",
                 borg_opts = borg_opts,
                 args = [settings.destination(True)] + src_dirs,
@@ -406,6 +407,7 @@ class CreateCommand(Command):
                 e.reraise(codicil="Run 'emborg init' to initialize the repository.")
             else:
                 raise
+        settings.hooks.backups_finish(borg)
 
         # update the date files
         narrate("update date file")
@@ -702,7 +704,7 @@ class ExtractCommand(Command):
 
         You extract a file or directory using:
 
-            emborg extract home/ken/src/verif/av/manpages/settings.py
+            emborg extract home/ken/src/avendesora/doc/overview.rst
 
         Use manifest to determine what path you should specify to identify the
         desired file or directory (they will paths relative to the working
@@ -714,16 +716,16 @@ class ExtractCommand(Command):
         used.  You can extract the version of a file or directory that existed
         on a particular date using:
 
-            emborg extract --date 2015-04-01 home/ken/src/verif/av/manpages/settings.py
+            emborg extract --date 2015-04-01 home/ken/src/avendesora/doc/overview.rst
 
         Or, you can extract the version from a particular archive using:
 
-            emborg extract --archive kundert-2018-12-05T12:54:26 home/ken/src/verif/av/manpages/settings.py
+            emborg extract --archive kundert-2018-12-05T12:54:26 home/ken/src/avendesora/doc/overview.rst
 
         The extracted files are placed in the current working directory with
         the original hierarchy. Thus, the above commands create the file:
 
-            ./home/ken/src/verif/av/manpages/settings.py
+            ./home/ken/src/avendesora/doc/overview.rst
 
         Normally, extract refuses to run if your current directory is the
         working directory used by Emborg so as to avoid overwriting an existing
@@ -1195,7 +1197,8 @@ class MountCommand(Command):
 
         If the specified mount point (backups in this example) exists in the
         current directory, it must be a directory. If it does not exist, it is
-        created.
+        created.  If you do not specify a mount point, the value of the
+        default_mount_point setting is used if provided.
 
         If you do not specify an archive or date, the most recently created
         archive is mounted.

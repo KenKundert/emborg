@@ -57,6 +57,9 @@ the repository.
     $ emborg borg key export @repo key.borg
     $ emborg borg list @repo::root-2020-04-11T23:38:37
 
+*Emborg* runs the *Borg* command from :ref:`working_dir` if it is specified and 
+``/`` if not.
+
 
 .. _breaklock:
 
@@ -131,6 +134,9 @@ backup in verbose mode::
     $ emborg -v create
 
 This can help you understand what is happening.
+
+*Emborg* runs the *create* command from :ref:`working_dir` if it is specified 
+and current directory if not.
 
 
 .. _delete:
@@ -416,6 +422,9 @@ For example, the following commands restore your .bashrc file::
 
     $ cd ~
     $ emborg restore .bashrc
+
+*Emborg* runs the *restore* command from :ref:`working_dir` if it is specified 
+and current directory if not.
 
 
 .. _settings:

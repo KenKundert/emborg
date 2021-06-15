@@ -42,6 +42,7 @@ from docopt import docopt
 from inform import Error, Inform, cull, display, fatal, os_error, terminate
 from . import __released__, __version__
 from .command import Command
+from .hooks import Hooks
 from .settings import NoMoreConfigs, Settings
 
 # Globals {{{1
@@ -81,6 +82,8 @@ def main():
         )
         if cmdline["--narrate"]:
             inform.narrate = True
+
+        Hooks.provision_hooks()
 
         try:
             # find the command

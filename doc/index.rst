@@ -224,6 +224,16 @@ passphrase and the path to the repository so you do not need to remember them.
 The :ref:`help command <help>` shows you information on how to use *Emborg*.
 
 
+Status
+------
+
+*Emborg* includes a utility, *emborg_overdue*, that can be run in a cron script 
+on either the client or the server machine that notifies you if your back-ups 
+have not completed successfully in a specified period of time.  In addition, 
+*Emborg* can be configured to update monitoring services such as 
+`healthchecks.io`_ with the status of the backups.
+
+
 Borg
 ----
 

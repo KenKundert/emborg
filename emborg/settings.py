@@ -51,6 +51,7 @@ from shlib import (
 )
 
 from .collection import Collection, split_lines
+from .hooks import Hooks
 from .patterns import (
     check_excludes,
     check_excludes_files,
@@ -179,6 +180,7 @@ class Settings:
         self.read(name)
         self.check()
         set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)
+        self.hooks = Hooks(self)
 
         # set colorscheme
         if self.colorscheme:
