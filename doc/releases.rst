@@ -5,28 +5,35 @@ Releases
     | Version: 1.21.2
     | Released: 2021-06-15
 
+    - added support for `healthchecks.io <https://healthchecks.io>`_ monitoring 
+      service.
+    - added support for `cronhub.io <https://cronhub.io>`_ monitoring service.
+
+
 **1.21 (2021-03-11)**:
+
     - made extensive changes to :ref:`manifest <manifest>` command to make it 
       more flexible
 
-      - colorized the output based on file health (green implies healthy, red 
-        implies unhealthy)
-      - added ``--no-color`` option to :ref:`manifest <manifest>` to suppress 
-        colorization
-      - added :ref:`colorscheme` setting.
-      - added :ref:`manifest_default_format` setting.
-      - added support for *Borg* *list* command field names for both reporting 
-        and sorting.
-      - added *Emborg* variants to some of the *Borg* field names.
-      - added ``--show-formats`` command line option.
-      - added ``--format`` command line option.
-      - added ``--sort-by-field`` command line option.
-      - change predefined formats to use fields that render faster
+        - colorized the output based on file health (green implies healthy, red 
+          implies unhealthy)
+        - added ``--no-color`` option to :ref:`manifest <manifest>` to suppress 
+          colorization
+        - added :ref:`colorscheme` setting.
+        - added :ref:`manifest_default_format` setting.
+        - added support for *Borg* *list* command field names for both reporting 
+          and sorting.
+        - added *Emborg* variants to some of the *Borg* field names.
+        - added ``--show-formats`` command line option.
+        - added ``--format`` command line option.
+        - added ``--sort-by-field`` command line option.
+        - change predefined formats to use fields that render faster
 
-      .. warning::
-          These changes are not backward compatible. If you have 
-          a :ref:`manifest_formats` setting from a previous version, it may need 
-          to be updated.
+        .. warning::
+            These changes are not backward compatible. If you have 
+            a :ref:`manifest_formats` setting from a previous version, it may 
+            need to be updated.
+
     - it is now an error for :ref:`prefix` setting to contain ``{{now}}``.
     - :ref:`settings <settings>` command will now print a single setting value 
       if its name is given.
