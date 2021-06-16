@@ -106,7 +106,7 @@ The second example is similar except the output is suppressed rather than being
 saved to a file.
 
 Alternately you can run *emborg-overdue* from cron.daily (described in the 
-:ref:`root example <root example>`.
+:ref:`root example <root example>`).
 
 
 .. _client_overdue:
