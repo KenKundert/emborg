@@ -150,7 +150,7 @@ CronHub.io
 ~~~~~~~~~~
 
 When you sign up with `cronhub.io <https://cronhub.io>`_ and configure the 
-health check for you *Emborg* configuration, you will be given a UUID (a 32 
+health check for your *Emborg* configuration, you will be given a UUID (a 32 
 digit hexadecimal number partitioned into 5 parts by dashes).  Add that to the 
 following setting in your configuration file:
 
@@ -165,7 +165,7 @@ HealthChecks.io
 ~~~~~~~~~~~~~~~
 
 When you sign up with `healthchecks.io <https://healthchecks.io>`_ and configure 
-the health check for you *Emborg* configuration, you will be given a UUID (a 32 
+the health check for your *Emborg* configuration, you will be given a UUID (a 32 
 digit hexadecimal number partitioned into 5 parts by dashes).  Add that to the 
 following setting in your configuration file:
 
