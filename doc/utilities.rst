@@ -1,7 +1,8 @@
 .. _utilities:
+.. _monitoring:
 
-Utilities
-=========
+Monitoring
+==========
 
 
 Overdue
@@ -130,3 +131,46 @@ file.  For example:
     ]
 
 Again, *emborg-overdue* is generally run from cron.
+
+
+.. _monitoring_services:
+
+Monitoring Services
+-------------------
+
+Various monitoring services are available on the web.  You can configure 
+*Emborg* to notify them when back-up jobs have started and finished.  These 
+services allow you to monitor many of your routine tasks and assure they have 
+completed recently and successfully.
+
+
+.. _cronhub:
+
+CronHub.io
+~~~~~~~~~~
+
+When you sign up with `cronhub.io <https://cronhub.io>`_ and configure the 
+health check for you *Emborg* configuration, you will be given a UUID (a 32 
+digit hexadecimal number partitioned into 5 parts by dashes).  Add that to the 
+following setting in your configuration file:
+
+.. code-block:: python
+
+    cronhub_uuid = '51cb35d8-2975-110b-67a7-11b65d432027'
+
+
+.. _healthchecks:
+
+HealthChecks.io
+~~~~~~~~~~~~~~~
+
+When you sign up with `healthchecks.io <https://healthchecks.io>`_ and configure 
+the health check for you *Emborg* configuration, you will be given a UUID (a 32 
+digit hexadecimal number partitioned into 5 parts by dashes).  Add that to the 
+following setting in your configuration file:
+
+.. code-block:: python
+
+    healthchecks_uuid = '51cb35d8-2975-110b-67a7-11b65d432027'
+
+

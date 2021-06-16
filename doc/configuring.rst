@@ -511,6 +511,22 @@ The value may be specified as a list of strings or just as a string. If
 specified as a string, it is split on white space to form the list.
 
 
+.. _cronhub_uuid:
+
+cronhub_uuid
+~~~~~~~~~~~~~~~~~
+
+If this setting is provided, *Emborg* notifies `cronhub.io 
+<https://cronhub.io>`_ when the archive is being created and whether the 
+creation was successful.  The value of the setting should be a UUID (a 32 digit 
+hexadecimal number that contains 4 dashes).  If given, this setting should be 
+specified on an individual configuration.  For example:
+
+.. code-block:: python
+
+    cronhub_uuid = '51cb35d8-2975-110b-67a7-11b65d432027'
+
+
 .. _default_configuration:
 
 default_configuration
@@ -648,9 +664,8 @@ healthchecks_uuid
 
 If this setting is provided, *Emborg* notifies `healthchecks.io 
 <https://healthchecks.io>`_ when the archive is being created and whether the 
-creation was successful.  The value of the setting should be a UUID (a long 
-hexidecimal number that contains 4 dashes), or the URL associated with the 
-health check (which ends with the UUID).  If given, this setting should be 
+creation was successful.  The value of the setting should be a UUID (a 32 digit 
+hexadecimal number that contains 4 dashes).  If given, this setting should be 
 specified on an individual configuration.  For example:
 
 .. code-block:: python
@@ -893,9 +908,9 @@ determines whether the repository is local or remote.
 run_after_backup
 ~~~~~~~~~~~~~~~~
 
-Specified commands that are to be run after the :ref:`create` command completes.  
-These commands often recreate useful files that were deleted by the 
-:ref:`run_before_backup` commands.
+Specified commands that are to be run after the :ref:`create` command 
+successfully completes.  These commands often recreate useful files that were 
+deleted by the :ref:`run_before_backup` commands.
 
 May be specified as a list of strings or as a multi-line string with one command 
 per line.

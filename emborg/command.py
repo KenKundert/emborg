@@ -1420,18 +1420,20 @@ class SettingsCommand(Command):
                 output(text)
 
             output("Emborg settings:")
-            for name, desc in EMBORG_SETTINGS.items():
-                show_setting(name, desc)
+            for name in sorted(EMBORG_SETTINGS):
+                show_setting(name, EMBORG_SETTINGS[name])
 
             output()
             output("Borg settings:")
-            for name, attrs in BORG_SETTINGS.items():
+            for name in sorted(BORG_SETTINGS):
+                attrs = BORG_SETTINGS[name]
                 show_setting(name, attrs['desc'])
+
             return 0
 
         if settings:
             requested = cmdline['<name>']
-            for k, v in settings:
+            for k, v in sorted(settings):
                 is_known = k in EMBORG_SETTINGS or k in BORG_SETTINGS
                 key = known(k) if is_known else unknown(k)
                 if requested and requested != k:

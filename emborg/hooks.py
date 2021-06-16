@@ -38,47 +38,78 @@ class Hooks:
 
     def backups_begin(self):
         for hook in self.active_hooks:
-            hook.backups_begin()
+            hook.signal_start()
 
     def backups_finish(self, borg):
         for hook in self.active_hooks:
-            hook.backups_finish(borg)
+            hook.signal_end(borg)
+
+    def is_active(self):
+        return bool(self.uuid)
+
+    def signal_start(self):
+        url = self.START_URL.format(uuid=self.uuid)
+        log(f'signaling start of backups to {self.NAME}: {self.uuid}.')
+        try:
+            requests.get(url)
+        except requests.exceptions.RequestException as e:
+            raise Error(f'{self.NAME} connection error.', codicil=full_stop(e))
+
+    def signal_end(self, borg):
+        status = borg.status
+        if status:
+            url = self.FAIL_URL.format(uuid=self.uuid)
+            result = 'failure'
+        else:
+            url = self.SUCCESS_URL.format(uuid=self.uuid)
+            result = 'success'
+        log(f'signaling {result} of backups to {self.NAME}: {self.uuid}.')
+        try:
+            response = requests.get(url)
+        except requests.exceptions.RequestException as e:
+            raise Error('{self.NAME} connection error.', codicil=full_stop(e))
+
 
 # HealthChecks class {{{1
 class HealthChecks(Hooks):
+    NAME = 'healthchecks.io'
     EMBORG_SETTINGS = dict(
-        healthchecks_uuid = 'the UUID associated with your health check.'
+        healthchecks_uuid = 'the healthchecks.io UUID for back-ups monitor.'
     )
+    URL = 'https://hc-ping.com'
 
     def __init__(self, settings):
-        self.url = settings.healthchecks_uuid
-        if self.url:
-            if not self.url.startswith('http'):
-                self.url = f'https://hc-ping.com/{self.url}'
+        self.uuid = settings.healthchecks_uuid
 
-    def is_active(self):
-        return bool(self.url)
-
-    def backups_begin(self):
-        url = f'{self.url}/start'
-        log(f'signaling start of backups to {self.url}.')
+    def signal_start(self):
+        url = f'{self.URL}/{self.uuid}/start'
+        log(f'signaling start of backups to {self.NAME}: {self.uuid}.')
         try:
             requests.post(url)
-        except (
-            requests.exceptions.ConnectionError,
-            requests.exceptions.RequestException
-        ) as e:
-            raise Error('healthcheck connection error.', codicil=full_stop(e))
+        except requests.exceptions.RequestException as e:
+            raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 
-    def backups_finish(self, borg):
+    def signal_end(self, borg):
         status = borg.status
+        result = 'failure' if status else 'success'
         payload = borg.stderr
-        url = f'{self.url}/{status}'
-        log(f'signaling end of backups to {self.url} with status {status}.')
+        url = f'{self.URL}/{self.uuid}/{status}'
+        log(f'signaling {result} of backups to {self.NAME}: {self.uuid}.')
         try:
             response = requests.post(url, data=payload.encode('utf-8'))
-        except (
-            requests.exceptions.ConnectionError,
-            requests.exceptions.RequestException
-        ) as e:
-            raise Error('healthcheck connection error.', codicil=full_stop(e))
+        except requests.exceptions.RequestException as e:
+            raise Error('{self.NAME} connection error.', codicil=full_stop(e))
+
+
+# CronHub class {{{1
+class CronHub(Hooks):
+    NAME = 'cronhub.io'
+    EMBORG_SETTINGS = dict(
+        cronhub_uuid = 'the cronhub.io UUID for back-ups monitor.'
+    )
+    START_URL = 'https://cronhub.io/start/{uuid}'
+    SUCCESS_URL = 'https://cronhub.io/finish/{uuid}'
+    FAIL_URL = 'https://cronhub.io/fail/{uuid}'
+
+    def __init__(self, settings):
+        self.uuid = settings.cronhub_uuid
