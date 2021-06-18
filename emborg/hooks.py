@@ -96,7 +96,10 @@ class HealthChecks(Hooks):
         url = f'{self.URL}/{self.uuid}/{status}'
         log(f'signaling {result} of backups to {self.NAME}: {self.uuid}.')
         try:
-            response = requests.post(url, data=payload.encode('utf-8'))
+            if payload is None:
+                response = requests.post(url)
+            else:
+                response = requests.post(url, data=payload.encode('utf-8'))
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 
