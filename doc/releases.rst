@@ -2,8 +2,8 @@ Releases
 ========
 
 **Latest development release**:
-    | Version: 1.21.2
-    | Released: 2021-06-15
+    | Version: 1.21.3
+    | Released: 2021-06-18
 
     - added support for `healthchecks.io <https://healthchecks.io>`_ monitoring 
       service.
