@@ -5,10 +5,8 @@ Emborg — Front-End to Borg Backup
 
 | Version: 1.21.3
 | Released: 2021-06-18
-| Please report all bugs and suggestions at
-  `Github <https://github.com/KenKundert/emborg/issues>`_
-  (or contact me directly at `emborg@nurdletech.com
-  <mailto://emborg@nurdletech.com>`_).
+| Please report all bugs and suggestions on
+  `Github <https://github.com/KenKundert/emborg/issues>`_.
 
 
 What is Emborg?
@@ -171,7 +169,7 @@ meaning it replaces the current version with the one from the archive.
     $ emborg mount BACKUPS
 
 The :ref:`mount command <mount>` creates a directory 'BACKUPS' and then mounts 
-an archive or the whold repository on this directory.  This allows you to move 
+an archive or the whole repository on this directory.  This allows you to move 
 into the archive or repository, navigating, examining, and retrieving files as 
 if it were a file system.
 
@@ -296,9 +294,9 @@ Contents
    installing
    commands
    configuring
+   monitoring
    examples
    api
-   utilities
    releases
 
 * :ref:`genindex`

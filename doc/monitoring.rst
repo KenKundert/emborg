@@ -143,6 +143,10 @@ Various monitoring services are available on the web.  You can configure
 services allow you to monitor many of your routine tasks and assure they have 
 completed recently and successfully.
 
+There are many such services available and they are not difficult to add.  If 
+the service you prefer is not currently available, feel free to request it on 
+`Github <https://github.com/KenKundert/emborg/issues>`_ or add it yourself and 
+issue a pull request.
 
 .. _cronhub:
 

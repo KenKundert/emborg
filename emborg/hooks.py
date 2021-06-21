@@ -97,6 +97,7 @@ class HealthChecks(Hooks):
         log(f'signaling {result} of backups to {self.NAME}: {self.uuid}.')
         try:
             if payload is None:
+                log('log unavailable to upload to healthchecks.io.')
                 response = requests.post(url)
             else:
                 response = requests.post(url, data=payload.encode('utf-8'))

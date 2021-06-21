@@ -29,7 +29,7 @@ An alternative to *Emborg* is
 the archive creation process and offers little for the other management tasks 
 such as monitoring (*due*, *list*, *manifest*), restoration (*extract*, *restore*,
 *mount*), and maintenance (*check*, *prune*). *borgmatic* recently added support 
-for the Borg extract command.
+for the Borg *extract* command.
 
 
 Getting Help
