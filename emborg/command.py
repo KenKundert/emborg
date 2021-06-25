@@ -38,6 +38,7 @@ from inform import (
     os_error,
     output,
     render,
+    title_case,
     warn,
 )
 from shlib import Run, cwd, mkdir, rm, set_prefs, to_path
@@ -53,7 +54,7 @@ set_prefs(use_inform=True, log_cmd=True)
 
 # title() {{{2
 def title(text):
-    return full_stop(text.capitalize())
+    return full_stop(title_case(text))
 
 
 # get_available_archives() {{{2

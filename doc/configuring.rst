@@ -514,7 +514,7 @@ specified as a string, it is split on white space to form the list.
 .. _cronhub_uuid:
 
 cronhub_uuid
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 If this setting is provided, *Emborg* notifies `cronhub.io 
 <https://cronhub.io>`_ when the archive is being created and whether the 

@@ -25,7 +25,7 @@ setup(
             "emborg-overdue=emborg.overdue:main",
         ]
     ),
-    install_requires="appdirs arrow>=0.15 docopt inform>=1.15 quantiphy shlib>=1.0".split(),
+    install_requires="appdirs arrow>=0.15 docopt inform>=1.21 quantiphy shlib>=1.0".split(),
     python_requires=">=3.6",
     keywords="emborg borg borgmatic backups".split(),
     classifiers=[
