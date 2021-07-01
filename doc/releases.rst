@@ -7,6 +7,11 @@ Latest development release
 | Released: 2021-06-21
 
 
+1.23 (2021-07-01)
+-----------------
+- fix missing dependency.
+
+
 1.22 (2021-06-21)
 -----------------
 - added support for `healthchecks.io <https://healthchecks.io>`_ monitoring 
