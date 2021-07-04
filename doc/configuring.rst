@@ -511,6 +511,16 @@ The value may be specified as a list of strings or just as a string. If
 specified as a string, it is split on white space to form the list.
 
 
+.. _cronhub_url:
+
+cronhub_url
+~~~~~~~~~~~
+
+This setting specifies the URL to use for `cronhub.io <https://cronhub.io>`_.
+Normally it is not needed.  If not specified ``https://cronhub.io`` is used.  
+You only need to specify the URL in special cases.
+
+
 .. _cronhub_uuid:
 
 cronhub_uuid
@@ -655,6 +665,17 @@ or files that contain the list of files or directories to exclude. If given as
 relative paths, they are relative to :ref:`working_dir`.  These files are 
 processed directly by *Borg*, which does not allow ``~`` to represent users' 
 home directories, unlike the patterns specified using :ref:`patterns`.
+
+
+.. _healthchecks_url:
+
+healthchecks_url
+~~~~~~~~~~~~~~~~
+
+This setting specifies the URL to use for `healthchecks.io 
+<https://healthchecks.io>`_.  Normally it is not needed.  If not specified 
+``https://.hc-ping.com`` is used.  You only need to specify the URL in special 
+cases.
 
 
 .. _healthchecks_uuid:

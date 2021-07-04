@@ -48,7 +48,7 @@ class Hooks:
         return bool(self.uuid)
 
     def signal_start(self):
-        url = self.START_URL.format(uuid=self.uuid)
+        url = self.START_URL.format(url=self.url, uuid=self.uuid)
         log(f'signaling start of backups to {self.NAME}: {self.uuid}.')
         try:
             requests.get(url)
@@ -58,10 +58,10 @@ class Hooks:
     def signal_end(self, borg):
         status = borg.status
         if status:
-            url = self.FAIL_URL.format(uuid=self.uuid)
+            url = self.FAIL_URL.format(url=self.url, uuid=self.uuid)
             result = 'failure'
         else:
-            url = self.SUCCESS_URL.format(uuid=self.uuid)
+            url = self.SUCCESS_URL.format(url=self.url, uuid=self.uuid)
             result = 'success'
         log(f'signaling {result} of backups to {self.NAME}: {self.uuid}.')
         try:
@@ -74,15 +74,19 @@ class Hooks:
 class HealthChecks(Hooks):
     NAME = 'healthchecks.io'
     EMBORG_SETTINGS = dict(
-        healthchecks_uuid = 'the healthchecks.io UUID for back-ups monitor.'
+        healthchecks_url = 'the healthchecks.io URL for back-ups monitor.',
+        healthchecks_uuid = 'the healthchecks.io UUID for back-ups monitor.',
     )
     URL = 'https://hc-ping.com'
 
     def __init__(self, settings):
         self.uuid = settings.healthchecks_uuid
+        self.url = settings.healthchecks_url
+        if not self.url:
+            self.url = self.URL
 
     def signal_start(self):
-        url = f'{self.URL}/{self.uuid}/start'
+        url = f'{self.url}/{self.uuid}/start'
         log(f'signaling start of backups to {self.NAME}: {self.uuid}.')
         try:
             requests.post(url)
@@ -109,11 +113,16 @@ class HealthChecks(Hooks):
 class CronHub(Hooks):
     NAME = 'cronhub.io'
     EMBORG_SETTINGS = dict(
-        cronhub_uuid = 'the cronhub.io UUID for back-ups monitor.'
+        cronhub_uuid = 'the cronhub.io UUID for back-ups monitor.',
+        cronhub_url = 'the cronhub.io URL for back-ups monitor.',
     )
-    START_URL = 'https://cronhub.io/start/{uuid}'
-    SUCCESS_URL = 'https://cronhub.io/finish/{uuid}'
-    FAIL_URL = 'https://cronhub.io/fail/{uuid}'
+    START_URL = '{url}/start/{uuid}'
+    SUCCESS_URL = '{url}/finish/{uuid}'
+    FAIL_URL = '{url}/fail/{uuid}'
+    URL = 'https://cronhub.io'
 
     def __init__(self, settings):
         self.uuid = settings.cronhub_uuid
+        self.url = settings.cronhub_url
+        if not self.url:
+            self.url = self.URL
