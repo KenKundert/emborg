@@ -49,7 +49,7 @@ class Hooks:
 
     def signal_start(self):
         url = self.START_URL.format(url=self.url, uuid=self.uuid)
-        log(f'signaling start of backups to {self.NAME}: {self.uuid}.')
+        log(f'signaling start of backups to {self.NAME}: {url}.')
         try:
             requests.get(url)
         except requests.exceptions.RequestException as e:
@@ -63,7 +63,7 @@ class Hooks:
         else:
             url = self.SUCCESS_URL.format(url=self.url, uuid=self.uuid)
             result = 'success'
-        log(f'signaling {result} of backups to {self.NAME}: {self.uuid}.')
+        log(f'signaling {result} of backups to {self.NAME}: {url}.')
         try:
             response = requests.get(url)
         except requests.exceptions.RequestException as e:
@@ -87,7 +87,7 @@ class HealthChecks(Hooks):
 
     def signal_start(self):
         url = f'{self.url}/{self.uuid}/start'
-        log(f'signaling start of backups to {self.NAME}: {self.uuid}.')
+        log(f'signaling start of backups to {self.NAME}: {url}.')
         try:
             requests.post(url)
         except requests.exceptions.RequestException as e:
@@ -97,8 +97,8 @@ class HealthChecks(Hooks):
         status = borg.status
         result = 'failure' if status else 'success'
         payload = borg.stderr
-        url = f'{self.URL}/{self.uuid}/{status}'
-        log(f'signaling {result} of backups to {self.NAME}: {self.uuid}.')
+        url = f'{self.url}/{self.uuid}/{status}'
+        log(f'signaling {result} of backups to {self.NAME}: {url}.')
         try:
             if payload is None:
                 log('log unavailable to upload to healthchecks.io.')
