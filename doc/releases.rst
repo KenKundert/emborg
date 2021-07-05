@@ -8,6 +8,7 @@ Latest development release
 
 
 1.24 (2021-07-05)
+-----------------
 - added *healthchecks_url* and *cronhub_url* settings.
 
 
