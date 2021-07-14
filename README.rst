@@ -1,6 +1,9 @@
 Emborg — Front-End to Borg Backup
 ==================================
 
+.. image:: https://pepy.tech/badge/emborg/month
+    :target: https://pepy.tech/project/emborg
+
 .. image:: https://img.shields.io/pypi/v/emborg.svg
     :target: https://pypi.python.org/pypi/emborg
 
