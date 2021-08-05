@@ -1,4 +1,7 @@
 # Test Emborg
+#
+# These tests require BorgBackup to be available.  As such, they are not really
+# suitable for public continuous integration services such as GitHub Actions.
 
 # Imports {{{1
 import os
