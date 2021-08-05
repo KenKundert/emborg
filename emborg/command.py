@@ -33,6 +33,7 @@ from inform import (
     full_stop,
     indent,
     is_str,
+    join,
     log,
     narrate,
     os_error,
@@ -41,16 +42,28 @@ from inform import (
     title_case,
     warn,
 )
-from shlib import Run, cwd, mkdir, rm, set_prefs, to_path
+from quantiphy import Quantity, UnitConversion, QuantiPhyError
+from shlib import Run, cwd, mkdir, rm, set_prefs, split_cmd, to_path
 
 from .collection import Collection
 from .preferences import BORG_SETTINGS, DEFAULT_COMMAND, EMBORG_SETTINGS, PROGRAM_NAME
 from .utilities import gethostname, two_columns
 
+
 # Utilities {{{1
 hostname = gethostname()
 set_prefs(use_inform=True, log_cmd=True)
 
+
+# time conversions {{{2
+UnitConversion('s', 'sec second seconds')
+UnitConversion('s', 'm min minute minutes', 60)
+UnitConversion('s', 'h hr hour hours', 60*60)
+UnitConversion('s', 'd day days', 24*60*60)
+UnitConversion('s', 'w week weeks', 7*24*60*60)
+UnitConversion('s', 'M month months', 30*24*60*60)
+UnitConversion('s', 'y year years', 365*24*60*60)
+Quantity.set_prefs(ignore_sf=True)
 
 # title() {{{2
 def title(text):
@@ -81,8 +94,20 @@ def get_name_of_nearest_archive(settings, date):
     archives = get_available_archives(settings)
     try:
         date = arrow.get(date)
-    except arrow.parser.ParserError:
-        raise Error("invalid date specification.", culprit=date)
+    except arrow.parser.ParserError as e:
+        try:
+            seconds = Quantity(date, 'd', scale='s')
+            date = arrow.now().shift(seconds=-seconds)
+        except QuantiPhyError:
+            codicil = join(
+                full_stop(e),
+                'Alternatively relative time formats are accepted:',
+                'Ns, Nm, Nh, Nd, Nw, NM, Ny.'
+            )
+            raise Error(
+                "invalid date specification.",
+                culprit=date, codicil=codicil, wrap=True
+            )
     for archive in archives:
         if arrow.get(archive["time"]) >= date:
             return archive["name"]
@@ -383,13 +408,21 @@ class CreateCommand(Command):
                 )
 
         # run prerequisites
-        cmds = settings.values("run_before_backup")
+        if settings.is_first_config():
+            cmds = settings.values("run_before_first_backup")
+        else:
+            cmds = []
+        cmds += settings.values("run_before_backup")
         for cmd in cmds:
             narrate("running pre-backup script:", cmd)
             try:
                 Run(cmd, "SoEW")
             except Error as e:
-                e.reraise(culprit=("run_before_backup", cmd.split()[0]))
+                if cmd in settings.values("run_before_first_backup"):
+                    setting = "run_before_first_backup"
+                else:
+                    setting = "run_before_backup"
+                e.reraise(culprit=(setting, cmd.split()[0]))
 
         # run borg
         src_dirs = settings.src_dirs
@@ -415,14 +448,22 @@ class CreateCommand(Command):
         now = arrow.now()
         settings.date_file.write_text(str(now))
 
-        # run any scripts specified to be run after a backup
-        cmds = settings.values("run_after_backup")
+        # run any every-time scripts specified to be run after a backup
+        if settings.is_last_config():
+            cmds = settings.values("run_after_last_backup")
+        else:
+            cmds = []
+        cmds += settings.values("run_after_backup")
         for cmd in cmds:
             narrate("running post-backup script:", cmd)
             try:
                 Run(cmd, "SoEW")
             except Error as e:
-                e.reraise(culprit=("run_after_backup", cmd.split()[0]))
+                if cmd in settings.values("run_after_last_backup"):
+                    setting = "run_after_last_backup"
+                else:
+                    setting = "run_after_backup"
+                e.reraise(culprit=(setting, cmd.split()[0]))
 
         if cmdline["--fast"]:
             return
@@ -713,15 +754,23 @@ class ExtractCommand(Command):
         file).  The paths may point to directories, in which case the entire
         directory is extracted. It may also be a glob pattern.
 
-        If you do not specify an archive or date, the most recent archive is
-        used.  You can extract the version of a file or directory that existed
-        on a particular date using:
+        By default, the most recent archive is used, however, if desired you can
+        explicitly specify a particular archive. For example:
 
-            emborg extract --date 2015-04-01 home/ken/src/avendesora/doc/overview.rst
+            $ emborg extract --archive continuum-2018-12-05T12:54:26 home/shaunte/bin
 
-        Or, you can extract the version from a particular archive using:
+        Alternatively you can specify a date.  The most recent archive that
+        existed on the specified date is used.  The date can be specified in
+        absolute terms, as in:
 
-            emborg extract --archive kundert-2018-12-05T12:54:26 home/ken/src/avendesora/doc/overview.rst
+            $ emborg extract --date 2015-04-01 home/shaunte/bin
+
+        Or you can specify the date in relative terms:
+
+            $ emborg extract --date 3d  home/shaunte/bin
+
+        In this case 3d means 3 days. You can use s, m, h, d, w, M, and y to
+        represent seconds, minutes, hours, days, weeks, months, and years.
 
         The extracted files are placed in the current working directory with
         the original hierarchy. Thus, the above commands create the file:
@@ -772,7 +821,7 @@ class ExtractCommand(Command):
             archive = get_name_of_nearest_archive(settings, date)
         if not archive:
             archive = get_name_of_latest_archive(settings)
-        output("Archive:", archive)
+        display("Archive:", archive)
 
         # run borg
         borg = settings.run_borg(
@@ -841,7 +890,7 @@ class InfoCommand(Command):
         output(f'               roots: {", ".join(roots)}')
         output(f"         destination: {settings.destination()}")
         output(f"  settings directory: {settings.config_dir}")
-        output(f"              logile: {settings.logfile}")
+        output(f"             logfile: {settings.logfile}")
         try:
             backup_date = arrow.get(settings.date_file.read_text())
             output(f"      last backed up: {backup_date}, {backup_date.humanize()}")
@@ -961,11 +1010,11 @@ class ManifestCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] manifest
-            emborg [options] m
-            emborg [options] la
-            emborg [options] files
-            emborg [options] f
+            emborg [options] manifest [<path>]
+            emborg [options] m [<path>]
+            emborg [options] la [<path>]
+            emborg [options] files [<path>]
+            emborg [options] f [<path>]
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to use
@@ -983,14 +1032,24 @@ class ManifestCommand(Command):
             -G, --sort-by-group                 sort by group
             -K <name>, --sort-by-key <name>     sort by key (the Borg field name)
             -r, --reverse-sort                  reverse the sort order
+            -R, --recursive                     show files is sub directories
+                                                when path is specified
 
         Once a backup has been performed, you can list the files available in
-        your archive using:
+        your archive using::
 
             emborg manifest
 
-        This lists the files in the most recent archive. You can explicitly
-        specify a particular archive if you wish:
+        This lists the files in the most recent archive.  If you specify the
+        path, then the files listed are contained within that path.  For
+        example::
+
+            emborg manifest .
+
+        This command lists the files in the archive that were originally
+        contained in the current working directory.
+
+        You can specify a particular archive if you wish:
 
             emborg manifest --archive kundert-2018-12-05T12:54:26
 
@@ -1000,6 +1059,11 @@ class ManifestCommand(Command):
             emborg manifest --date 2015/04/01
             emborg manifest --date 2015-04-01
             emborg manifest --date 2018-12-05T12:39
+
+        You can also the date in relative terms using s, m, h, d, w, M, y to
+        indicate seconds, minutes, hours, days, weeks, months, and years:
+
+            emborg manifest --date 2w
 
         There are a variety of ways that you use to sort the output. For example,
         sort by size, use:
@@ -1014,8 +1078,16 @@ class ManifestCommand(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
+        path = cmdline["<path>"]
         archive = cmdline["--archive"]
         date = cmdline["--date"]
+        recursive = cmdline["--recursive"]
+
+        # resolve the path relative to working directory
+        if path:
+            path = str(to_path(path).resolve().relative_to(settings.working_dir))
+        else:
+            path = ''
 
         # get the desired archive
         if date and not archive:
@@ -1111,15 +1183,7 @@ class ManifestCommand(Command):
             lines.reverse()
 
         # import QuantiPhy for Size
-        try:
-            from quantiphy import Quantity
-
-            Quantity.set_prefs(spacer="")
-        except ImportError:
-            comment("Could not import QuantiPhy.")
-
-            def Quantity(value, units):
-                return value
+        Quantity.set_prefs(spacer="")
 
         # generate formatted output
         if cmdline['--no-color']:
@@ -1130,6 +1194,12 @@ class ManifestCommand(Command):
         for values in lines:
             # this loop can be quite slow. the biggest issue is arrow. parsing
             # time is slow. also output() can be slow, so use print() instead.
+            if path:
+                if not values['path'].startswith(path):
+                    continue  # skip files not on the path
+                if not recursive:
+                    if '/' in values['path'][len(path)+1:]:
+                        continue  # skip files is subdirs of specified path
             if values['healthy']:
                 colorize = healthy_color
             else:
@@ -1207,6 +1277,13 @@ class MountCommand(Command):
         You can mount an archive that existed on a particular date using:
 
             emborg mount --date 2015-04-01 backups
+
+        You can also specify the date in relative terms::
+
+            $ emborg mount --date 6M backups
+
+        where s, m, h, d, w, M, and y represents seconds, minutes, hours, days,
+        weeks, months, and years.
 
         You can mount a particular archive using:
 
@@ -1334,6 +1411,24 @@ class RestoreCommand(Command):
             -l, --list                          list the files and directories
                                                 as they are processed
 
+        By default, the most recent archive is used, however, if desired you can
+        explicitly specify a particular archive. For example:
+
+            $ emborg restore --archive continuum-2018-12-05T12:54:26 resume.doc
+
+        Alternatively you can specify a date.  The most recent archive that
+        existed on the specified date is used.  The date can be specified in
+        absolute terms, as in:
+
+            $ emborg restore --date 2015-04-01 resume.doc
+
+        Or you can specify the date in relative terms:
+
+            $ emborg restore --date 3d  resume.doc
+
+        In this case 3d means 3 days. You can use s, m, h, d, w, M, and y to
+        represent seconds, minutes, hours, days, weeks, months, and years.
+
         This command is very similar to the extract command except that it is
         meant to be replace files while in place.
         """
@@ -1365,7 +1460,7 @@ class RestoreCommand(Command):
             archive = get_name_of_nearest_archive(settings, date)
         if not archive:
             archive = get_name_of_latest_archive(settings)
-        output("Archive:", archive)
+        display("Archive:", archive)
 
         # run borg
         borg = settings.run_borg(

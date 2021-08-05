@@ -1,0 +1,9 @@
+from shlib import cwd
+working_dir = str(cwd())
+patterns = '''
+    R ./configs
+    - fm:*/.viminfo
+    - **/.*.swp
+    - **/.*.swo
+'''
+default_mount_point = '~/RESTORED'

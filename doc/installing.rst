@@ -8,14 +8,18 @@ Installing
 
 Many Linux distributions include *Borg* in their package managers. In Fedora it 
 is referred to as *borgbackup*. In this case you would install *borg* by running 
-the following::
+the following:
+
+.. code-block:: bash
 
     $ sudo dnf install borgbackup
 
 Alternately, you can download a precompiled version from `Borg Github Releases 
 <https://github.com/borgbackup/borg/releases/>`_, which allows you to install 
 Borg as an unprivileged user.  You can do so with following commands (they will 
-need to be adjusted for to get the latest version)::
+need to be adjusted for to get the latest version):
+
+.. code-block:: bash
 
     $ cd ~/bin
     $ wget https://github.com/borgbackup/borg/releases/download/1.1.15/borg-linux64
@@ -26,15 +30,21 @@ need to be adjusted for to get the latest version)::
     $ chmod 755 borg-linux64
 
 Finally, you can install it using `pip 
-<https://pip.pypa.io/en/stable/installing>`_::
+<https://pip.pypa.io/en/stable/installing>`_:
+
+.. code-block:: bash
 
     $ pip install --user borgbackup
 
-Download and install *Emborg* as follows (requires Python3.6 or better)::
+Download and install *Emborg* as follows (requires Python3.6 or better):
+
+.. code-block:: bash
 
     $ pip install --user emborg
 
-Or, if you want the development version, use::
+Or, if you want the development version, use:
+
+.. code-block:: bash
 
     $ git clone https://github.com/KenKundert/emborg.git
     $ pip install --user ./emborg
@@ -142,15 +152,21 @@ comprehensive information about configuring *Emborg* can be found in the section
 on :ref:`configuring_emborg`.
 
 With this configuration, you can now initialize your repository and use it to 
-perform backups.  If the repository does not yet exist, initialize it using::
+perform backups.  If the repository does not yet exist, initialize it using:
+
+.. code-block:: bash
 
     $ emborg init
 
-Then perform a back up using::
+Then perform a back up using:
+
+.. code-block:: bash
 
     $ emborg create
 
-or simply::
+or simply:
+
+.. code-block:: bash
 
     $ emborg
 
@@ -158,7 +174,9 @@ This works because *create* is the default action and *backups* is the default
 configuration.
 
 Then, you can convince yourself it is working as expected by moving a directory 
-out of the way and using *Emborg* to restore it::
+out of the way and using *Emborg* to restore it:
+
+.. code-block:: bash
 
     $ mv bin bin-saved
     $ emborg restore bin
@@ -190,17 +208,23 @@ In this case the repository is on the local machine and it is not encrypted. It
 again backs up your home directory, but for this configuration the archives are 
 only kept for a day.
 
-The repository must be initialized before it can be used::
+The repository must be initialized before it can be used:
+
+.. code-block:: bash
 
     $ emborg -c snapshots init
 
 Here the desired configuration was specified because it is not the default. Now, 
 a *cron* entry can be created using ``crontab -e`` that creates a snapshot every 
-10 minutes::
+10 minutes:
+
+.. code-block:: text
 
     */10 * * * *  emborg --config snapshots --mute create
 
-Once it has run, you can pull a file from the latest snapshot using::
+Once it has run, you can pull a file from the latest snapshot using:
+
+.. code-block:: bash
 
     $ emborg restore passwords.gpg
 
@@ -209,7 +233,9 @@ Overdue Backups
 ^^^^^^^^^^^^^^^
 
 *Emborg* allows you to easily determine when your files were last backed up 
-using::
+using:
+
+.. code-block:: bash
 
     $ emborg due
 
@@ -228,7 +254,9 @@ using a configuration file: ~/.config/emborg/overdue.conf.  For example:
         dict(host='laptop (backups)', path='backups.lastbackup'),
     ]
 
-Then you would configure *cron* to run *emborg-overdue* using something like::
+Then you would configure *cron* to run *emborg-overdue* using something like:
+
+.. code-block:: text
 
     00 * * * * ~/.local/bin/emborg-overdue --quiet --mail
 
@@ -245,8 +273,9 @@ In this example the actual repository is not checked directly, rather the
 *lastbackup* file is checked.  This is a file that is updated by *Emborg* after 
 every back up. This file is found in the *Emborg* output directory. Every time 
 *Emborg* runs it creates a log file that can also be found in this directory.  
-That logfile can be viewed directly, or you can view it using the *log* 
-command::
+That logfile can be viewed directly, or you can view it using the *log* command:
+
+.. code-block:: bash
 
     $ emborg log
 
@@ -259,7 +288,9 @@ needs to be configured and run by *root*. This allows all the files on the
 machine to be backed up regardless of who owns them.  Other than being root, the 
 mechanics are very much the same.
 
-To start, run emborg to create the initial configuration files::
+To start, run emborg to create the initial configuration files:
+
+.. code-block:: bash
 
     # emborg
 
@@ -302,12 +333,16 @@ Again, this is a rather minimal example. In this case, *repokey* is used as the
 encryption method, which is only suitable if the repository is on a server you 
 control.
 
-As before you need to initialize the repository before it can be used::
+As before you need to initialize the repository before it can be used:
+
+.. code-block:: bash
 
     # emborg init
 
 To assure that the backups are run daily, the following is added to 
-/etc/cron.daily/emborg::
+/etc/cron.daily/emborg:
+
+.. code-block:: bash
 
     #/bin/sh
     # Run root backups

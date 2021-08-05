@@ -3,15 +3,21 @@
 Commands
 ========
 
-You invoke *Emborg* from your shell by entering a line of the form::
+You invoke *Emborg* from your shell by entering a line of the form:
+
+.. code-block:: bash
 
     $ emborg [global-options] <command> [command-options]
 
-Details about the options and commands can be accessed with::
+Details about the options and commands can be accessed with:
+
+.. code-block:: bash
 
     $ emborg help
 
-or::
+or:
+
+.. code-block:: bash
 
     $ emborg help <command>
 
@@ -52,7 +58,7 @@ Runs raw *Borg* commands. Before running the passphrase or passcommand is set.
 Also, if ``@repo`` is found on the command line, it is replaced by the path to 
 the repository.
 
-::
+.. code-block:: bash
 
     $ emborg borg key export @repo key.borg
     $ emborg borg list @repo::root-2020-04-11T23:38:37
@@ -70,7 +76,7 @@ This command breaks the repository and cache locks. Please use carefully and
 only while no *Borg* process (on any machine) is trying to access the Cache or 
 the Repository.
 
-::
+.. code-block:: bash
 
     $ emborg break-lock
     $ emborg breaklock
@@ -98,12 +104,16 @@ Configs
 List the available backup configurations.  Each configuration corresponds to 
 a settings file in your configuration directory (~/.config/emborg). Settings 
 common to all your configurations should be placed in ~/.config/emborg/settings.  
-You can see available configurations using::
+You can see available configurations using:
+
+.. code-block:: bash
 
     $ emborg configs
 
 To run a command on a specific configuration, add --config=<cfg> or -c cfg 
-before the command. For example::
+before the command. For example:
+
+.. code-block:: bash
 
     $ emborg -c home create
 
@@ -117,19 +127,23 @@ This creates an archive in an existing repository. An archive is a snapshot of
 your files as they currently exist.  Borg is a de-duplicating backup program, so 
 only the changes from the already existing archives are saved.
 
-::
+.. code-block:: bash
 
     $ emborg create
 
 Before creating your first archive, you must use the :ref:`init <init>` command 
 to initialize your repository.
 
-This is the default command, so you can create an archive with simply::
+This is the default command, so you can create an archive with simply:
+
+.. code-block:: bash
 
     $ emborg
 
 If the backup seems to be taking a long time for no obvious reason, run the 
-backup in verbose mode::
+backup in verbose mode:
+
+.. code-block:: bash
 
     $ emborg -v create
 
@@ -144,7 +158,9 @@ and current directory if not.
 Delete
 ------
 
-Delete an archive currently contained in the repository::
+Delete an archive currently contained in the repository:
+
+.. code-block:: bash
 
     $ emborg delete continuum-2018-12-05T19:23:09
 
@@ -159,7 +175,9 @@ Specifying ``--repo`` results in the entire repository being deleted.
 Diff
 ----
 
-Shows the differences between two archives::
+Shows the differences between two archives:
+
+.. code-block:: bash
 
     $ emborg diff continuum-2018-12-05T19:23:09 continuum-2018-12-04T17:41:28
 
@@ -170,7 +188,9 @@ Due
 ---
 
 When run with no options it indicates when the last backup was created.  For 
-example::
+example:
+
+.. code-block:: bash
 
     $ emborg due
     backup was performed 19 hours ago.
@@ -181,7 +201,9 @@ option results in the message being sent to the specified address rather than
 printed.  This allows you to run the :ref:`due <due>` command from a cron script 
 in order to send your self reminders to do a backup if one has not occurred for 
 a while.  In these case it is often run with the --no-log option to avoid 
-replacing the log file with one that is inherently uninteresting::
+replacing the log file with one that is inherently uninteresting:
+
+.. code-block:: bash
 
     $ emborg --no-log due --days 1 --email me@mydomain.com
 
@@ -191,7 +213,9 @@ floating-point format codes to specify the resolution used. For example:
 {days:.1f}. Also, {elapsed} is replaced with a humanized description of how long 
 it has been since the last backup, and {config} is replaced with the name of the 
 configuration being reported on. So ``--message '{elapsed} since last backup of 
-{config}.'`` might produce something like this::
+{config}.'`` might produce something like this:
+
+.. code-block:: text
 
     12 hours since last backup of home.
 
@@ -204,7 +228,9 @@ unless --oldest is specified, in which case only the oldest is displayed.
 Extract
 -------
 
-You extract a file or directory from an archive using::
+You extract a file or directory from an archive using:
+
+.. code-block:: bash
 
     $ emborg extract home/shaunte/bin
 
@@ -214,18 +240,34 @@ paths that are relative to ``/``, thus the paths should look like absolute paths
 with the leading slash removed.  The paths may point to directories, in which 
 case the entire directory is extracted.  It may also be a glob pattern.
 
-If you do not specify an archive or date, the most recent archive is used.  You 
-can extract the version of a file or directory that existed on a particular date 
-using::
+By default, the most recent archive is used, however, if desired you can 
+explicitly specify a particular archive. For example:
 
-    $ emborg extract --date 2015-04-01 home/shaunte/bin
-
-Or, you can extract the version from a particular archive using::
+.. code-block:: bash
 
     $ emborg extract --archive continuum-2018-12-05T12:54:26 home/shaunte/bin
 
+Alternatively you can specify a date.  The most recent archive that existed on 
+the specified date is used.  The date can be specified in absolute terms, as 
+in:
+
+.. code-block:: bash
+
+    $ emborg extract --date 2015-04-01 home/shaunte/bin
+
+Or you can specify the date in relative terms:
+
+.. code-block:: bash
+
+    $ emborg extract --date 3d  home/shaunte/bin
+
+In this case 3d means 3 days. You can use s, m, h, d, w, M, and y to represent 
+seconds, minutes, hours, days, weeks, months, and years.
+
 The extracted files are placed in the current working directory with
-the original hierarchy. Thus, the above commands create the directory::
+the original hierarchy. Thus, the above commands create the directory:
+
+.. code-block:: text
 
     ./home/shaunte/bin
 
@@ -239,15 +281,21 @@ directory.
 Help
 ----
 
-Show information about Emborg::
+Show information about Emborg:
+
+.. code-block:: bash
 
     $ emborg help
 
-You can ask for help on a specific command or topic with::
+You can ask for help on a specific command or topic with:
+
+.. code-block:: bash
 
     $ emborg help <topic>
 
-For example::
+For example:
+
+.. code-block:: bash
 
     $ emborg help extract
 
@@ -259,7 +307,7 @@ Info
 
 This command prints out the locations of important files and directories.
 
-::
+.. code-block:: bash
 
     $ emborg info
 
@@ -272,7 +320,7 @@ Init
 Initializes a Borg repository. This must be done before you create your first 
 archive.
 
-::
+.. code-block:: bash
 
     $ emborg init
 
@@ -284,7 +332,7 @@ List
 
 List available archives.
 
-::
+.. code-block:: bash
 
     $ emborg list
 
@@ -296,7 +344,7 @@ Log
 
 Show the logfile from the previous run.
 
-::
+.. code-block:: bash
 
     $ emborg log
 
@@ -307,31 +355,62 @@ Manifest
 --------
 
 Once a backup has been performed, you can list the files available in your 
-archive using::
+archive using:
+
+.. code-block:: bash
 
     $ emborg manifest
 
+You specify a path.  If so, the files listed are those contained within that 
+path.  For example:
+
+.. code-block:: bash
+
+    $ emborg manifest .
+    $ emborg manifest -R .
+
+The first command lists the files in the archive that were originally contained 
+in the current working directory.  The second lists the files that were in 
+specified directory and any sub directories.
+
 If you do not specify an archive, as above, the latest archive is used.
 
-You can explicitly specify an archive::
+You can explicitly specify an archive:
+
+.. code-block:: bash
 
     $ emborg manifest --archive continuum-2015-04-01T12:19:58
 
-Or you can list the files that existed on a particular date using::
+Or you can list the files that existed on a particular date using:
+
+.. code-block:: bash
 
     $ emborg manifest --date 2015-04-01
 
+You can also specify the date in relative terms:
+
+.. code-block:: bash
+
+    $ emborg manifest --date 1w
+
+where s, m, h, d, w, M, and y represents seconds, minutes, hours, days, weeks, 
+months, and years.
+
 The *manifest* command provides a variety of sorting and formatting options. The 
 formatting options are under the control of the :ref:`manifest_formats` setting.  
-For example::
+For example:
+
+.. code-block:: bash
 
     $ emborg manifest
 
 This outputs the files in the order and with the format produced by Borg.
-The lines are green if the corresponding file is healthy, and red if it is 
-broken (see *Borg* for more information on broken files).
+If a line is green if the corresponding file is healthy, and if red it is broken 
+(see `Borg list command
+<https://borgbackup.readthedocs.io/en/stable/usage/list.html#description>`_ for 
+more information on broken files).
 
-::
+.. code-block:: bash
 
     $ emborg manifest -l
     $ emborg manifest -n
@@ -341,7 +420,9 @@ These use the Borg order but change the amount of information shown.  With
 and the path. With ``-n`` the *name* is used, which by default contains 
 only the path.
 
-Finally::
+Finally:
+
+.. code-block:: bash
 
     $ emborg manifest -S
     $ emborg manifest -D
@@ -352,7 +433,9 @@ date. It uses the *date* format, which by default contains the day, date, time
 and the path.  More choices are available; run ``emborg help manifest`` for the 
 details.
 
-You can use ``files`` as an alias for ``manifest``::
+You can use ``files`` as an alias for ``manifest``:
+
+.. code-block:: bash
 
     $ emborg files
 
@@ -378,15 +461,30 @@ is used if set.
 If you do not specify an archive, as above, the most recently created archive
 is mounted.
 
-You can explicitly specify an archive::
+You can explicitly specify an archive:
+
+.. code-block:: bash
 
     $ emborg mount --archive continuum-2015-04-01T12:19:58 backups
 
-You can mount the files that existed on a particular date using::
+You can mount the files that existed on a particular date using:
+
+.. code-block:: bash
 
     $ emborg mount --date 2015-04-01 backups
 
-Or, you can mount all the available archives::
+You can also specify the date in relative terms:
+
+.. code-block:: bash
+
+    $ emborg mount --date 6M backups
+
+where s, m, h, d, w, M, and y represents seconds, minutes, hours, days, weeks, 
+months, and years.
+
+Finally, you can mount all the available archives:
+
+.. code-block:: bash
 
     $ emborg mount --all backups
 
@@ -403,7 +501,9 @@ Prune the repository of excess archives.  You can use the :ref:`keep_within`,
 :ref:`keep_last`, :ref:`keep_minutely`, :ref:`keep_hourly`, :ref:`keep_daily`, 
 :ref:`keep_weekly`, :ref:`keep_monthly`, and :ref:`keep_yearly` settings to 
 control which archives should be kept. At least one of these settings must be 
-specified to use :ref:`prune <prune>`::
+specified to use :ref:`prune <prune>`:
+
+.. code-block:: bash
 
     $ emborg prune
 
@@ -418,13 +518,18 @@ it is meant to be run in place. Thus, the paths given are converted to absolute
 paths and then the borg :ref:`extract <extract>` command is run from the root 
 directory (/) so that the existing files are replaced by the extracted files.
 
-For example, the following commands restore your .bashrc file::
+For example, the following commands restore your .bashrc file:
+
+.. code-block:: bash
 
     $ cd ~
     $ emborg restore .bashrc
 
 *Emborg* runs the *restore* command from :ref:`working_dir` if it is specified 
-and current directory if not.
+and the current directory if not.
+
+This command is very similar to the :ref:`extract <extract>` command except that 
+it is meant to replace files in place.  It also takes similar options.
 
 
 .. _settings:
@@ -434,7 +539,7 @@ Settings
 
 This command displays all the settings that affect a backup configuration.
 
-::
+.. code-block:: bash
 
     $ emborg settings
 
@@ -447,7 +552,9 @@ rather than the settings actually specified and their values.
 Umount
 ------
 
-Un-mount a previously mounted repository or archive::
+Un-mount a previously mounted repository or archive:
+
+.. code-block:: bash
 
     $ emborg umount backups
     $ rmdir backups
@@ -465,6 +572,6 @@ Version
 
 Prints the *Emborg* version.
 
-::
+.. code-block:: bash
 
     $ emborg version

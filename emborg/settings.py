@@ -104,6 +104,8 @@ for name, attrs in BORG_SETTINGS.items():
 
 # get_config {{{2
 config_queue = None
+first_config = None
+last_config = None
 
 
 class NoMoreConfigs(Exception):
@@ -111,7 +113,7 @@ class NoMoreConfigs(Exception):
 
 
 def get_config(name, settings, composite_config_response, show_config_name):
-    global config_queue
+    global config_queue, first_config, last_config
 
     if config_queue is not None:
         try:
@@ -151,6 +153,8 @@ def get_config(name, settings, composite_config_response, show_config_name):
         raise Error("command does not support composite configs.", culprit=name)
     elif num_configs < 1:
         raise Error("empty composite config.", culprit=name)
+    first_config = configs[0]
+    last_config = configs[-1]
     active_config = configs.pop(0)
     if composite_config_response == "all":
         config_queue = configs
@@ -159,7 +163,6 @@ def get_config(name, settings, composite_config_response, show_config_name):
     if config_queue and show_config_name:
         display("===", active_config, "===")
     return active_config
-
 
 # Settings class {{{1
 class Settings:
@@ -517,6 +520,11 @@ class Settings:
 
     # publish_passcode() {{{2
     def publish_passcode(self):
+        for v in ['BORG_PASSPHRASE', 'BORG_PASSCOMMAND', 'BORG_PASSPHRASE_FD']:
+            if v in os.environ:
+                narrate(f"Using existing {v}.")
+                return
+
         passcommand = self.value('passcommand')
         passcode = self.passphrase
 
@@ -524,7 +532,10 @@ class Settings:
         if passcommand:
             if passcode:
                 warn("passphrase unneeded.", culprit="passcommand")
-            return dict(BORG_PASSCOMMAND=passcommand)
+            narrate(f"Setting BORG_PASSCOMMAND.")
+            os.environ['BORG_PASSCOMMAND'] = passcommand
+            self.borg_passcode_env_var_set_by_emborg = 'BORG_PASSCOMMAND'
+            return
 
         # get passphrase from avendesora
         if not passcode and self.avendesora_account:
@@ -544,13 +555,16 @@ class Settings:
                 )
 
         if passcode:
-            return dict(BORG_PASSPHRASE=passcode)
+            os.environ['BORG_PASSPHRASE'] = passcode
+            narrate(f"Setting BORG_PASSPHRASE.")
+            self.borg_passcode_env_var_set_by_emborg = 'BORG_PASSPHRASE'
+            return
 
         if self.encryption is None:
             self.encryption = "none"
-        if self.encryption == "none":
-            comment("passphrase is not available, encryption disabled.")
-            return {}
+        if self.encryption == "none" or self.encryption.startswith('authenticated'):
+            comment("Encryption is disabled.")
+            return
         raise Error("Cannot determine the encryption passphrase.")
 
     # run_borg() {{{2
@@ -565,16 +579,17 @@ class Settings:
         use_working_dir=False,
     ):
         # prepare the command
-        os.environ.update(self.publish_passcode())
-        os.environ["BORG_DISPLAY_PASSPHRASE"] = "no"
+        self.publish_passcode()
+        if "BORG_PASSPHRASE" in os.environ:
+            os.environ["BORG_DISPLAY_PASSPHRASE"] = "no"
         if self.ssh_command:
             os.environ["BORG_RSH"] = self.ssh_command
-        executable = self.value("borg_executable", BORG)
-        borg_opts = self.borg_options(cmd, borg_opts, emborg_opts, strip_prefix)
-        command = [executable] + cmd.split() + borg_opts + args
         environ = {k: v for k, v in os.environ.items() if k.startswith("BORG_")}
         if "BORG_PASSPHRASE" in environ:
             environ["BORG_PASSPHRASE"] = "<redacted>"
+        executable = self.value("borg_executable", BORG)
+        borg_opts = self.borg_options(cmd, borg_opts, emborg_opts, strip_prefix)
+        command = [executable] + cmd.split() + borg_opts + args
         narrate("Borg-related environment variables:", render(environ))
 
         # check if ssh agent is present
@@ -610,7 +625,7 @@ class Settings:
             try:
                 borg = Run(command, modes=modes, stdin="", env=os.environ, log=False)
             except Error as e:
-                narrate('Borg terminates with exist status:', e.status)
+                narrate('Borg terminates with exit status:', e.status)
                 codicil = None
                 if e.stderr and 'previously located at' in e.stderr:
                     codicil = dedent(f'''
@@ -635,7 +650,7 @@ class Settings:
     def run_borg_raw(self, args):
 
         # prepare the command
-        os.environ.update(self.publish_passcode())
+        self.publish_passcode()
         os.environ["BORG_DISPLAY_PASSPHRASE"] = "no"
         executable = self.value("borg_executable", BORG)
         remote_path = self.value("remote_path")
@@ -682,6 +697,13 @@ class Settings:
             return f"{self.repository!s}::{archive}"
         return self.repository
 
+    # is_config() {{{2
+    def is_first_config(self):
+        return self.config_name == first_config
+
+    def is_last_config(self):
+        return self.config_name == last_config
+
     # get attribute {{{2
     def __getattr__(self, name):
         return self.settings.get(name)
@@ -693,6 +715,8 @@ class Settings:
 
     # enter {{{2
     def __enter__(self):
+        self.borg_passcode_env_var_set_by_emborg = None
+
         # resolve src directories
         self.src_dirs = self.as_paths("src_dirs", resolve=False)
 
@@ -789,3 +813,8 @@ class Settings:
         # delete lockfile
         if self.requires_exclusivity:
             self.lockfile.unlink()
+
+        # remove passcode env variables created by emborg
+        if self.borg_passcode_env_var_set_by_emborg:
+            narrate(f"Unsetting {self.borg_passcode_env_var_set_by_emborg}.")
+            del os.environ[self.borg_passcode_env_var_set_by_emborg]

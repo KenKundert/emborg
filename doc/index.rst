@@ -108,27 +108,29 @@ You must initially describe your repository or repositories to *Emborg*.  You do
 so by adding configuration files to ~/.config/emborg. Once you have done that, 
 you can use *Emborg* to perform common tasks that involve you backups.
 
-For example::
+For example:
+
+.. code-block:: bash
 
     $ emborg init
 
 The :ref:`init command <init>` initializes a repository, which is necessary 
 before it can be used.
 
-::
+.. code-block:: bash
 
     $ emborg create
 
 The :ref:`create command <create>` creates an archive, meaning that it backs up 
 your current files.
 
-::
+.. code-block:: bash
 
     $ emborg list
 
 The :ref:`list command <list>` displays a list of all existing archives.
 
-::
+.. code-block:: bash
 
     $ emborg manifest
     $ emborg files
@@ -136,27 +138,27 @@ The :ref:`list command <list>` displays a list of all existing archives.
 The :ref:`manifest or files command <manifest>` displays all the files in the 
 most recent archive.
 
-::
+.. code-block:: bash
 
-    $ emborg manifest continuum-2019-04-23T18:35:33
+    $ emborg manifest -a continuum-2019-04-23T18:35:33
 
 If you give the name of an archive, it displays all the files in the specified 
 archive.
 
-::
+.. code-block:: bash
 
     $ emborg diff continuum-2019-04-23T18:35:33 continuum-2019-04-22T17:24:06
 
 The :ref:`diff command <diff>` shows you the difference between two archives.
 
-::
+.. code-block:: bash
 
     $ emborg extract home/seven/bin/vu
 
 The :ref:`extract command <extract>` extracts a file or directory from the most 
 recent archive.
 
-::
+.. code-block:: bash
 
     $ cd ~/bin
     $ emborg restore vu
@@ -164,7 +166,7 @@ recent archive.
 The :ref:`restore command <restore>` restores files or directories in place, 
 meaning it replaces the current version with the one from the archive.
 
-::
+.. code-block:: bash
 
     $ emborg mount BACKUPS
 
@@ -173,41 +175,41 @@ an archive or the whole repository on this directory.  This allows you to move
 into the archive or repository, navigating, examining, and retrieving files as 
 if it were a file system.
 
-::
+.. code-block:: bash
 
     $ emborg umount BACKUPS
 
 The :ref:`umount command <umount>` un-mounts the archive or repository after you 
 are done with it.
 
-::
+.. code-block:: bash
 
     $ emborg due
 
 The :ref:`due command <due>` tells you when the last successful backup was 
 performed.
 
-::
+.. code-block:: bash
 
     $ emborg info
 
 The :ref:`info command <info>` shows you information about your repository such 
 as where it is located and how large it is.
 
-::
+.. code-block:: bash
 
     $ emborg check
 
 The :ref:`check command <check>` performs internal consistency checking on your 
 repository.
 
-::
+.. code-block:: bash
 
     $ emborg prune
 
 The :ref:`prune command <prune>` removes redundant archives.
 
-::
+.. code-block:: bash
 
     $ emborg borg check --repair @repo
 
@@ -215,7 +217,7 @@ The :ref:`borg command <borg>` runs a raw *Borg* command for you.  The benefit
 of having *Emborg* run *Borg* for you is that it automatically sets the 
 passphrase and the path to the repository so you do not need to remember them.
 
-::
+.. code-block:: bash
 
     $ emborg help
 
@@ -255,7 +257,9 @@ and keys, that you would need to get started after a catastrophic loss of your
 disk.
 
 If you keep the passphrase in an *Emborg* configuration file then you should set
-the permissions for that file so that it is not readable by others::
+the permissions for that file so that it is not readable by others:
+
+.. code-block:: bash
 
    chmod 600 ~/.config/emborg/*
 

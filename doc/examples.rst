@@ -91,13 +91,17 @@ you control the server that holds the repository and you know it to be secure.
 
 Once this configuration is complete and has been tested, you would want to add 
 a crontab entry so that it runs on a routine schedule. On servers that are 
-always running, you could use `crontab -e` and add an entry like this::
+always running, you could use `crontab -e` and add an entry like this:
+
+.. code-block:: text
 
     30 03 * * * emborg --mute --config root create
 
 For individual workstations or laptops that are likely to be turned off at 
 night, one would instead create an executable script in /etc/cron.daily that 
-contains the following::
+contains the following:
+
+.. code-block:: bash
 
     #/bin/sh
     # Run root backups
@@ -105,7 +109,9 @@ contains the following::
     emborg --mute --config root create
 
 Assume that this file is named *emborg*. Then after creating it, you would make 
-it executable with::
+it executable with:
+
+.. code-block:: bash
 
     $ chmod a+x /etc/cron.daily/emborg
 
@@ -199,24 +205,32 @@ As such, it is critical that you extract the keyfile from *Borg* and copy it and
 your *Avendesora* files to a safe place so that both the keyfile and passphrase 
 are available if you lose your disk. You can use `SpareKeys 
 <https://github.com/kalekundert/sparekeys>`_ to do this for you. Otherwise 
-extract the keyfile using::
+extract the keyfile using:
+
+.. code-block:: bash
 
     $ emborg borg key export @repo key.borg
 
 *cron* is not used for this configuration because the machine, being a laptop, 
 is not guaranteed to be on at any particular time of the day. So instead, you 
-would simply run *Emborg* on your own at a convenient time using::
+would simply run *Emborg* on your own at a convenient time using:
+
+.. code-block:: bash
 
     $ emborg
 
 You can use the *Emborg due* command to remind you if a backup is overdue. You 
 can wire it into status bar programs, such as *i3status* to give you a visual 
 reminder, or you can configure cron to check every hour and notify you if they 
-are overdue. This one triggers a notification::
+are overdue. This one triggers a notification:
+
+.. code-block:: text
 
     0 * * * * emborg --mute due --days 1 || notify-send 'Backups are overdue'
 
-And this one sends an email::
+And this one sends an email:
+
+.. code-block:: text
 
     0 * * * * emborg --mute due --days 1 --mail me@mydomain.com
 
@@ -254,7 +268,9 @@ And finally, here is the contents of the *snapshots* configuration file:
     prune_after_create = True
 
 To run this configuration every 10 minutes, add the following entry to your 
-crontab file using 'crontab -e'::
+crontab file using 'crontab -e':
+
+.. code-block:: text
 
     0,10,20,30,40,50 * * * * emborg --mute --config snapshots create
 

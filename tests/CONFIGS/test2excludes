@@ -1,0 +1,4 @@
+# here is another comment
+fm:*/.viminfo
+sh:**/.*.swp
+sh:**/.*.swo

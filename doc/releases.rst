@@ -6,27 +6,38 @@ Latest development release
 | Version: 1.24.0
 | Released: 2021-07-05
 
+- Added
+  :ref:`run_before_first_backup <run_before_first_backup>` and 
+  :ref:`run_after_last_backup <run_after_last_backup>` settings.
+- Allow files listed by :ref:`manifest <manifest>` command to be constrained to 
+  those contained within a path.
+- Allow relative dates to be specified on the :ref:`extract <extract>`,
+  :ref:`manifest <manifest>`, :ref:`mount <mount>` and :ref:`restore <restore>` 
+  commands.
+- Allow *BORG_PASSPHRASE*, *BORG_PASSPHRASE_FD*, or *BORG_PASSCOMMAND* to 
+  dominate over *Emborg* passphrase settings.
+
 
 1.24 (2021-07-05)
 -----------------
-- added *healthchecks_url* and *cronhub_url* settings.
+- Added *healthchecks_url* and *cronhub_url* settings.
 
 
 1.23 (2021-07-01)
 -----------------
-- fix missing dependency.
+- Fix missing dependency.
 
 
 1.22 (2021-06-21)
 -----------------
-- added support for `healthchecks.io <https://healthchecks.io>`_ monitoring 
+- Added support for `healthchecks.io <https://healthchecks.io>`_ monitoring 
   service.
-- added support for `cronhub.io <https://cronhub.io>`_ monitoring service.
+- Added support for `cronhub.io <https://cronhub.io>`_ monitoring service.
 
 
 1.21 (2021-03-11)
 -----------------
-- made extensive changes to :ref:`manifest <manifest>` command to make it more 
+- Made extensive changes to :ref:`manifest <manifest>` command to make it more 
   flexible
 
     - colorized the output based on file health (green implies healthy, red 
@@ -48,74 +59,74 @@ Latest development release
         a :ref:`manifest_formats` setting from a previous version, it may 
         need to be updated.
 
-- it is now an error for :ref:`prefix` setting to contain ``{{now}}``.
-- :ref:`settings <settings>` command will now print a single setting value 
+- It is now an error for :ref:`prefix` setting to contain ``{{now}}``.
+- :ref:`Settings <settings>` command will now print a single setting value 
   if its name is given.
 
 
 1.20 (2021-02-13)
 -----------------
 
-- add ``--progress`` command-line option and :ref:`show_progress` option to 
+- Add ``--progress`` command-line option and :ref:`show_progress` option to 
   the :ref:`create <create>` command.
 
 1.19 (2021-01-02)
 -----------------
-- added ``--list`` command-line option to the :ref:`prune <prune>` command.
+- Added ``--list`` command-line option to the :ref:`prune <prune>` command.
 
 1.18 (2020-07-19)
 -----------------
-- added ``--repo`` option to :ref:`delete <delete>` command.
-- added ``--relocated`` global command-line option.
+- Added ``--repo`` option to :ref:`delete <delete>` command.
+- Added ``--relocated`` global command-line option.
 - *Emborg* now automatically confirms to *Borg* that you know what you are doing 
   when you delete a repository or repair an archive.
 
 1.17 (2020-04-15)
 -----------------
-- :ref:`borg <borg>` command allows archive to be added to ``@repo``.
-- added :ref:`encoding` setting.
+- :ref:`Borg <borg>` command allows archive to be added to ``@repo``.
+- Added :ref:`encoding` setting.
 
 1.16 (2020-03-17)
 -----------------
-- refinements and bug fixes.
+- Refinements and bug fixes.
 
 1.15 (2020-03-06)
 -----------------
-- improve messaging from *emborg-overdue*
-- :ref:`configs <configs>` command now outputs default configuration too.
-- some commands now use first subconfig when run with a composite configuration 
+- Improve messaging from *emborg-overdue*
+- :ref:`Configs <configs>` command now outputs default configuration too.
+- Some commands now use first subconfig when run with a composite configuration 
   rather than terminating with an error.
-- added :ref:`show_stats` setting.
-- added ``--stats`` option to :ref:`create <create>`, :ref:`delete <delete>` and 
+- Added :ref:`show_stats` setting.
+- Added ``--stats`` option to :ref:`create <create>`, :ref:`delete <delete>` and 
   :ref:`prune <prune>` commands.
-- added ``--list`` option to :ref:`create <create>`, :ref:`extract <extract>` 
+- Added ``--list`` option to :ref:`create <create>`, :ref:`extract <extract>` 
   and :ref:`restore <restore>` commands.
-- added sorting and formatting options to :ref:`manifest <manifest>` command.
-- added :ref:`manifest_formats` setting.
-- renamed ``--trial-run`` option to ``--dry-run`` to be more consistent with 
+- Added sorting and formatting options to :ref:`manifest <manifest>` command.
+- Added :ref:`manifest_formats` setting.
+- Renamed ``--trial-run`` option to ``--dry-run`` to be more consistent with 
   *Borg*.
-- add *files* and *f* aliases to :ref:`manifest <manifest>` command.
-- added :ref:`working_dir` setting.
-- added :ref:`do_not_expand` setting.
-- added :ref:`exclude_nodump` setting
-- added :ref:`patterns` and :ref:`patterns_from` settings.
+- Add *files* and *f* aliases to :ref:`manifest <manifest>` command.
+- Added :ref:`working_dir` setting.
+- Added :ref:`do_not_expand` setting.
+- Added :ref:`exclude_nodump` setting
+- Added :ref:`patterns` and :ref:`patterns_from` settings.
 - *Emborg* lock file is now ignored if the process it references is no longer 
   running
-- support ``--repair`` option on :ref:`check command <check>`.
+- Support ``--repair`` option on :ref:`check command <check>`.
 
 1.14 (2019-12-31)
 -----------------
-- remove debug message accidentally left in *emborg-overdue*
+- Remove debug message accidentally left in *emborg-overdue*
 
 1.13 (2019-12-31)
 -----------------
-- enhance *emborg-overdue* to work on clients as well as servers
+- Enhance *emborg-overdue* to work on clients as well as servers
 
 1.12 (2019-12-25)
 -----------------
-- added :ref:`default_mount_point` setting.
-- fixed some issues with :ref:`borg <borg>` command.
-- added ``--oldest`` option to :ref:`due <due>` command.
+- Added :ref:`default_mount_point` setting.
+- Fixed some issues with :ref:`borg <borg>` command.
+- Added ``--oldest`` option to :ref:`due <due>` command.
 
 1.11 (2019-11-27)
 -----------------
@@ -191,13 +202,13 @@ Latest development release
 
 1.0 (2019-01-09)
 ----------------
-- added :ref:`remote_path <remote_path>` setting.
-- formal public release.
+- Added :ref:`remote_path <remote_path>` setting.
+- Formal public release.
 
 0.3 (2018-12-25)
 ----------------
-- initial public release (beta).
+- Initial public release (beta).
 
 0.0 (2018-12-05)
 ----------------
-- initial release (alpha).
+- Initial release (alpha).

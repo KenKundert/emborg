@@ -1,0 +1,4 @@
+from shlib import cwd
+working_dir = str(cwd())
+patterns_from = '{config_dir}/test6patterns'
+default_mount_point = '~/RESTORED'

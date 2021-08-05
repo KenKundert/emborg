@@ -1,0 +1,10 @@
+src_dirs = '~'.split()
+encryption = 'repokey'
+passphrase = 'pretty kitty'
+
+patterns = '''- ~/repositories   
+              - ~/.local   
+              - ~/tests   
+              - **/.viminfo   
+              - **/.*.swp   
+              - **/.*.swo'''

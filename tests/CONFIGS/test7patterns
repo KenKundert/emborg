@@ -1,0 +1,6 @@
+R «TESTS»
++ «TESTS»/configs
+- «TESTS»
+- fm:*/.viminfo
+- **/.*.swp
+- **/.*.swo

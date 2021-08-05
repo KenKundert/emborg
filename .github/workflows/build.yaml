@@ -1,0 +1,32 @@
+name: Emborg
+on: [push, pull_request]
+jobs:
+  check-bats-version:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+      max-parallel: 4
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-node@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install packages
+        run:
+          python -m pip install --upgrade pip
+          pip install .
+          pip install tox
+          pip install coveralls
+      - name: Run tests
+        run: tox
+      - name: Report test coverage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_SERVICE_NAME: github
+        run: coveralls

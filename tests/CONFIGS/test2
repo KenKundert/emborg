@@ -1,0 +1,6 @@
+encryption = 'repokey'
+passcommand = 'cat {config_dir}/test2passphrase'
+
+src_dirs = '~'.split()
+
+exclude_from = '{config_dir}/test2excludes'

@@ -1,0 +1,8 @@
+src_dirs = '~/configs'.split()
+default_mount_point = '~/RESTORED'
+
+excludes = [
+    'fm:*/.viminfo',
+    'sh:**/.*.swp',
+    'sh:**/.*.swo',
+]

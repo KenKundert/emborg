@@ -1,0 +1,24 @@
+# These settings are common to all configurations
+# configurations
+configurations = '''
+    test0 test1 test2 test3 test4 test5 test6 test7
+    tests=test0,test1,test2,test3
+'''
+
+default_configuration = 'tests'
+
+# repository/archive settings
+repository = '~/repositories'
+prefix = '{config_name}-'
+archive = '{prefix}{{now}}'
+encryption = 'none'
+
+# shared filter settings
+exclude_if_present = '.nobackup'
+exclude_caches = True
+
+# prune settings
+keep_within = '1d'                        # keep all archives created within this interval
+prune_after_create = True
+check_after_create = True
+

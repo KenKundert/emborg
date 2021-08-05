@@ -1,0 +1,14 @@
+src_dirs = '~'.split()
+
+excludes = '''
+    # this is a comment
+    ~/repositories
+    ~/.local
+    ~/tests
+
+    # here is another comment
+    fm:*/.viminfo
+    sh:**/.*.swp
+    sh:**/.*.swo
+'''
+

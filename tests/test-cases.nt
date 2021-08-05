@@ -1,0 +1,704 @@
+emborg without configs:
+
+    0:
+        args: version
+        expected_re: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+
+    1:
+        args: help
+        expected:
+            > Emborg Backups
+            >
+            > Backs up the contents of a file hierarchy.  A front end for Borg's
+            > encrypted incremental backup utility.
+            >
+            > Usage:
+            >     emborg [options] [<command> [<args>...]]
+            >
+            > Options:
+            >     -c <cfgname>, --config <cfgname>  Specifies the configuration to use.
+            >     -d, --dry-run                     Run Borg in dry run mode.
+            >     -h, --help                        Output basic usage information.
+            >     -m, --mute                        Suppress all output.
+            >     -n, --narrate                     Send emborg and Borg narration to stdout.
+            >     -q, --quiet                       Suppress optional output.
+            >     -r, --relocated                   Acknowledge that repository was relocated.
+            >     -v, --verbose                     Make Borg more verbose.
+            >     --no-log                          Do not create log file.
+            >
+            > Available commands:
+            >     borg              run a raw borg command.
+            >     breaklock, break-lock
+            >                       breaks the repository and cache locks.
+            >     check             checks the repository and its archives
+            >     configs           list available backup configurations
+            >     create, backup    create an archive of the current files
+            >     delete            delete an archive currently contained in the repository
+            >     diff              show the differences between two archives
+            >     due               days since last backup
+            >     extract           recover file or files from archive
+            >     help              give information about commands or other topics
+            >     info              print information about a backup
+            >     init              initialize the repository
+            >     list, lr, archives
+            >                       list the archives currently contained in the repository
+            >     log               print logfile for the last emborg run
+            >     manifest, m, la, files, f
+            >                       list the files contained in an archive
+            >     mount             mount a repository or archive
+            >     prune             prune the repository of excess archives
+            >     restore           Restore the given files or directories in place
+            >     settings, setting
+            >                       list settings of chosen configuration
+            >     umount, unmount   un-mount a previously mounted repository or archive
+            >     version           display emborg version
+            >
+            > Available topics:
+            >     overview          overview of emborg
+            >     precautions       what everybody should know before using emborg
+
+    2:
+        args: settings --available
+        expected:
+            > Emborg settings:
+            >                    archive: template Borg should use when creating archive
+            >                             names
+            >         avendesora_account: account name that holds passphrase for
+            >                             encryption key in Avendesora
+            >           avendesora_field: name of field in Avendesora that holds the
+            >                             passphrase
+            >            borg_executable: path to borg
+            >         check_after_create: run check as the last step of an archive
+            >                             creation
+            >                colorscheme: the color scheme
+            >                 config_dir: absolute path to configuration directory
+            >                             (read-only)
+            >                config_name: name of active configuration (set by program)
+            >             configurations: available Emborg configurations
+            >                cronhub_url: the cronhub.io URL for back-ups monitor.
+            >               cronhub_uuid: the cronhub.io UUID for back-ups monitor.
+            >      default_configuration: default Emborg configuration
+            >        default_mount_point: directory to use as mount point if one is not
+            >                             specified
+            >              do_not_expand: names of settings that must not undergo
+            >                             setting evaluation
+            >                   encoding: encoding when talking to borg
+            >                 encryption: encryption method (see Borg documentation)
+            >               exclude_from: file that contains exclude patterns
+            >                   excludes: list of glob strings of files or directories
+            >                             to skip
+            >           healthchecks_url: the healthchecks.io URL for back-ups monitor.
+            >          healthchecks_uuid: the healthchecks.io UUID for back-ups monitor.
+            >                   home_dir: users home directory (read only)
+            >                    log_dir: emborg log directory (read only)
+            >    manifest_default_format: the format that manifest should use if none is
+            >                             specified
+            >           manifest_formats: format strings used by manifest
+            >                 must_exist: if set, each of these files or directories
+            >                             must exist or create will quit with an error
+            >            needs_ssh_agent: if set, Emborg will complain if ssh_agent is
+            >                             not available
+            >                   notifier: notification program
+            >                     notify: email address to notify when things go wrong
+            >                passcommand: command used by Borg to acquire the passphrase
+            >                 passphrase: passphrase for encryption key (if specified,
+            >                             Avendesora is not used)
+            >                   patterns: patterns that indicate whether a path should
+            >                             be included or excluded
+            >              patterns_from: file that contains patterns
+            >         prune_after_create: run prune after creating an archive
+            >                 repository: path to remote directory that contains
+            >                             repository
+            >           run_after_backup: commands to run after archive has been created
+            >      run_after_last_backup: commands to run after last archive has been
+            >                             created
+            >          run_before_backup: commands to run before archive is created
+            >    run_before_first_backup: commands to run before first archive is
+            >                             created
+            >              show_progress: show borg progress when running create command
+            >                 show_stats: show borg statistics when running create,
+            >                             delete, and prune commands
+            >                   src_dirs: the directories to archive
+            >                ssh_command: command to use for SSH, can be used to specify
+            >                             SSH options
+            >                    verbose: make Borg more verbose
+            >                working_dir: working directory
+            >
+            > Borg settings:
+            >                append_only: create an append-only mode repository
+            >                compression: compression algorithm
+            >             exclude_caches: exclude directories that contain a
+            >                             CACHEDIR.TAG file
+            >         exclude_if_present: exclude directories that are tagged by
+            >                             containing a filesystem object with the given
+            >                             NAME
+            >             exclude_nodump: exclude files flagged NODUMP
+            >                 keep_daily: number of daily archives to keep
+            >                keep_hourly: number of hourly archives to keep
+            >                  keep_last: number of the most recent archives to keep
+            >              keep_minutely: number of minutely archives to keep
+            >               keep_monthly: number of monthly archives to keep
+            >                keep_weekly: number of weekly archives to keep
+            >                keep_within: keep all archives within this time interval
+            >                keep_yearly: number of yearly archives to keep
+            >                  lock_wait: wait at most SECONDS for acquiring a
+            >                             repository/cache lock (default: 1)
+            >            one_file_system: stay in the same file system and do not store
+            >                             mount points of other file systems
+            >                     prefix: only consider archive names starting with this
+            >                             prefix
+            >                remote_path: name of borg executable on remote platform
+            >           remote_ratelimit: set remote network upload rate limit in kiB/s
+            >                             (default: 0=unlimited)
+            >                      umask: set umask to M (local and remote, default:
+            >                             0077)
+
+emborg with configs:
+
+    3:
+        args: version
+        expected_re: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+
+    4:
+        args: settings --available
+        expected:
+            > Emborg settings:
+            >                    archive: template Borg should use when creating archive
+            >                             names
+            >         avendesora_account: account name that holds passphrase for
+            >                             encryption key in Avendesora
+            >           avendesora_field: name of field in Avendesora that holds the
+            >                             passphrase
+            >            borg_executable: path to borg
+            >         check_after_create: run check as the last step of an archive
+            >                             creation
+            >                colorscheme: the color scheme
+            >                 config_dir: absolute path to configuration directory
+            >                             (read-only)
+            >                config_name: name of active configuration (set by program)
+            >             configurations: available Emborg configurations
+            >                cronhub_url: the cronhub.io URL for back-ups monitor.
+            >               cronhub_uuid: the cronhub.io UUID for back-ups monitor.
+            >      default_configuration: default Emborg configuration
+            >        default_mount_point: directory to use as mount point if one is not
+            >                             specified
+            >              do_not_expand: names of settings that must not undergo
+            >                             setting evaluation
+            >                   encoding: encoding when talking to borg
+            >                 encryption: encryption method (see Borg documentation)
+            >               exclude_from: file that contains exclude patterns
+            >                   excludes: list of glob strings of files or directories
+            >                             to skip
+            >           healthchecks_url: the healthchecks.io URL for back-ups monitor.
+            >          healthchecks_uuid: the healthchecks.io UUID for back-ups monitor.
+            >                   home_dir: users home directory (read only)
+            >                    log_dir: emborg log directory (read only)
+            >    manifest_default_format: the format that manifest should use if none is
+            >                             specified
+            >           manifest_formats: format strings used by manifest
+            >                 must_exist: if set, each of these files or directories
+            >                             must exist or create will quit with an error
+            >            needs_ssh_agent: if set, Emborg will complain if ssh_agent is
+            >                             not available
+            >                   notifier: notification program
+            >                     notify: email address to notify when things go wrong
+            >                passcommand: command used by Borg to acquire the passphrase
+            >                 passphrase: passphrase for encryption key (if specified,
+            >                             Avendesora is not used)
+            >                   patterns: patterns that indicate whether a path should
+            >                             be included or excluded
+            >              patterns_from: file that contains patterns
+            >         prune_after_create: run prune after creating an archive
+            >                 repository: path to remote directory that contains
+            >                             repository
+            >           run_after_backup: commands to run after archive has been created
+            >      run_after_last_backup: commands to run after last archive has been
+            >                             created
+            >          run_before_backup: commands to run before archive is created
+            >    run_before_first_backup: commands to run before first archive is
+            >                             created
+            >              show_progress: show borg progress when running create command
+            >                 show_stats: show borg statistics when running create,
+            >                             delete, and prune commands
+            >                   src_dirs: the directories to archive
+            >                ssh_command: command to use for SSH, can be used to specify
+            >                             SSH options
+            >                    verbose: make Borg more verbose
+            >                working_dir: working directory
+            >
+            > Borg settings:
+            >                append_only: create an append-only mode repository
+            >                compression: compression algorithm
+            >             exclude_caches: exclude directories that contain a
+            >                             CACHEDIR.TAG file
+            >         exclude_if_present: exclude directories that are tagged by
+            >                             containing a filesystem object with the given
+            >                             NAME
+            >             exclude_nodump: exclude files flagged NODUMP
+            >                 keep_daily: number of daily archives to keep
+            >                keep_hourly: number of hourly archives to keep
+            >                  keep_last: number of the most recent archives to keep
+            >              keep_minutely: number of minutely archives to keep
+            >               keep_monthly: number of monthly archives to keep
+            >                keep_weekly: number of weekly archives to keep
+            >                keep_within: keep all archives within this time interval
+            >                keep_yearly: number of yearly archives to keep
+            >                  lock_wait: wait at most SECONDS for acquiring a
+            >                             repository/cache lock (default: 1)
+            >            one_file_system: stay in the same file system and do not store
+            >                             mount points of other file systems
+            >                     prefix: only consider archive names starting with this
+            >                             prefix
+            >                remote_path: name of borg executable on remote platform
+            >           remote_ratelimit: set remote network upload rate limit in kiB/s
+            >                             (default: 0=unlimited)
+            >                      umask: set umask to M (local and remote, default:
+            >                             0077)
+
+    5:
+        args: version
+        expected_re: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+
+    6:
+        args: --quiet configs
+        expected:
+            > Available Configurations:
+            >     test0
+            >     test1
+            >     test2
+            >     test3
+            >     test4
+            >     test5
+            >     test6
+            >     test7
+            >     tests=test0,test1,test2,test3
+            >
+            > Default Configuration:
+            >     tests
+
+    7:
+        args: --quiet --config test0 settings
+        expected:
+            >               archive: '{prefix}{{now}}'
+            >                        'test0-{now}'
+            >    check_after_create: True
+            >            config_dir: '/«TESTS»/.config/emborg'
+            >           config_name: 'test0'
+            >        configurations: """
+            >                            test0 test1 test2 test3 test4 test5 test6 test7
+            >                            tests=test0,test1,test2,test3
+            >                        """
+            > default_configuration: 'tests'
+            >   default_mount_point: '~/RESTORED'
+            >            encryption: 'none'
+            >        exclude_caches: True
+            >    exclude_if_present: '.nobackup'
+            >              excludes: [
+            >                            'fm:*/.viminfo',
+            >                            'sh:**/.*.swp',
+            >                            'sh:**/.*.swo',
+            >                        ]
+            >              home_dir: '/«TESTS»'
+            >           keep_within: '1d'
+            >               log_dir: '/«TESTS»/.local/share/emborg'
+            >                prefix: '{config_name}-'
+            >                        'test0-'
+            >    prune_after_create: True
+            >            repository: '~/repositories'
+            >              src_dirs: ['~/configs']
+
+    8:
+        args: --quiet --config test0 init
+
+    9:
+        args: --config test0 list
+
+    10:
+        args: --config test0 files
+        expected: FAILURE
+
+    11:
+        args: --quiet create
+
+    12:
+        args: --quiet --config test0 list
+        expected_re: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    13:
+        args: --quiet --config test0 list --include-external
+        expected_re:
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    14:
+        args: --quiet --config test2 delete
+
+    15:
+        args: --quiet --config test0 list --include-external
+        expected_re:
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    16:
+        args: --quiet --config test0 manifest --name --sort-by-name
+        expected_re:
+            > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > «TESTS»/configs
+            > «TESTS»/configs/README
+            > «TESTS»/configs/overdue.conf
+            > «TESTS»/configs/settings
+            > «TESTS»/configs/test0
+            > «TESTS»/configs/test1
+            > «TESTS»/configs/test2
+            > «TESTS»/configs/test2excludes
+            > «TESTS»/configs/test2passphrase
+            > «TESTS»/configs/test3
+            > «TESTS»/configs/test4
+            > «TESTS»/configs/test5
+            > «TESTS»/configs/test6
+            > «TESTS»/configs/test6patterns
+            > «TESTS»/configs/test7
+            > «TESTS»/configs/test7patterns
+
+    17:
+        args: --quiet --config test0 manifest --name --sort-by-name /«TESTS»/configs/test
+        expected_re:
+            > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > «TESTS»/configs/test0
+            > «TESTS»/configs/test1
+            > «TESTS»/configs/test2
+            > «TESTS»/configs/test2excludes
+            > «TESTS»/configs/test2passphrase
+            > «TESTS»/configs/test3
+            > «TESTS»/configs/test4
+            > «TESTS»/configs/test5
+            > «TESTS»/configs/test6
+            > «TESTS»/configs/test6patterns
+            > «TESTS»/configs/test7
+            > «TESTS»/configs/test7patterns
+
+    18:
+        args: --quiet create
+
+    19:
+        args: --quiet --config test0 list --include-external
+        expected_re:
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    20:
+        args: --quiet --config test0 prune
+
+    21:
+        args: --quiet --config test0 prune --include-external
+
+    22:
+        args: --quiet --config test0 check
+
+    23:
+        args: --quiet --config test0 check --all
+
+    24:
+        args: --quiet --config test0 check --include-external
+
+    25:
+        args: --quiet --config test0 list --include-external
+        expected_re:
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    26:
+        args: --quiet due
+        expected_re:
+            > The latest test0 archive was created (just now|(\d+ )?seconds ago)\.
+            > The latest test1 archive was created (just now|(\d+ )?seconds ago)\.
+            > The latest test2 archive was created (just now|(\d+ )?seconds ago)\.
+            > The latest test3 archive was created (just now|(\d+ )?seconds ago)\.
+
+    27:
+        args: --quiet --config test0 info
+        expected_re:
+            >               config: test0
+            >                roots: /«TESTS»/configs
+            >          destination: /«TESTS»/repositories
+            >   settings directory: /«TESTS»/.config/emborg
+            >              logfile: /«TESTS»/.local/share/emborg/test0.log
+            >       last backed up: .*
+            >
+            > Repository ID: \w*
+            > Location: /«TESTS»/repositories
+            > Encrypted: No
+            > Cache: /«TESTS»/.cache/borg/\w+
+            > Security dir: /«TESTS»/.config/borg/security/\w+
+            > ------------------------------------------------------------------------------
+            >                        Original size      Compressed size    Deduplicated size
+            > All archives:          .............      ...............    .................
+            >
+            >                        Unique chunks         Total chunks
+            > Chunk index:           .............         ............
+
+    28:
+        args: --quiet --config test0 extract /«TESTS»/configs
+        cmp_dirs: /«TESTS»/CONFIGS configs
+
+    29:
+        args: --quiet --config test0 restore configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    30:
+        args: --quiet --config test0 mount RESTORED
+        cmp_dirs: RESTORED/«TESTS»/configs configs
+
+    31:
+        args: --quiet --config test0 umount RESTORED
+
+    32:
+        args: --quiet --config test0 mount
+        cmp_dirs: RESTORED/«TESTS»/configs configs
+
+    33:
+        args: --quiet --config test0 umount
+
+    34:
+        args: --quiet --config test4 create
+
+    35:
+        args: --quiet --config test4 list
+        expected_re: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    36:
+        args: --quiet --config test4 files -S
+        expected_re:
+            > Archive: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            >        0 configs/
+            >       13 configs/test2passphrase
+            >       52 configs/test6patterns
+            >       66 configs/test2excludes
+            >       84 configs/test7patterns
+            >       89 configs/test7
+            >      127 configs/test6
+            >      141 configs/test2
+            >      143 configs/test0
+            >      149 configs/test5
+            >      169 configs/test4
+            >      195 configs/test1
+            >      253 configs/test3
+            >      556 configs/overdue.conf
+            >      589 configs/settings
+            >     1620 configs/README
+
+    37:
+        args: --quiet --config test4 extract -f configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    38:
+        args: --quiet --config test4 extract -f /«TESTS»/configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    39:
+        args: --quiet --config test4 restore configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    40:
+        args: --quiet --config test4 mount
+        cmp_dirs: RESTORED/configs configs
+
+    41:
+        args: --quiet --config test4 umount
+
+    42:
+        args: --quiet --config test4 borg list --prefix test4- --short @repo
+        expected_re: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    43:
+        args: --quiet --config test5 create
+
+    44:
+        args: --quiet --config test5 list
+        expected_re: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    45:
+        args: --quiet --config test5 files -N
+        expected_re:
+            > Archive: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > «TESTS»/configs/
+            > «TESTS»/configs/README
+            > «TESTS»/configs/overdue.conf
+            > «TESTS»/configs/settings
+            > «TESTS»/configs/test0
+            > «TESTS»/configs/test1
+            > «TESTS»/configs/test2
+            > «TESTS»/configs/test2excludes
+            > «TESTS»/configs/test2passphrase
+            > «TESTS»/configs/test3
+            > «TESTS»/configs/test4
+            > «TESTS»/configs/test5
+            > «TESTS»/configs/test6
+            > «TESTS»/configs/test6patterns
+            > «TESTS»/configs/test7
+            > «TESTS»/configs/test7patterns
+
+    46:
+        args: --quiet --config test5 extract «TESTS»/configs
+        cmp_dirs: «TESTS»/configs configs
+
+    47:
+        args: --quiet --config test5 restore configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    48:
+        args: --quiet --config test5 mount
+        cmp_dirs: RESTORED/«TESTS»/configs CONFIGS
+
+    49:
+        args: --quiet --config test5 umount
+
+    50:
+        args: --quiet --config test5 borg list --prefix test5- --short @repo
+        expected_re: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    51:
+        args: --quiet --config test6 create
+
+    52:
+        args: --quiet --config test6 list
+        expected_re: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    53:
+        args: --quiet --config test6 files -S
+        expected_re:
+            > Archive: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            >        0 configs/
+            >       13 configs/test2passphrase
+            >       52 configs/test6patterns
+            >       66 configs/test2excludes
+            >       84 configs/test7patterns
+            >       89 configs/test7
+            >      127 configs/test6
+            >      141 configs/test2
+            >      143 configs/test0
+            >      149 configs/test5
+            >      169 configs/test4
+            >      195 configs/test1
+            >      253 configs/test3
+            >      556 configs/overdue.conf
+            >      589 configs/settings
+            >     1620 configs/README
+
+    54:
+        args: --quiet --config test6 extract -f configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    55:
+        args: --quiet --config test6 extract -f /«TESTS»/configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    56:
+        args: --quiet --config test6 restore configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    57:
+        args: --quiet --config test6 mount
+        cmp_dirs: RESTORED/configs configs
+
+    58:
+        args: --quiet --config test6 umount
+
+    59:
+        args: --quiet --config test6 borg list --prefix test6- --short @repo
+        expected_re: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    60:
+        args: --quiet --config test7 create
+
+    61:
+        args: --quiet --config test7 list
+        expected_re: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    62:
+        args: --quiet --config test7 files -N
+        expected_re:
+            > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > «TESTS»/configs/
+            > «TESTS»/configs/README
+            > «TESTS»/configs/overdue.conf
+            > «TESTS»/configs/settings
+            > «TESTS»/configs/test0
+            > «TESTS»/configs/test1
+            > «TESTS»/configs/test2
+            > «TESTS»/configs/test2excludes
+            > «TESTS»/configs/test2passphrase
+            > «TESTS»/configs/test3
+            > «TESTS»/configs/test4
+            > «TESTS»/configs/test5
+            > «TESTS»/configs/test6
+            > «TESTS»/configs/test6patterns
+            > «TESTS»/configs/test7
+            > «TESTS»/configs/test7patterns
+
+    63:
+        args: --quiet --config test7 extract «TESTS»/configs
+        cmp_dirs: «TESTS»/configs configs
+
+    64:
+        args: --quiet --config test7 restore configs
+        cmp_dirs: CONFIGS configs
+        rm: configs
+
+    65:
+        args: --quiet --config test7 mount
+        cmp_dirs: RESTORED/«TESTS»/configs CONFIGS
+
+    66:
+        args: --quiet --config test7 umount
+
+    67:
+        args: --quiet --config test7 borg list --prefix test7- --short @repo
+        expected_re: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+
+    68:
+        args: --config test7 delete --repo
+
+    69:
+        args: --config test7 list
+        expected: FAILURE
+
+emborg-overdue:
+
+    70:
+        expected:
+            > test0: 0.0 hours
+            > test1: 0.0 hours
+            > test2: 0.0 hours
+            > test3: 0.0 hours
+            > test4: 0.0 hours
+            > test5: 0.0 hours
+            > test6: 0.0 hours
+            > test7: 0.0 hours
+            >
+
+    71:
+        args: --no-passes
+        expected:
+

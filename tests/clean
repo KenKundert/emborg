@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [[ -d RESTORED/home ]]; then
+    fusermount -u RESTORED
+fi
+
+rm -rf configs .config .local repositories home __pycache__ RESTORED
+rm -rf .cache .hypothesis .test.sum .coverage .test.emborg.sum

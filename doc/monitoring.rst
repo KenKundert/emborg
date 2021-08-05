@@ -16,7 +16,9 @@ Checking for Overdue Backups from the Server
 *Emborg* contains an additional executable, *emborg-overdue*, that can be run on 
 the destination server to determine whether the backups have been performed 
 recently.  It reads its own settings file in ~/.config/emborg/overdue.conf that 
-is also a Python file and may contain the following settings::
+is also a Python file and may contain the following settings:
+
+.. code-block:: text
 
     default_maintainer (email address -- mail is sent to this person upon failure)
     default_max_age (hours)
@@ -79,20 +81,28 @@ is not given, the *default_maintainer* is used. If *max_age* is not given, the
 *default_max_age* is used.
 
 To run the program interactively, just make sure *emborg-overdue* has been 
-installed and is on your path. Then type::
+installed and is on your path. Then type:
+
+.. code-block:: bash
 
     $ emborg-overdue
 
 It is also common to run *emborg-overdue* on a fixed schedule from cron. To do 
-so, run::
+so, run:
+
+.. code-block:: bash
 
     $ crontab -e
 
-and add something like the following::
+and add something like the following:
+
+.. code-block:: text
 
     34 5 * * * ~/.local/bin/emborg-overdue --mail > ~/.local/share/emborg/emborg-overdue.out 2>&
 
-or::
+or:
+
+.. code-block:: text
 
     34 5 * * * ~/.local/bin/emborg-overdue --quiet --mail
 

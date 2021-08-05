@@ -1,0 +1,53 @@
+There are 7 base configurations and one composite configurations.
+Before the start of testing, 'CONFIGS' is copied to 'configs'
+
+The tests back up only this directory or the 'configs' subdirectory
+    - need a controlled set of files to test manifest
+
+test0:
+    - backs up the ./configs directory
+    - uses excludes to select which files to backup
+    - uses default mount point
+
+test1:
+    - backs up the . directory
+    - uses excludes to select which files to backup
+    - does not use default mount point
+
+test2:
+    - backs up the . directory
+    - uses encryption and passcommand
+    - uses exclude_from to select which files to backup
+    - does not use default mount point
+
+test3:
+    - backs up the . directory
+    - uses encryption and passphrase
+    - uses patterns with simple excludes to select which files to backup
+    - does not use default mount point
+
+test4:
+    - backs up the ./configs directory
+    - uses patterns with root and excludes to select which files to backup
+    - sets working_dir to . (relative paths)
+    - uses default mount point
+
+test5
+    - backs up the . directory
+    - uses patterns with root, includes and excludes to select which files to 
+      backup
+    - uses default mount point
+
+test6
+    - backs up the . directory
+    - uses patterns_from with root and excludes to select which files to backup
+    - sets working_dir to . (relative paths)
+    - uses default mount point
+
+test7
+    - backs up the . directory
+    - uses patterns_from with root, includes and excludes to select which files 
+      to backup
+    - uses default mount point
+
+tests contains test{0,1,2,3}
