@@ -31,7 +31,10 @@ jobs:
       - name: Run tests
         run: tox
       - name: Report test coverage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_SERVICE_NAME: github
-        run: coveralls
+        #env:
+        #  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #  COVERALLS_SERVICE_NAME: github
+        #run: coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
