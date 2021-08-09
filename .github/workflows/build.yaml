@@ -20,6 +20,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install Borg
+        run: sudo apt install borgbackup
       - name: Install packages
         run:
           python -m pip install --upgrade pip
