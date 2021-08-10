@@ -4,14 +4,14 @@ Emborg — Front-End to Borg Backup
 .. image:: https://pepy.tech/badge/emborg/month
     :target: https://pepy.tech/project/emborg
 
-.. image:: https://img.shields.io/pypi/v/emborg.svg
-    :target: https://pypi.python.org/pypi/emborg
-
 ..  image:: https://github.com/KenKundert/emborg/actions/workflows/build.yaml/badge.svg
     :target: https://github.com/KenKundert/emborg/actions/workflows/build.yaml
 
 .. image:: https://coveralls.io/repos/github/KenKundert/emborg/badge.svg?branch=master
     :target: https://coveralls.io/github/KenKundert/emborg?branch=master
+
+.. image:: https://img.shields.io/pypi/v/emborg.svg
+    :target: https://pypi.python.org/pypi/emborg
 
 .. image:: https://img.shields.io/pypi/pyversions/emborg.svg
     :target: https://pypi.python.org/pypi/emborg/
