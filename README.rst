@@ -4,6 +4,9 @@ Emborg — Front-End to Borg Backup
 .. image:: https://pepy.tech/badge/emborg/month
     :target: https://pepy.tech/project/emborg
 
+.. image:: https://img.shields.io/readthedocs/emborg.svg
+   :target: https://emborg.readthedocs.io/en/latest/?badge=latest
+
 ..  image:: https://github.com/KenKundert/emborg/actions/workflows/build.yaml/badge.svg
     :target: https://github.com/KenKundert/emborg/actions/workflows/build.yaml
 

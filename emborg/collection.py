@@ -51,7 +51,7 @@ def split_lines(text, comment=None, strip=False, cull=False, sep=None):
     if sep:
         pairs = dict(l.partition(sep)[::2] for l in lines)
         if strip:
-            lines = {k.strip():v.strip() for k, v in pairs.items()}
+            lines = {k.strip(): v.strip() for k, v in pairs.items()}
     return lines
 
 
