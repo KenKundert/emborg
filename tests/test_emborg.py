@@ -4,17 +4,20 @@
 # suitable for public continuous integration services such as GitHub Actions.
 
 # Imports {{{1
+import nestedtext as nt
 import os
+import parametrize_from_file
 import pytest
 import re
-import nestedtext as nt
 from inform import is_str, Color, Error, indent
 from shlib import Run, cd, cp, cwd, ln, lsf, mkdir, rm, set_prefs, touch
 from textwrap import dedent
+from voluptuous import Schema, Optional, Required, Any
+parametrize = parametrize_from_file
 
 
 # Globals {{{1
-# uses local code
+# uses local versions of emborg (../bu) and emborg_overdue (../od)
 emborg_exe = "../bu".split()
 emborg_overdue_exe = "../od".split()
 # uses installed code
@@ -25,25 +28,29 @@ tests_dir = __file__.rpartition('/')[0]
 tests_dir_wo_slash = tests_dir.strip('/')
     # remove the leading and trailing slashes
     # they will be added back in tests if needed
-parametrize = pytest.mark.parametrize
 
+# schema for test cases {{{2
+emborg_schema = Schema({
+    Optional('opts', default=""): str,
+    Optional('args', default=[]): Any(str, list),
+    Optional('expected', default=""): str,
+    Optional('expected_re', default=""): str,
+    Optional('cmp_dirs', default=""): str,
+    Optional('rm', default=""): str,
+}, required=True)
+emborg_overdue_schema = Schema({
+    Optional('conf', default=""): str,
+    Optional('args', default=[]): Any(str, list),
+    Required('expected', default=""): str,
+}, required=True)
 
 # EmborgTester class {{{1
 class EmborgTester(object):
-    def __init__(
-        self,
-        name,
-        opts="",
-        args="",
-        config=None,
-        expected=None,
-        expected_re=None,
-        cmp_dirs=None,
-        rm=None,
-    ):
+    # constructor {{{2
+    def __init__(self, opts, args, expected, expected_re, cmp_dirs, rm):
         # expected == None implies that another test method is to be used if
         #     available, otherwise the run should not fail.
-        # expected == FAILURE implies that the run should fail.
+        # expected == 'FAILURE' implies that the run should fail.
         # expected == <str> implies stdout should match the string precisely
         # expected_re is a regular expression that should match stdout in full
         # cmp_dirs is a pair of directories that should match exactly
@@ -58,7 +65,6 @@ class EmborgTester(object):
         if cmp_dirs:
             cmp_dirs = cmp_dirs.replace("«TESTS»", tests_dir_wo_slash)
 
-        self.name = name
         self.args = args.split() if is_str(args) else args
         self.expected = expected
         if expected:
@@ -72,6 +78,7 @@ class EmborgTester(object):
         self.rm = rm
         self.diffout = None
 
+    # run() {{{2
     def run(self):
         try:
             if self.rm:
@@ -99,6 +106,7 @@ class EmborgTester(object):
             self.result = str(e)
             return self.expected == 'FAILURE'
 
+    # get_expected() {{{2
     def get_expected(self):
         if self.expected:
             expected = self.expected
@@ -111,6 +119,7 @@ class EmborgTester(object):
         else:
             return expected
 
+    # get_result() {{{2
     def get_result(self):
         if "\n" in self.result:
             return "\n" + indent(self.result, stops=2)
@@ -119,9 +128,6 @@ class EmborgTester(object):
 
 
 # Setup {{{1
-# Load Tests {{{2
-tests = nt.load(f'{tests_dir}/test-cases.nt')
-
 # Test fixture {{{2
 # initialize {{{3
 @pytest.fixture(scope="session")
@@ -147,60 +153,54 @@ def initialize_configs(initialize):
 
 
 # Tests {{{1
-# test_names {{{2
-# assure all test names are unique
-def test_names():
-    names = set()
-    for phase, tsts in tests.items():
-        for name in tsts.keys():
-            assert name not in names, f"Test name '{name}' is not unique."
-            names.add(name)
-
 # test_emborg_without_configs{{{2
 @parametrize(
-    'name, params',
-    tests['emborg without configs'].items(),
-    ids=tests['emborg without configs'].keys()
+    path = f'{tests_dir}/test-cases.nt',
+    key = 'emborg without configs',
+    schema = emborg_schema
 )
-def test_emborg_without_configs(initialize, name, params):
+def test_emborg_without_configs(
+    initialize, opts, args, expected, expected_re, cmp_dirs, rm
+):
     with cd(tests_dir):
-        tester = EmborgTester(name, **params)
+        tester = EmborgTester(opts, args, expected, expected_re, cmp_dirs, rm)
         passes = tester.run()
         if not passes:
             result = dict(passes=passes, output=tester.get_result())
             expected = dict(passes=True, output=tester.get_expected())
-            assert result == expected, f'Test {tester.name}'
+            assert result == expected
 
 # test_emborg_with_configs{{{2
 @parametrize(
-    "name, params",
-    tests['emborg with configs'].items(),
-    ids = tests['emborg with configs'].keys()
+    path = f'{tests_dir}/test-cases.nt',
+    key = 'emborg with configs',
+    schema = emborg_schema
 )
-def test_emborg_with_configs(initialize_configs, name, params):
+def test_emborg_with_configs(
+    initialize_configs, opts, args, expected, expected_re, cmp_dirs, rm
+):
     with cd(tests_dir):
-        tester = EmborgTester(name, **params)
+        tester = EmborgTester(opts, args, expected, expected_re, cmp_dirs, rm)
         passes = tester.run()
         if not passes:
             result = dict(passes=passes, output=tester.get_result())
             expected = dict(passes=True, output=tester.get_expected())
-            assert result == expected, f'Test {tester.name}'
+            assert result == expected
 
 # test_emborg_overdue {{{2
 @parametrize(
-    "name, params",
-    list(tests['emborg-overdue'].items()),
-    ids = tests['emborg-overdue'].keys()
+    path = f'{tests_dir}/test-cases.nt',
+    key = 'emborg-overdue',
+    schema = emborg_overdue_schema
 )
-def test_emborg_overdue(initialize, name, params):
+def test_emborg_overdue(initialize, conf, args, expected):
     with cd(tests_dir):
-        if 'conf' in params:
+        if conf:
             with open('.config/overdue.conf', 'w') as f:
-                f.write(params['conf'])
+                f.write(conf)
         try:
-            args = params.get('args', [])
             args = args.split() if is_str(args) else args
             overdue = Run(emborg_overdue_exe + args, "sOEW")
-            assert overdue.stdout == params['expected']
+            assert overdue.stdout == expected
         except Error as e:
-            return str(e) == params['expected']
+            return str(e) == expected
