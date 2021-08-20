@@ -1447,11 +1447,42 @@ class RestoreCommand(Command):
         if cmdline["--list"]:
             borg_opts.append("--list")
 
+        # need to construct a path to the file that is compatible with those
+        # paths stored in borg, thus it must begin with a src_dir (cannot just
+        # use the absolute path because the corresponding src_dir path may
+        # contain a symbolic link, in which the absolute path would not be found
+        # in the borg repository
         # convert to paths relative to the working directory
         try:
-            paths = [
-                to_path(p).resolve().relative_to(settings.working_dir) for p in paths
-            ]
+            paths_not_found = set(paths)
+            resolved_paths = []
+            roots = settings.resolve_patterns([], skip_checks=True)
+            for root_dir in settings.roots:
+                resolved_root_dir = root_dir.resolve()
+                for name in paths:
+                    path = to_path(name)
+                    resolved_path = path.resolve()
+                    try:
+                        # get relative path from root_dir to path after resolving
+                        # symbolic links in both root_dir and path
+                        path = resolved_path.relative_to(resolved_root_dir)
+
+                        # add original root_dir (with sym links) to relative path
+                        path = to_path(settings.working_dir, root_dir, path)
+
+                        # get relative path from working dir to computed path
+                        # this will be the path contained in borg archive
+                        path = path.relative_to(settings.working_dir)
+                        resolved_paths.append(path)
+                        paths_not_found.remove(name)
+                    except ValueError as e:
+                        pass
+
+            if paths_not_found:
+                raise Error(
+                    'not contained in a source directory:',
+                    conjoin(paths_not_found)
+                )
         except ValueError as e:
             raise Error(e)
 
@@ -1466,7 +1497,7 @@ class RestoreCommand(Command):
         borg = settings.run_borg(
             cmd = "extract",
             borg_opts = borg_opts,
-            args = [settings.destination(archive)] + paths,
+            args = [settings.destination(archive)] + resolved_paths,
             emborg_opts = options,
             show_borg_output = bool(borg_opts),
             use_working_dir = True,

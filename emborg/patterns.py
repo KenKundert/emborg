@@ -34,7 +34,9 @@ def check_root(root, working_dir):
     root = to_path(root)
     if not root.exists():
         raise Error("not found.", culprit=root)
-    if not str(root.resolve()).startswith(str(working_dir)):
+    try:
+        root.resolve().relative_to(working_dir.resolve())
+    except ValueError:
         raise Error("not in working directory:", working_dir, culprit=root)
     return root.is_absolute()
 
@@ -91,7 +93,9 @@ def check_pattern(pattern, default_style, roots, expand_tilde):
 
 
 # check_patterns() {{{1
-def check_patterns(patterns, roots, working_dir, src, expand_tilde=True):
+def check_patterns(
+    patterns, roots, working_dir, src, expand_tilde=True, skip_checks=False
+):
     paths = []
     default_style = "sh"
     for pattern in patterns:
@@ -112,8 +116,9 @@ def check_patterns(patterns, roots, working_dir, src, expand_tilde=True):
                         culprit=culprit,
                     )
                 root = expand_user(arg)
-                check_root(root, working_dir)
-                roots.append(root)
+                if not skip_checks:
+                    check_root(root, working_dir)
+                roots.append(to_path(root))
             except AttributeError:
                 error("can no longer add roots.", culprit=culprit)
             paths.append(kind + " " + root)
@@ -155,10 +160,13 @@ def check_excludes(patterns, roots, src, expand_tilde=True):
 
 
 # check_patterns_files() {{{1
-def check_patterns_files(filenames, roots, working_dir):
+def check_patterns_files(filenames, roots, working_dir, skip_checks=False):
     for filename in filenames:
         patterns = to_path(filename).read_text().splitlines()
-        check_patterns(patterns, roots, working_dir, filename, expand_tilde=False)
+        check_patterns(
+            patterns, roots, working_dir, filename,
+            expand_tilde=False, skip_checks=skip_checks
+        )
 
 
 # check_excludes_files() {{{1

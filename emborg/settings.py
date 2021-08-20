@@ -141,7 +141,11 @@ def get_config(name, settings, composite_config_response, show_config_name):
         name = default
     if name:
         if name not in config_groups:
-            raise Error("unknown configuration.", culprit=name)
+            raise Error(
+                "unknown configuration.",
+                culprit = name,
+                codicil = "Perhaps you forgot to add it to the 'configurations' setting?.",
+            )
     else:
         if len(configs) > 0:
             name = configs[0]
@@ -413,6 +417,44 @@ class Settings:
         if s:
             return self.to_path(s, resolve, name if must_exist else None)
 
+    # resolve_patterns() {{{2
+    def resolve_patterns(self, borg_opts, skip_checks=False):
+        roots = self.src_dirs[:]
+
+        patterns = self.values("patterns")
+        if patterns:
+            for pattern in check_patterns(
+                patterns, roots, self.working_dir, "patterns",
+                skip_checks=skip_checks
+            ):
+                borg_opts.extend(["--pattern", pattern])
+
+        excludes = self.values("excludes")
+        if excludes:
+            for exclude in check_excludes(excludes, roots, "excludes"):
+                borg_opts.extend(["--exclude", exclude])
+
+        patterns_froms = self.as_paths("patterns_from", must_exist=True)
+        if patterns_froms:
+            check_patterns_files(
+                patterns_froms, roots, self.working_dir, skip_checks=skip_checks
+            )
+            for patterns_from in patterns_froms:
+                borg_opts.extend(["--patterns-from", patterns_from])
+
+        exclude_froms = self.as_paths("exclude_from", must_exist=True)
+        if exclude_froms:
+            check_excludes_files(exclude_froms, roots)
+            for exclude_from in exclude_froms:
+                borg_opts.extend(["--exclude-from", exclude_from])
+
+        if not skip_checks:
+            check_roots(roots, self.working_dir)
+
+        if errors_accrued():
+            raise Error("stopping due to previously reported errors.")
+        self.roots = roots
+
     # as_paths() {{{2
     def as_paths(self, name, resolve=True, must_exist=False):
         """Convert setting to paths, without resolution."""
@@ -435,34 +477,10 @@ class Settings:
         if "dry-run" in emborg_opts and cmd in borg_commands_with_dryrun:
             borg_opts.append("--dry-run")
 
-        if cmd == "create":
+        if cmd in "create":
             if "verbose" in emborg_opts and "--list" not in borg_opts:
                 borg_opts.append("--list")
-            roots = self.src_dirs[:]
-            patterns = self.values("patterns")
-            if patterns:
-                for pattern in check_patterns(
-                    patterns, roots, self.working_dir, "patterns"
-                ):
-                    borg_opts.extend(["--pattern", pattern])
-            excludes = self.values("excludes")
-            if excludes:
-                for exclude in check_excludes(excludes, roots, "excludes"):
-                    borg_opts.extend(["--exclude", exclude])
-            patterns_froms = self.as_paths("patterns_from", must_exist=True)
-            if patterns_froms:
-                check_patterns_files(patterns_froms, roots, self.working_dir)
-                for patterns_from in patterns_froms:
-                    borg_opts.extend(["--patterns-from", patterns_from])
-            exclude_froms = self.as_paths("exclude_from", must_exist=True)
-            if exclude_froms:
-                check_excludes_files(exclude_froms, roots)
-                for exclude_from in exclude_froms:
-                    borg_opts.extend(["--exclude-from", exclude_from])
-            check_roots(roots, self.working_dir)
-            if errors_accrued():
-                raise Error("stopping due to previously reported errors.")
-            self.roots = roots
+            self.resolve_patterns(borg_opts)
 
         elif cmd == "extract":
             if "verbose" in emborg_opts:

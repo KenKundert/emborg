@@ -238,7 +238,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Emborg', u'Emborg Documentation',
-   u'Ken Kundert', 'Emborg', 'One line description of project.',
+   u'Ken Kundert', 'Emborg', 'Front-end to Borg Backup.',
    'Miscellaneous'),
 ]
 
