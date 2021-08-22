@@ -1,8 +1,9 @@
 #!/bin/sh
 
-if [[ -d RESTORED/home ]]; then
-    fusermount -u RESTORED
+if [ -d EMBORG/home ] || [ -d EMBORG/configs.symlink ]; then
+    fusermount -u EMBORG
 fi
 
-rm -rf configs .config .local repositories home __pycache__ RESTORED
+rm -f configs.symlink
+rm -rf configs .config .local repositories home __pycache__ EMBORG
 rm -rf .cache .hypothesis .test.sum .coverage .test.emborg.sum

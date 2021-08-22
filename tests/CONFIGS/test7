@@ -1,2 +1,2 @@
 patterns_from = '{config_dir}/test7patterns'
-default_mount_point = '{home_dir}/RESTORED'
+default_mount_point = '{home_dir}/EMBORG'

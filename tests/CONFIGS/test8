@@ -1,7 +1,7 @@
 from shlib import cwd
 working_dir = str(cwd())
 patterns = '''
-    R ./configs
+    R ./configs.symlink/subdir
     - fm:*/.viminfo
     - **/.*.swp
     - **/.*.swo

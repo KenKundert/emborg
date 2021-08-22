@@ -477,7 +477,7 @@ class Settings:
         if "dry-run" in emborg_opts and cmd in borg_commands_with_dryrun:
             borg_opts.append("--dry-run")
 
-        if cmd in "create":
+        if cmd == "create":
             if "verbose" in emborg_opts and "--list" not in borg_opts:
                 borg_opts.append("--list")
             self.resolve_patterns(borg_opts)
@@ -643,14 +643,7 @@ class Settings:
             try:
                 borg = Run(command, modes=modes, stdin="", env=os.environ, log=False)
             except Error as e:
-                narrate('Borg terminates with exit status:', e.status)
-                codicil = None
-                if e.stderr and 'previously located at' in e.stderr:
-                    codicil = dedent(f'''
-                        If repository was intentionally relocated, re-run with --relocated:
-                            emborg --relocated {cmd} ...
-                    ''')
-                e.reraise(culprit=f"borg {cmd}", codicil=codicil)
+                self.report_borg_error(e, cmd)
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))
@@ -690,7 +683,10 @@ class Settings:
             narrate("running in:", cwd())
             starts_at = arrow.now()
             log("starts at: {!s}".format(starts_at))
-            borg = Run(command, modes="soeW", env=os.environ, log=False)
+            try:
+                borg = Run(command, modes="soeW", env=os.environ, log=False)
+            except Error as e:
+                self.report_borg_error(e, ' '.join(command))
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))
@@ -704,6 +700,19 @@ class Settings:
             narrate("Borg exit status:", borg.status)
 
         return borg
+
+    def report_borg_error(self, e, cmd):
+        narrate('Borg terminates with exit status:', e.status)
+        codicil = None
+        if e.stderr:
+            if 'previously located at' in e.stderr:
+                codicil = dedent(f'''
+                    If repository was intentionally relocated, re-run with --relocated:
+                        emborg --relocated {cmd} ...
+                ''')
+            if 'Failed to create/acquire the lock' in e.stderr:
+                codicil = 'Perhaps your still have an archive mounted?'
+        e.reraise(culprit=f"borg {cmd}", codicil=codicil)
 
     # destination() {{{2
     def destination(self, archive=None):

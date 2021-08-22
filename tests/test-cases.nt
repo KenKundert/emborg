@@ -2,7 +2,8 @@ emborg without configs:
 
     -
         args: version
-        expected_re: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected_type: regex
 
     -
         args: help
@@ -157,7 +158,8 @@ emborg with configs:
 
     -
         args: version
-        expected_re: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected_type: regex
 
     -
         args: settings --available
@@ -257,7 +259,8 @@ emborg with configs:
 
     -
         args: version
-        expected_re: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected_type: regex
 
     -
         args: --quiet configs
@@ -271,6 +274,7 @@ emborg with configs:
             >     test5
             >     test6
             >     test7
+            >     test8
             >     tests=test0,test1,test2,test3
             >
             > Default Configuration:
@@ -285,11 +289,10 @@ emborg with configs:
             >            config_dir: '/«TESTS»/.config/emborg'
             >           config_name: 'test0'
             >        configurations: """
-            >                            test0 test1 test2 test3 test4 test5 test6 test7
+            >                            test0 test1 test2 test3 test4 test5 test6 test7 test8
             >                            tests=test0,test1,test2,test3
             >                        """
             > default_configuration: 'tests'
-            >   default_mount_point: '~/RESTORED'
             >            encryption: 'none'
             >        exclude_caches: True
             >    exclude_if_present: '.nobackup'
@@ -315,41 +318,47 @@ emborg with configs:
 
     -
         args: --config test0 files
-        expected: FAILURE
+        expected: bu error: no archives are available.
+        expected_type: error
 
     -
         args: --quiet create
 
     -
         args: --quiet --config test0 list
-        expected_re: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test0 list --include-external
-        expected_re:
+        expected:
             > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test2 delete
 
     -
         args: --quiet --config test0 list --include-external
-        expected_re:
+        expected:
             > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test0 manifest --name --sort-by-name
-        expected_re:
+        expected:
             > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > «TESTS»/configs
             > «TESTS»/configs/README
             > «TESTS»/configs/overdue.conf
             > «TESTS»/configs/settings
+            > «TESTS»/configs/subdir
+            > «TESTS»/configs/subdir/file
             > «TESTS»/configs/test0
             > «TESTS»/configs/test1
             > «TESTS»/configs/test2
@@ -362,10 +371,12 @@ emborg with configs:
             > «TESTS»/configs/test6patterns
             > «TESTS»/configs/test7
             > «TESTS»/configs/test7patterns
+            > «TESTS»/configs/test8
+        expected_type: regex
 
     -
         args: --quiet --config test0 manifest --name --sort-by-name /«TESTS»/configs/test
-        expected_re:
+        expected:
             > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > «TESTS»/configs/test0
             > «TESTS»/configs/test1
@@ -379,13 +390,15 @@ emborg with configs:
             > «TESTS»/configs/test6patterns
             > «TESTS»/configs/test7
             > «TESTS»/configs/test7patterns
+            > «TESTS»/configs/test8
+        expected_type: regex
 
     -
         args: --quiet create
 
     -
         args: --quiet --config test0 list --include-external
-        expected_re:
+        expected:
             > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -393,6 +406,7 @@ emborg with configs:
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test0 prune
@@ -411,7 +425,7 @@ emborg with configs:
 
     -
         args: --quiet --config test0 list --include-external
-        expected_re:
+        expected:
             > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -419,18 +433,20 @@ emborg with configs:
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet due
-        expected_re:
+        expected:
             > The latest test0 archive was created (just now|(\d+ )?seconds ago)\.
             > The latest test1 archive was created (just now|(\d+ )?seconds ago)\.
             > The latest test2 archive was created (just now|(\d+ )?seconds ago)\.
             > The latest test3 archive was created (just now|(\d+ )?seconds ago)\.
+        expected_type: regex
 
     -
         args: --quiet --config test0 info
-        expected_re:
+        expected:
             >               config: test0
             >                roots: /«TESTS»/configs
             >          destination: /«TESTS»/repositories
@@ -449,99 +465,112 @@ emborg with configs:
             >
             >                        Unique chunks         Total chunks
             > Chunk index:           .............         ............
+        expected_type: regex
 
     -
         args: --quiet --config test0 extract /«TESTS»/configs
         cmp_dirs: /«TESTS»/CONFIGS configs
 
     -
+        rm: configs
         args: --quiet --config test0 restore configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
-        args: --quiet --config test0 mount RESTORED
-        cmp_dirs: RESTORED/«TESTS»/configs configs
+        args: --quiet --config test0 mount EMBORG
+        cmp_dirs: EMBORG/«TESTS»/configs configs
+        # if this test fails with 'EMBORG: Mountpoint must be a writable', it is 
+        # because EMBORG is still mounted from a previous run.
 
     -
-        args: --quiet --config test0 umount RESTORED
+        args: --quiet --config test0 create
+        expected:
+            > bu error: borg create:
+            >     Failed to create/acquire the lock [^ ]*/emborg/tests/repositories/lock \(timeout\)\.
+            >         Perhaps your still have an archive mounted\?
+        expected_type: error regex
 
     -
-        args: --quiet --config test0 mount
-        cmp_dirs: RESTORED/«TESTS»/configs configs
-
-    -
-        args: --quiet --config test0 umount
+        args: --quiet --config test0 umount EMBORG
 
     -
         args: --quiet --config test4 create
 
     -
         args: --quiet --config test4 list
-        expected_re: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test4 files -S
-        expected_re:
+        expected:
             > Archive: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             >        0 configs/
+            >        0 configs/subdir/
+            >        0 configs/subdir/file
             >       13 configs/test2passphrase
             >       52 configs/test6patterns
             >       66 configs/test2excludes
             >       84 configs/test7patterns
-            >       89 configs/test7
-            >      127 configs/test6
+            >       87 configs/test7
+            >      108 configs/test0
+            >      125 configs/test6
             >      141 configs/test2
-            >      143 configs/test0
-            >      149 configs/test5
-            >      169 configs/test4
+            >      147 configs/test5
+            >      167 configs/test4
+            >      182 configs/test8
             >      195 configs/test1
             >      253 configs/test3
             >      556 configs/overdue.conf
-            >      589 configs/settings
+            >      594 configs/settings
             >     1620 configs/README
+        expected_type: regex
 
     -
+        rm: configs
         args: --quiet --config test4 extract -f configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
+        rm: configs
         args: --quiet --config test4 extract -f /«TESTS»/configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
+        rm: configs
         args: --quiet --config test4 restore configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
         args: --quiet --config test4 mount
-        cmp_dirs: RESTORED/configs configs
+        cmp_dirs: EMBORG/configs configs
 
     -
         args: --quiet --config test4 umount
 
     -
         args: --quiet --config test4 borg list --prefix test4- --short @repo
-        expected_re: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test5 create
 
     -
         args: --quiet --config test5 list
-        expected_re: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test5 files -N
-        expected_re:
+        expected:
             > Archive: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > «TESTS»/configs/
             > «TESTS»/configs/README
             > «TESTS»/configs/overdue.conf
             > «TESTS»/configs/settings
+            > «TESTS»/configs/subdir/
+            > «TESTS»/configs/subdir/file
             > «TESTS»/configs/test0
             > «TESTS»/configs/test1
             > «TESTS»/configs/test2
@@ -554,96 +583,108 @@ emborg with configs:
             > «TESTS»/configs/test6patterns
             > «TESTS»/configs/test7
             > «TESTS»/configs/test7patterns
+            > «TESTS»/configs/test8
+        expected_type: regex
 
     -
         args: --quiet --config test5 extract «TESTS»/configs
         cmp_dirs: «TESTS»/configs configs
 
     -
+        rm: configs
         args: --quiet --config test5 restore configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
         args: --quiet --config test5 mount
-        cmp_dirs: RESTORED/«TESTS»/configs CONFIGS
+        cmp_dirs: EMBORG/«TESTS»/configs CONFIGS
 
     -
         args: --quiet --config test5 umount
 
     -
         args: --quiet --config test5 borg list --prefix test5- --short @repo
-        expected_re: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test6 create
 
     -
         args: --quiet --config test6 list
-        expected_re: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test6 files -S
-        expected_re:
+        expected:
             > Archive: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             >        0 configs/
+            >        0 configs/subdir/
+            >        0 configs/subdir/file
             >       13 configs/test2passphrase
             >       52 configs/test6patterns
             >       66 configs/test2excludes
             >       84 configs/test7patterns
-            >       89 configs/test7
-            >      127 configs/test6
+            >       87 configs/test7
+            >      108 configs/test0
+            >      125 configs/test6
             >      141 configs/test2
-            >      143 configs/test0
-            >      149 configs/test5
-            >      169 configs/test4
+            >      147 configs/test5
+            >      167 configs/test4
+            >      182 configs/test8
             >      195 configs/test1
             >      253 configs/test3
             >      556 configs/overdue.conf
-            >      589 configs/settings
+            >      594 configs/settings
             >     1620 configs/README
+        expected_type: regex
 
     -
+        rm: configs
         args: --quiet --config test6 extract -f configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
+        rm: configs
         args: --quiet --config test6 extract -f /«TESTS»/configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
+        rm: configs
         args: --quiet --config test6 restore configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
         args: --quiet --config test6 mount
-        cmp_dirs: RESTORED/configs configs
+        cmp_dirs: EMBORG/configs configs
 
     -
         args: --quiet --config test6 umount
 
     -
         args: --quiet --config test6 borg list --prefix test6- --short @repo
-        expected_re: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test7 create
 
     -
         args: --quiet --config test7 list
-        expected_re: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --quiet --config test7 files -N
-        expected_re:
+        expected:
             > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > «TESTS»/configs/
             > «TESTS»/configs/README
             > «TESTS»/configs/overdue.conf
             > «TESTS»/configs/settings
+            > «TESTS»/configs/subdir/
+            > «TESTS»/configs/subdir/file
             > «TESTS»/configs/test0
             > «TESTS»/configs/test1
             > «TESTS»/configs/test2
@@ -656,33 +697,90 @@ emborg with configs:
             > «TESTS»/configs/test6patterns
             > «TESTS»/configs/test7
             > «TESTS»/configs/test7patterns
+            > «TESTS»/configs/test8
+        expected_type: regex
 
     -
         args: --quiet --config test7 extract «TESTS»/configs
         cmp_dirs: «TESTS»/configs configs
 
     -
+        rm: configs
         args: --quiet --config test7 restore configs
         cmp_dirs: CONFIGS configs
-        rm: configs
 
     -
         args: --quiet --config test7 mount
-        cmp_dirs: RESTORED/«TESTS»/configs CONFIGS
+        cmp_dirs: EMBORG/«TESTS»/configs CONFIGS
 
     -
         args: --quiet --config test7 umount
 
     -
         args: --quiet --config test7 borg list --prefix test7- --short @repo
-        expected_re: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
     -
         args: --config test7 delete --repo
 
     -
         args: --config test7 list
-        expected: FAILURE
+        expected:
+            > bu error: borg list:
+            >     Repository [^ ]*/emborg/tests/repositories does not exist\.
+        expected_type: error regex
+
+    -
+        args: --quiet --config test8 init
+
+    -
+        args: --quiet --config test8 create
+
+    -
+        args: --quiet --config test8 list
+        expected: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files -S
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            >        0 configs.symlink/subdir/
+            >        0 configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        rm: configs/subdir/file
+        args: --quiet --config test8 extract -f configs.symlink/subdir/file
+        cmp_dirs: CONFIGS/subdir ./«TESTS»/configs/subdir
+
+    -
+        rm: configs/subdir/file
+        args: --quiet --config test8 extract -f /«TESTS»/configs.symlink/subdir/file
+        cmp_dirs: CONFIGS/subdir ./«TESTS»/configs/subdir
+
+    -
+        rm: configs/subdir
+        args: --quiet --config test8 restore configs/subdir
+        cmp_dirs: CONFIGS/subdir configs/subdir
+
+    -
+        rm: configs/subdir/file
+        args: --quiet --config test8 restore configs/subdir/file
+        cmp_dirs: CONFIGS/subdir configs/subdir
+
+    -
+        args: --quiet --config test8 mount
+        cmp_dirs: EMBORG/configs.symlink/subdir configs.symlink/subdir
+
+    -
+        args: --quiet --config test8 umount
+
+    -
+        args: --quiet --config test8 borg list --prefix test8- --short @repo
+        expected: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected_type: regex
 
 emborg-overdue:
 
