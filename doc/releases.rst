@@ -6,7 +6,9 @@ Latest development release
 | Version: 1.24.1
 | Released: 2021-08-24
 
-- Added
+- Added the :ref:`compare command <compare>`.
+- Added the :ref:`manage_diffs_cmd` and :ref:`report_diffs_cmd` settings.
+- Added the
   :ref:`run_before_first_backup <run_before_first_backup>` and 
   :ref:`run_after_last_backup <run_after_last_backup>` settings.
 - Allow files listed by :ref:`manifest <manifest>` command to be constrained to 
