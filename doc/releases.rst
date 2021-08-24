@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.24.0
-| Released: 2021-07-05
+| Version: 1.24.1
+| Released: 2021-08-24
 
 - Added
   :ref:`run_before_first_backup <run_before_first_backup>` and 
