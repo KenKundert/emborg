@@ -74,8 +74,8 @@ class Hooks:
 class HealthChecks(Hooks):
     NAME = 'healthchecks.io'
     EMBORG_SETTINGS = dict(
-        healthchecks_url = 'the healthchecks.io URL for back-ups monitor.',
-        healthchecks_uuid = 'the healthchecks.io UUID for back-ups monitor.',
+        healthchecks_url = 'the healthchecks.io URL for back-ups monitor',
+        healthchecks_uuid = 'the healthchecks.io UUID for back-ups monitor',
     )
     URL = 'https://hc-ping.com'
 
@@ -113,8 +113,8 @@ class HealthChecks(Hooks):
 class CronHub(Hooks):
     NAME = 'cronhub.io'
     EMBORG_SETTINGS = dict(
-        cronhub_uuid = 'the cronhub.io UUID for back-ups monitor.',
-        cronhub_url = 'the cronhub.io URL for back-ups monitor.',
+        cronhub_uuid = 'the cronhub.io UUID for back-ups monitor',
+        cronhub_url = 'the cronhub.io URL for back-ups monitor',
     )
     START_URL = '{url}/start/{uuid}'
     SUCCESS_URL = '{url}/finish/{uuid}'

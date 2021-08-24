@@ -1686,7 +1686,7 @@ class SettingsCommand(Command):
                     v = "<set>"
                 output(f"{key:>{width + color_adjust}}: {render(v, level=7)}")
                 try:
-                    if is_str(v) and "{" in v:
+                    if is_str(v) and "{" in v and k not in settings.do_not_expand:
                         output(resolved(
                             f'{leader}{render(settings.resolve(v), level=6)}'
                         ))

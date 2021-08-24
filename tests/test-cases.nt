@@ -32,6 +32,7 @@ emborg without configs:
             >     breaklock, break-lock
             >                       breaks the repository and cache locks.
             >     check             checks the repository and its archives
+            >     compare           compare local files or directories to those in an archive
             >     configs           list available backup configurations
             >     create, backup    create an archive of the current files
             >     delete            delete an archive currently contained in the repository
@@ -76,8 +77,8 @@ emborg without configs:
             >                             (read-only)
             >                config_name: name of active configuration (set by program)
             >             configurations: available Emborg configurations
-            >                cronhub_url: the cronhub.io URL for back-ups monitor.
-            >               cronhub_uuid: the cronhub.io UUID for back-ups monitor.
+            >                cronhub_url: the cronhub.io URL for back-ups monitor
+            >               cronhub_uuid: the cronhub.io UUID for back-ups monitor
             >      default_configuration: default Emborg configuration
             >        default_mount_point: directory to use as mount point if one is not
             >                             specified
@@ -88,10 +89,12 @@ emborg without configs:
             >               exclude_from: file that contains exclude patterns
             >                   excludes: list of glob strings of files or directories
             >                             to skip
-            >           healthchecks_url: the healthchecks.io URL for back-ups monitor.
-            >          healthchecks_uuid: the healthchecks.io UUID for back-ups monitor.
+            >           healthchecks_url: the healthchecks.io URL for back-ups monitor
+            >          healthchecks_uuid: the healthchecks.io UUID for back-ups monitor
             >                   home_dir: users home directory (read only)
             >                    log_dir: emborg log directory (read only)
+            >           manage_diffs_cmd: command to use to manage differences in files
+            >                             and directories
             >    manifest_default_format: the format that manifest should use if none is
             >                             specified
             >           manifest_formats: format strings used by manifest
@@ -108,6 +111,8 @@ emborg without configs:
             >                             be included or excluded
             >              patterns_from: file that contains patterns
             >         prune_after_create: run prune after creating an archive
+            >           report_diffs_cmd: shell command to use to report differences in
+            >                             files and directories
             >                 repository: path to remote directory that contains
             >                             repository
             >           run_after_backup: commands to run after archive has been created
@@ -179,8 +184,8 @@ emborg with configs:
             >                             (read-only)
             >                config_name: name of active configuration (set by program)
             >             configurations: available Emborg configurations
-            >                cronhub_url: the cronhub.io URL for back-ups monitor.
-            >               cronhub_uuid: the cronhub.io UUID for back-ups monitor.
+            >                cronhub_url: the cronhub.io URL for back-ups monitor
+            >               cronhub_uuid: the cronhub.io UUID for back-ups monitor
             >      default_configuration: default Emborg configuration
             >        default_mount_point: directory to use as mount point if one is not
             >                             specified
@@ -191,10 +196,12 @@ emborg with configs:
             >               exclude_from: file that contains exclude patterns
             >                   excludes: list of glob strings of files or directories
             >                             to skip
-            >           healthchecks_url: the healthchecks.io URL for back-ups monitor.
-            >          healthchecks_uuid: the healthchecks.io UUID for back-ups monitor.
+            >           healthchecks_url: the healthchecks.io URL for back-ups monitor
+            >          healthchecks_uuid: the healthchecks.io UUID for back-ups monitor
             >                   home_dir: users home directory (read only)
             >                    log_dir: emborg log directory (read only)
+            >           manage_diffs_cmd: command to use to manage differences in files
+            >                             and directories
             >    manifest_default_format: the format that manifest should use if none is
             >                             specified
             >           manifest_formats: format strings used by manifest
@@ -211,6 +218,8 @@ emborg with configs:
             >                             be included or excluded
             >              patterns_from: file that contains patterns
             >         prune_after_create: run prune after creating an archive
+            >           report_diffs_cmd: shell command to use to report differences in
+            >                             files and directories
             >                 repository: path to remote directory that contains
             >                             repository
             >           run_after_backup: commands to run after archive has been created

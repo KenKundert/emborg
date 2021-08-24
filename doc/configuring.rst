@@ -744,8 +744,13 @@ streamlined interface to *Vim/DirDiff*.  Here are examples on how to configure
 .. code-block:: python
 
     manage_diffs_cmd = "meld"
-    manage_diffs_cmd = "gvim -f -c 'DirDiff {} {}'"
+    manage_diffs_cmd = "gvim -f -c 'DirDiff {{}} {{}}'"
     manage_diffs_cmd = "vdiff -g"
+
+Pairs of braces are also used to insert *Emborg* settings into other settings, 
+which is generally not desired in this case.  To avoid that the braces are 
+doubled up to escape them.  Alternatively you could simply list 
+*report_diffs_cmd* in the :ref:`do_not_expand` setting.
 
 The :ref:`compare command <compare>` mounts the remote archive, runs the 
 specified command and then immediately unmounts the archive.  As such, it is 
@@ -959,7 +964,12 @@ configuring *diff*:
 .. code-block:: python
 
     report_diffs_cmd = "diff -r"
-    report_diffs_cmd = "diff -r {} {}"
+    report_diffs_cmd = "diff -r {{}} {{}}"
+
+Pairs of braces are also used to insert *Emborg* settings into other settings, 
+which is generally not desired in this case.  To avoid that the braces are 
+doubled up to escape them.  Alternatively you could simply list 
+*report_diffs_cmd* in the :ref:`do_not_expand` setting.
 
 
 .. _repository:
