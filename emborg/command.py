@@ -20,10 +20,8 @@ import json
 import os
 import sys
 from textwrap import dedent, fill
-
 import arrow
 from docopt import docopt
-
 from inform import (
     Color,
     Error,
@@ -44,7 +42,7 @@ from inform import (
 )
 from quantiphy import Quantity, UnitConversion, QuantiPhyError
 from shlib import Run, cwd, mkdir, rm, set_prefs, split_cmd, to_path
-
+from time import sleep
 from .collection import Collection
 from .preferences import BORG_SETTINGS, DEFAULT_COMMAND, EMBORG_SETTINGS, PROGRAM_NAME
 from .utilities import gethostname, two_columns
@@ -102,7 +100,7 @@ def get_name_of_nearest_archive(settings, date):
             codicil = join(
                 full_stop(e),
                 'Alternatively relative time formats are accepted:',
-                'Ns, Nm, Nh, Nd, Nw, NM, Ny.'
+                'Ns, Nm, Nh, Nd, Nw, NM, Ny.  Example 2w is 2 weeks.'
             )
             raise Error(
                 "invalid date specification.",
@@ -325,6 +323,92 @@ class CheckCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+
+
+# CompareCommand command {{{1
+class CompareCommand(Command):
+    NAMES = "compare".split()
+    DESCRIPTION = "compare local files or directories to those in an archive"
+    USAGE = dedent(
+        """
+        Usage:
+            emborg [options] compare [<path>]
+
+        Options:
+            -a <archive>, --archive <archive>   name of the archive to mount
+            -d <date>, --date <date>            date of the desired archive
+            -i, --interactive                   perform an interactive comparison
+        """
+    ).strip()
+    REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = "first"
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        mount_point = settings.as_path("default_mount_point")
+        if not mount_point:
+            raise Error("must specify default_mount_point setting to use this command.")
+        path = cmdline['<path>']
+        archive = cmdline["--archive"]
+        date = cmdline["--date"]
+
+        # get the desired archive
+        if not archive:
+            if date:
+                archive = get_name_of_nearest_archive(settings, date)
+            else:
+                archive = get_name_of_latest_archive(settings)
+
+        # create mount point if it does not exist
+        try:
+            mkdir(mount_point)
+        except OSError as e:
+            raise Error(os_error(e))
+
+        # run borg to mount
+        borg = settings.run_borg(
+            cmd = "mount",
+            args = [settings.destination(archive), mount_point],
+            emborg_opts = options,
+        )
+
+        # resolve the path relative to working directory
+        if not path:
+            path = '.'
+        arch_path = to_path(path).resolve().relative_to(settings.working_dir)
+        arch_path = to_path(mount_point, arch_path)
+
+        # get diff tool
+        if cmdline['--interactive']:
+            differ = settings.manage_diffs_cmd
+            if not differ:
+                narrate("manage_diffs_cmd not set, trying report_diffs_cmd.")
+            differ = settings.report_diffs_cmd
+        else:
+            differ = settings.report_diffs_cmd
+            if not differ:
+                narrate("report_diffs_cmd not set, trying manage_diffs_cmd.")
+            differ = settings.manage_diffs_cmd
+        if not differ:
+            raise Error("no diff command available.")
+
+        # run diff tool
+        diff_cmd = differ.format(path, arch_path)
+        if diff_cmd == differ:
+            diff_cmd = f"{differ} '{path}' '{arch_path}'"
+        Run(diff_cmd, 'SoeW1')
+
+        # run borg to un-mount
+        sleep(0.25)
+        settings.run_borg(
+            cmd="umount", args=[mount_point], emborg_opts=options,
+        )
+        try:
+            mount_point.rmdir()
+        except OSError as e:
+            warn(os_error(e), codicil="You will need to unmount before proceeding.")
 
 
 # ConfigsCommand command {{{1
@@ -561,7 +645,11 @@ class DiffCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg diff <archive1> <archive2>
+            emborg diff [options] <archive1> <archive2> [<path>]
+
+        Options:
+            -R, --recursive                     show files in sub directories
+                                                when path is specified
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -573,16 +661,45 @@ class DiffCommand(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         archive1 = cmdline["<archive1>"]
         archive2 = cmdline["<archive2>"]
+        path = cmdline['<path>']
+        recursive = cmdline['--recursive']
+
+        # resolve the path relative to working directory
+        if path:
+            path = str(to_path(path).resolve().relative_to(settings.working_dir))
+        else:
+            path = ''
 
         # run borg
         borg = settings.run_borg(
             cmd = "diff",
             args = [settings.destination(archive1), archive2],
             emborg_opts = options,
+            borg_opts = ['--json-lines'],
         )
-        out = borg.stdout
-        if out:
-            output(out.rstrip())
+
+        # convert from JSON-lines to JSON
+        json_data = '[' + ','.join(borg.stdout.splitlines()) + ']'
+        diffs = json.loads(json_data)
+
+        for diff in diffs:
+            this_path = diff['path']
+            if path:
+                if not this_path.startswith(path):
+                    continue  # skip files not on the path
+                if not recursive:
+                    if '/' in this_path[len(path)+1:]:
+                        continue  # skip files is subdirs of specified path
+            changes = diff['changes'][0]
+            type = changes.get('type', '')
+            if 'size' in changes:
+                size = Quantity(changes['size'], 'B').render(prec=3)
+            else:
+                size = ''
+            num_spaces = max(19 - len(type) - len(size), 1)
+            sep = num_spaces * ' '
+            desc = type + sep + size
+            print(desc, this_path)
 
 
 # DueCommand command {{{1
@@ -1032,7 +1149,7 @@ class ManifestCommand(Command):
             -G, --sort-by-group                 sort by group
             -K <name>, --sort-by-key <name>     sort by key (the Borg field name)
             -r, --reverse-sort                  reverse the sort order
-            -R, --recursive                     show files is sub directories
+            -R, --recursive                     show files in sub directories
                                                 when path is specified
 
         Once a backup has been performed, you can list the files available in
@@ -1587,8 +1704,8 @@ class UmountCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] umount [<mount_point>]
-            emborg [options] unmount [<mount_point>]
+            emborg umount [<mount_point>]
+            emborg unmount [<mount_point>]
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True

@@ -26,6 +26,7 @@ The available commands are:
     :borg:       :ref:`run a raw borg command. <borg>`
     :breaklock:  :ref:`breaks the repository and cache locks. <breaklock>`
     :check:      :ref:`checks the repository and its archives <check>`
+    :compare:    :ref:`compare local files with those in an archive <compare>`
     :configs:    :ref:`list available backup configurations <configs>`
     :create:     :ref:`create an archive of the current files <create>`
     :delete:     :ref:`delete an archive currently contained in the repository <delete>`
@@ -96,6 +97,59 @@ this is considered an *experimental* feature in *Borg* and so carries extra risk
 due to its immaturity.
 
 
+.. _compare:
+
+Compare
+-------
+
+Reports and allows you to manage the differences between your local files and 
+those in an archive.  The base command simply reports the differences:
+
+.. code-block:: bash
+
+    $ emborg compare
+
+The ``--interactive`` option allows you to manage those differences.  
+Specifically, it will open an interactive file comparison tool that allows you 
+to compare the contents of your files and copy differences from the files in the 
+archive to your local files:
+
+.. code-block:: bash
+
+    $ emborg compare -i
+
+You can specify the archive by name or by date or age.  If you do not you will 
+use the most recent archive:
+
+.. code-block:: bash
+
+    $ emborg compare -a continuum-2020-12-04T17:41:28
+    $ emborg compare -d 2020-12-04
+    $ emborg compare -d 1w
+
+You can specify a path to a file or directory to compare, if you do not you will 
+compare the files and directories of the current working directory.
+
+.. code-block:: bash
+
+    $ emborg compare tests
+    $ emborg compare ~/bin
+
+This command requires that the following settings be specified in your settings 
+file: :ref:`manage_diffs_cmd`, :ref:`report_diffs_cmd`, and 
+:ref:`default_mount_point`.
+
+The command operates by mounting the desired archive, performing the comparison, 
+and then unmounting the directory. Problems sometimes occur that can result in 
+the archive remaining mounted.  In this case you will need to resolve any issues 
+that are preventing the unmounting, and then explicitly run the :ref:`unmount 
+command <umount>` before you can use this *Borg* repository again.
+
+This command differs from the :ref:`diff command <diff>` in that it compares 
+local files to those in an archive where as :ref:`diff <diff>` compares the 
+files contained in two archives.
+
+
 .. _configs:
 
 Configs
@@ -162,7 +216,7 @@ Delete an archive currently contained in the repository:
 
 .. code-block:: bash
 
-    $ emborg delete continuum-2018-12-05T19:23:09
+    $ emborg delete continuum-2020-12-05T19:23:09
 
 Only one archive can be deleted per command invocation. If an archive is not 
 given, the latest is deleted.
@@ -179,7 +233,20 @@ Shows the differences between two archives:
 
 .. code-block:: bash
 
-    $ emborg diff continuum-2018-12-05T19:23:09 continuum-2018-12-04T17:41:28
+    $ emborg diff continuum-2020-12-05T19:23:09 continuum-2020-12-04T17:41:28
+
+You can constrain the output listing to only those files in a particular 
+directory by adding that path to the end of the command:
+
+.. code-block:: bash
+
+    $ emborg diff continuum-2020-12-05T19:23:09 continuum-2020-12-04T17:41:28 .
+
+This command differs from the :ref:`compare command <compare>` in that it only 
+reports a list of files that differ between two archives, whereas :ref:`compare 
+<compare>` shows how local files differ from those in an archive and can show 
+you the contents of those files and allow you interactively copy changes from 
+the archive to your local files.
 
 
 .. _due:
@@ -245,7 +312,7 @@ explicitly specify a particular archive. For example:
 
 .. code-block:: bash
 
-    $ emborg extract --archive continuum-2018-12-05T12:54:26 home/shaunte/bin
+    $ emborg extract --archive continuum-2020-12-05T12:54:26 home/shaunte/bin
 
 Alternatively you can specify a date.  The most recent archive that existed on 
 the specified date is used.  The date can be specified in absolute terms, as 

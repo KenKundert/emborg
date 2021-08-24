@@ -153,6 +153,13 @@ The :ref:`diff command <diff>` shows you the difference between two archives.
 
 .. code-block:: bash
 
+    $ emborg compare doc/thesis
+
+The :ref:`compare command <compare>` allows you to see and manage the 
+differences between your local files and those in an archive.
+
+.. code-block:: bash
+
     $ emborg extract home/seven/bin/vu
 
 The :ref:`extract command <extract>` extracts a file or directory from the most 

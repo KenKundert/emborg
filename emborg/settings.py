@@ -701,6 +701,7 @@ class Settings:
 
         return borg
 
+    # report_borg_error() {{{2
     def report_borg_error(self, e, cmd):
         narrate('Borg terminates with exit status:', e.status)
         codicil = None
@@ -712,6 +713,8 @@ class Settings:
                 ''')
             if 'Failed to create/acquire the lock' in e.stderr:
                 codicil = 'Perhaps your still have an archive mounted?'
+            if 'Mountpoint must be a writable directory' in e.stderr:
+                codicil = 'Perhaps an archive is already mounted there?'
         e.reraise(culprit=f"borg {cmd}", codicil=codicil)
 
     # destination() {{{2

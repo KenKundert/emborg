@@ -722,6 +722,42 @@ The contents of that file are read into *Emborg*.  If the path is relative, it
 is relative to the file that includes it.
 
 
+.. _manage_diffs_cmd:
+
+manage_diffs_cmd
+~~~~~~~~~~~~~~~~
+
+Command to use to perform interactive file and directory comparisons using the 
+``--interactive`` option to the :ref:`compare command <compare>`.  The command 
+is executed in a subshell, so the command string you specify may contain quotes 
+and such.  The string may contain two sets of empty braces, which are replaced 
+by the two files or directories to be compared.  If not, then the paths are 
+simply appended to the end of the command as specified.  Suitable commands for 
+use in this setting include `Vim <https://www.vim.org>`_ with the `DirDiff 
+<https://www.vim.org/scripts/script.php?script_id=102>`_  plugin, `Meld 
+<https://meldmerge.org>`_, and presumably others such as *DiffMerge*, *Kompare*, 
+*Diffuse*, *KDiff3*, etc.  If you are a *Vim* user, another alternative is 
+`vdiff <https://github.com/KenKundert/vdiff>`_, which provides a more 
+streamlined interface to *Vim/DirDiff*.  Here are examples on how to configure 
+*Vim*, *Meld* and *VDiff*:
+
+.. code-block:: python
+
+    manage_diffs_cmd = "meld"
+    manage_diffs_cmd = "gvim -f -c 'DirDiff {} {}'"
+    manage_diffs_cmd = "vdiff -g"
+
+The :ref:`compare command <compare>` mounts the remote archive, runs the 
+specified command and then immediately unmounts the archive.  As such, it is 
+important that the command run in the foreground.  By default, *gvim* runs in 
+the foreground.  You can tell this because if run directly in a shell, the shell 
+immediately accepts new commands even though *gvim* is still active.  To avoid 
+this, the ``-f`` option is added to the *gvim* command line to indicate it 
+should run in the background.  Without this, you will see an error from 
+fusermount indicating 'Device or resource busy'.  If you get this message, you 
+will have to close the editor and manually un-mount the archive.
+
+
 .. _manifest_default_format:
 
 manifest_default_format
@@ -904,6 +940,26 @@ prune_after_create
 
 A Boolean. If true the :ref:`prune command <prune>` is run after creating an 
 archive.
+
+
+.. _report_diffs_cmd:
+
+report_diffs_cmd
+~~~~~~~~~~~~~~~~
+
+Command used to perform file and directory comparisons using the :ref:`compare 
+command <compare>`.  The command is executed in a subshell, so the command 
+string you specify may contain quotes and such.  The string may contain two sets 
+of empty braces, which are replaced by the two files or directories to be 
+compared.  If not, then the paths are simply appended to the end of the command 
+as specified.  Suitable commands for use in this setting include ``diff -r`` the 
+and ``colordiff -r``.  Here are examples of two different but equivalent ways of 
+configuring *diff*:
+
+.. code-block:: python
+
+    report_diffs_cmd = "diff -r"
+    report_diffs_cmd = "diff -r {} {}"
 
 
 .. _repository:
