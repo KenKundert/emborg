@@ -791,14 +791,20 @@ emborg with configs:
         expected_type: regex
 
     -
-        args: --quiet --config test8 files --date 1h
-        expected: bu error: no archive available is older than 1h (an hour ago).
-        expected_type: error
+        args: --quiet --config test8 files --date 1h --sort-by-name
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/
+            > configs.symlink/subdir/file
+        expected_type: regex
 
     -
         args: --quiet --config test8 files --date «DATE» --sort-by-name
-        expected: bu error: no archive available is older than «DATE» \(.* ago\)\.
-        expected_type: error regex
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/
+            > configs.symlink/subdir/file
+        expected_type: regex
 
     -
         args: --quiet --config test8 files -O

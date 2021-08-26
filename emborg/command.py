@@ -107,15 +107,25 @@ def get_name_of_nearest_archive(settings, date):
                 culprit=date, codicil=codicil, wrap=True
             )
 
-    # find youngest archive that is older than specified target
-    prev_archive = None
+    # find oldest archive that is younger than specified target
+    archive = prev_archive = None
     for archive in reversed(archives):
         archive_time = arrow.get(archive["time"], tzinfo='local')
         if archive_time <= target:
             if prev_archive:
                 return prev_archive["name"]
-            break
+            warn(
+                f'archive younger than {date} ({target.humanize()}) was not found.',
+                codicil='Using youngest that is older than given date and time.'
+            )
+            return archive["name"]
         prev_archive = archive
+    if archive:
+        warn(
+            f'archive older than {date} ({target.humanize()}) was not found.',
+            codicil='Using oldest available.'
+        )
+        return archive["name"]
     raise Error(
         f"no archive available is older than {date} ({target.humanize()})."
     )
@@ -986,8 +996,8 @@ class ExtractCommand(Command):
             $ emborg extract --archive continuum-2020-12-05T12:54:26 home/shaunte/bin
 
         Alternatively you can specify a date or date and time.  If only the date
-        is given the time is taken to be midnight.  The youngest archive that is
-        older than specified date and time is used.
+        is given the time is taken to be midnight.  The oldest archive that is
+        younger than specified date and time is used.
 
             $ emborg extract --date 2021-04-01 home/shaunte/bin
             $ emborg extract --date 2021-04-01T15:30 home/shaunte/bin
@@ -1284,8 +1294,8 @@ class ManifestCommand(Command):
 
             emborg manifest --archive kundert-2018-12-05T12:54:26
 
-        Or you choose an archive based on a date and time.  The youngest archive
-        that is older than specified date and time is used.
+        Or you choose an archive based on a date and time.  The oldest archive
+        that is younger than specified date and time is used.
 
             emborg manifest --date 2021/04/01
             emborg manifest --date 2021-04-01
@@ -1505,8 +1515,8 @@ class MountCommand(Command):
         If you do not specify an archive or date, the most recently created
         archive is mounted.
 
-        Or you choose an archive based on a date and time.  The youngest archive
-        that is older than specified date and time is used.
+        Or you choose an archive based on a date and time.  The oldest archive
+        that is younger than specified date and time is used.
 
             emborg mount --date 2021-04-01 backups
             emborg mount --date 2021-04-01T18:30 backups
@@ -1654,8 +1664,8 @@ class RestoreCommand(Command):
 
             $ emborg restore --archive continuum-2020-12-05T12:54:26 resume.doc
 
-        Or you choose an archive based on a date and time.  The youngest archive
-        that is older than specified date and time is used.
+        Or you choose an archive based on a date and time.  The oldest archive
+        that is younger than specified date and time is used.
 
             $ emborg restore --date 2021-04-01 resume.doc
             $ emborg restore --date 2021-04-01T18:30 resume.doc

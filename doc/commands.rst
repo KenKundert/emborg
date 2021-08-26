@@ -315,8 +315,8 @@ explicitly specify a particular archive. For example:
     $ emborg extract --archive continuum-2020-12-05T12:54:26 home/shaunte/bin
 
 Alternatively you can specify a date or date and time.  If only the date is 
-given the time is taken to be midnight.  The youngest archive that is older than 
-the specified date and time is used.  For example:
+given the time is taken to be midnight.  The oldest archive that is                 
+younger than specified date and time is used. For example:
 
 .. code-block:: bash
 
@@ -449,8 +449,8 @@ You can explicitly specify an archive:
 
     $ emborg manifest --archive continuum-2021-04-01T12:19:58
 
-Or you choose an archive based on a date and time.  The youngest archive that is 
-older than specified date and time is used.
+Or you choose an archive based on a date and time.  The oldest archive that is                 
+younger than specified date and time is used.
 
 .. code-block:: bash
 
@@ -555,7 +555,7 @@ You can also specify the date in relative terms:
 where s, m, h, d, w, M, and y represents seconds, minutes, hours, days, weeks, 
 months, and years.
 
-When a date is given, the youngest archive that is older than the specified date 
+When a date is given, the oldest archive that is younger than the specified date 
 or time is used.
 
 Finally, you can mount all the available archives:
@@ -609,8 +609,8 @@ explicitly specify a particular archive. For example:
 
     $ emborg restore --archive continuum-2020-12-05T12:54:26 resume.doc
 
-Or you choose an archive based on a date and time.  The youngest archive that is 
-older than specified date and time is used.
+Or you choose an archive based on a date and time.  The oldest archive that is 
+younger than specified date and time is used.
 
     $ emborg restore --date 2021-04-01 resume.doc
     $ emborg restore --date 2021-04-01T18:30 resume.doc
