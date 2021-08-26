@@ -481,7 +481,7 @@ emborg with configs:
         cmp_dirs: /«TESTS»/CONFIGS configs
 
     -
-        rm: configs
+        remove: configs
         args: --quiet --config test0 restore configs
         cmp_dirs: CONFIGS configs
 
@@ -525,10 +525,10 @@ emborg with configs:
             >      108 configs/test0
             >      125 configs/test6
             >      141 configs/test2
-            >      147 configs/test5
-            >      167 configs/test4
+            >      176 configs/test5
             >      182 configs/test8
             >      195 configs/test1
+            >      196 configs/test4
             >      253 configs/test3
             >      556 configs/overdue.conf
             >      594 configs/settings
@@ -536,17 +536,31 @@ emborg with configs:
         expected_type: regex
 
     -
-        rm: configs
+        remove: configs/test4
+        args: --quiet --config test4 compare configs
+        expected:
+            > Only in /home/ken/src/emborg/tests/EMBORG/configs: test4
+        expected_type: diff
+
+    -
+        remove: configs/subdir/file
+        args: --quiet --config test4 compare configs/subdir
+        expected:
+            > Only in /home/ken/src/emborg/tests/EMBORG/configs/subdir: file
+        expected_type: diff
+
+    -
+        remove: configs
         args: --quiet --config test4 extract -f configs
         cmp_dirs: CONFIGS configs
 
     -
-        rm: configs
+        remove: configs
         args: --quiet --config test4 extract -f /«TESTS»/configs
         cmp_dirs: CONFIGS configs
 
     -
-        rm: configs
+        remove: configs
         args: --quiet --config test4 restore configs
         cmp_dirs: CONFIGS configs
 
@@ -561,6 +575,15 @@ emborg with configs:
         args: --quiet --config test4 borg list --prefix test4- --short @repo
         expected: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
+
+    -
+        args: --quiet --config test4 compare configs
+
+    -
+        args: --quiet --config test4 compare configs/subdir
+
+    -
+        args: --quiet --config test4 compare --interactive configs
 
     -
         args: --quiet --config test5 create
@@ -596,11 +619,17 @@ emborg with configs:
         expected_type: regex
 
     -
-        args: --quiet --config test5 extract «TESTS»/configs
+        args: --quiet --config test5 extract configs
+        expected:
+            > bu error: borg extract: Include pattern 'configs' never matched.
+        expected_type: error
+
+    -
+        args: --quiet --config test5 extract /«TESTS»/configs
         cmp_dirs: «TESTS»/configs configs
 
     -
-        rm: configs
+        remove: configs
         args: --quiet --config test5 restore configs
         cmp_dirs: CONFIGS configs
 
@@ -615,6 +644,12 @@ emborg with configs:
         args: --quiet --config test5 borg list --prefix test5- --short @repo
         expected: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
+
+    -
+        args: --quiet --config test5 compare configs
+
+    -
+        args: --quiet --config test5 compare --interactive configs
 
     -
         args: --quiet --config test6 create
@@ -639,10 +674,10 @@ emborg with configs:
             >      108 configs/test0
             >      125 configs/test6
             >      141 configs/test2
-            >      147 configs/test5
-            >      167 configs/test4
+            >      176 configs/test5
             >      182 configs/test8
             >      195 configs/test1
+            >      196 configs/test4
             >      253 configs/test3
             >      556 configs/overdue.conf
             >      594 configs/settings
@@ -650,17 +685,17 @@ emborg with configs:
         expected_type: regex
 
     -
-        rm: configs
+        remove: configs
         args: --quiet --config test6 extract -f configs
         cmp_dirs: CONFIGS configs
 
     -
-        rm: configs
+        remove: configs
         args: --quiet --config test6 extract -f /«TESTS»/configs
         cmp_dirs: CONFIGS configs
 
     -
-        rm: configs
+        remove: configs
         args: --quiet --config test6 restore configs
         cmp_dirs: CONFIGS configs
 
@@ -677,6 +712,11 @@ emborg with configs:
         expected_type: regex
 
     -
+        args: --quiet --config test6 compare
+        expected: bu error: no diff command available.
+        expected_type: error
+
+    -
         args: --quiet --config test7 create
 
     -
@@ -685,36 +725,25 @@ emborg with configs:
         expected_type: regex
 
     -
-        args: --quiet --config test7 files -N
+        args: --quiet --config test7 files -N configs/subdir
         expected:
             > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > «TESTS»/configs/
-            > «TESTS»/configs/README
-            > «TESTS»/configs/overdue.conf
-            > «TESTS»/configs/settings
             > «TESTS»/configs/subdir/
             > «TESTS»/configs/subdir/file
-            > «TESTS»/configs/test0
-            > «TESTS»/configs/test1
-            > «TESTS»/configs/test2
-            > «TESTS»/configs/test2excludes
-            > «TESTS»/configs/test2passphrase
-            > «TESTS»/configs/test3
-            > «TESTS»/configs/test4
-            > «TESTS»/configs/test5
-            > «TESTS»/configs/test6
-            > «TESTS»/configs/test6patterns
-            > «TESTS»/configs/test7
-            > «TESTS»/configs/test7patterns
-            > «TESTS»/configs/test8
         expected_type: regex
 
     -
-        args: --quiet --config test7 extract «TESTS»/configs
+        args: --quiet --config test7 extract configs
+        expected:
+            > bu error: borg extract: Include pattern 'configs' never matched.
+        expected_type: error
+
+    -
+        args: --quiet --config test7 extract /«TESTS»/configs
         cmp_dirs: «TESTS»/configs configs
 
     -
-        rm: configs
+        remove: configs
         args: --quiet --config test7 restore configs
         cmp_dirs: CONFIGS configs
 
@@ -752,30 +781,119 @@ emborg with configs:
         expected_type: regex
 
     -
-        args: --quiet --config test8 files -S
+        args: --quiet --config test8 files -D
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            >        0 configs.symlink/subdir/
-            >        0 configs.symlink/subdir/file
+            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d configs.symlink/subdir/file
+            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d configs.symlink/subdir/
         expected_type: regex
 
     -
-        rm: configs/subdir/file
+        args: --quiet --config test8 files --date 1h
+        expected: bu error: no archive available is older than 1h (an hour ago).
+        expected_type: error
+
+    -
+        args: --quiet --config test8 files --date «DATE» --sort-by-name
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/
+            > configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files -O
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > \w+\s* configs.symlink/subdir/
+            > \w+\s* configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files -G
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > \w+\s* configs.symlink/subdir/
+            > \w+\s* configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files -K path
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/
+            > configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files --name
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir
+            > configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files --short
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/
+            > configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files --short
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/
+            > configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files does-not-exist
+        expected: bu error: not contained in a source directory: does-not-exist
+        expected_type: error
+
+    -
+        args: --quiet --config test8 files configs.symlink/subdir/file
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files configs.symlink/subdir
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/
+            > configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        args: --quiet --config test8 files --recursive configs.symlink/subdir
+        expected:
+            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > configs.symlink/subdir/
+            > configs.symlink/subdir/file
+        expected_type: regex
+
+    -
+        remove: configs/subdir/file
         args: --quiet --config test8 extract -f configs.symlink/subdir/file
         cmp_dirs: CONFIGS/subdir ./«TESTS»/configs/subdir
 
     -
-        rm: configs/subdir/file
+        remove: configs/subdir/file
         args: --quiet --config test8 extract -f /«TESTS»/configs.symlink/subdir/file
         cmp_dirs: CONFIGS/subdir ./«TESTS»/configs/subdir
 
     -
-        rm: configs/subdir
+        remove: configs/subdir
         args: --quiet --config test8 restore configs/subdir
         cmp_dirs: CONFIGS/subdir configs/subdir
 
     -
-        rm: configs/subdir/file
+        remove: configs/subdir/file
         args: --quiet --config test8 restore configs/subdir/file
         cmp_dirs: CONFIGS/subdir configs/subdir
 
@@ -795,15 +913,16 @@ emborg-overdue:
 
     -
         expected:
-            > test0: 0.0 hours
-            > test1: 0.0 hours
-            > test2: 0.0 hours
-            > test3: 0.0 hours
-            > test4: 0.0 hours
-            > test5: 0.0 hours
-            > test6: 0.0 hours
-            > test7: 0.0 hours
+            > test0: 0.[01] hours
+            > test1: 0.[01] hours
+            > test2: 0.[01] hours
+            > test3: 0.[01] hours
+            > test4: 0.[01] hours
+            > test5: 0.[01] hours
+            > test6: 0.[01] hours
+            > test7: 0.[01] hours
             >
+        expected_type: regex
 
     -
         args: --no-passes

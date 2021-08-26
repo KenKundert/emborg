@@ -91,11 +91,11 @@ def get_name_of_latest_archive(settings):
 def get_name_of_nearest_archive(settings, date):
     archives = get_available_archives(settings)
     try:
-        date = arrow.get(date)
+        datetime = arrow.get(date)
     except arrow.parser.ParserError as e:
         try:
             seconds = Quantity(date, 'd', scale='s')
-            date = arrow.now().shift(seconds=-seconds)
+            datetime = arrow.now().shift(seconds=-seconds)
         except QuantiPhyError:
             codicil = join(
                 full_stop(e),
@@ -107,9 +107,9 @@ def get_name_of_nearest_archive(settings, date):
                 culprit=date, codicil=codicil, wrap=True
             )
     for archive in archives:
-        if arrow.get(archive["time"]) >= date:
+        if arrow.get(archive["time"]) >= datetime:
             return archive["name"]
-    raise Error("archive not available.", culprit=date)
+    raise Error(f"no archive available is older than {date} ({datetime.humanize()}).")
 
 
 # get_available_files() {{{2
@@ -125,6 +125,57 @@ def get_available_files(settings, archive):
         return files
     except json.decoder.JSONDecodeError as e:
         raise Error("Could not decode output of Borg list command.", codicil=e)
+
+# get_archive_paths() {{{2
+def get_archive_paths(paths, settings):
+    # need to construct a path to the file that is compatible with those
+    # paths stored in borg, thus it must begin with a src_dir (cannot just
+    # use the absolute path because the corresponding src_dir path may
+    # contain a symbolic link, in which the absolute path would not be found
+    # in the borg repository
+    # convert to paths relative to the working directory
+    #
+    paths_not_found = set(paths)
+    resolved_paths = []
+    roots = settings.resolve_patterns([], skip_checks=True)
+    try:
+        for root_dir in settings.roots:
+            resolved_root_dir = root_dir.resolve()
+            for name in paths:
+                path = to_path(name)
+                resolved_path = path.resolve()
+                try:
+                    # get relative path from root_dir to path after resolving
+                    # symbolic links in both root_dir and path
+                    path = resolved_path.relative_to(resolved_root_dir)
+
+                    # add original root_dir (with sym links) to relative path
+                    path = to_path(settings.working_dir, root_dir, path)
+
+                    # get relative path from working dir to computed path
+                    # this will be the path contained in borg archive
+                    path = path.relative_to(settings.working_dir)
+
+                    resolved_paths.append(path)
+                    paths_not_found.remove(name)
+                except ValueError as e:
+                    pass
+        if paths_not_found:
+            raise Error(
+                'not contained in a source directory:',
+                conjoin(paths_not_found)
+            )
+        return resolved_paths
+    except ValueError as e:
+        raise Error(e)
+
+
+# get_archive_path() {{{2
+def get_archive_path(path, settings):
+    paths = get_archive_paths([path], settings)
+    assert len(paths) == 1
+    return paths[0]
+
 
 # Command base class {{{1
 class Command:
@@ -361,6 +412,26 @@ class CompareCommand(Command):
             else:
                 archive = get_name_of_latest_archive(settings)
 
+        # get diff tool
+        if cmdline['--interactive']:
+            differ = settings.manage_diffs_cmd
+            if not differ:
+                narrate("manage_diffs_cmd not set, trying report_diffs_cmd.")
+                differ = settings.report_diffs_cmd
+        else:
+            differ = settings.report_diffs_cmd
+            if not differ:
+                narrate("report_diffs_cmd not set, trying manage_diffs_cmd.")
+                differ = settings.manage_diffs_cmd
+        if not differ:
+            raise Error("no diff command available.")
+
+        # resolve the path relative to working directory
+        if not path:
+            path = '.'
+        arch_path = to_path(path).resolve().relative_to(settings.working_dir)
+        arch_path = to_path(mount_point, arch_path)
+
         # create mount point if it does not exist
         try:
             mkdir(mount_point)
@@ -374,41 +445,25 @@ class CompareCommand(Command):
             emborg_opts = options,
         )
 
-        # resolve the path relative to working directory
-        if not path:
-            path = '.'
-        arch_path = to_path(path).resolve().relative_to(settings.working_dir)
-        arch_path = to_path(mount_point, arch_path)
-
-        # get diff tool
-        if cmdline['--interactive']:
-            differ = settings.manage_diffs_cmd
-            if not differ:
-                narrate("manage_diffs_cmd not set, trying report_diffs_cmd.")
-            differ = settings.report_diffs_cmd
-        else:
-            differ = settings.report_diffs_cmd
-            if not differ:
-                narrate("report_diffs_cmd not set, trying manage_diffs_cmd.")
-            differ = settings.manage_diffs_cmd
-        if not differ:
-            raise Error("no diff command available.")
-
-        # run diff tool
-        diff_cmd = differ.format(path, arch_path)
-        if diff_cmd == differ:
-            diff_cmd = f"{differ} '{path}' '{arch_path}'"
-        Run(diff_cmd, 'SoeW1')
-
-        # run borg to un-mount
-        sleep(0.25)
-        settings.run_borg(
-            cmd="umount", args=[mount_point], emborg_opts=options,
-        )
         try:
-            mount_point.rmdir()
-        except OSError as e:
-            warn(os_error(e), codicil="You will need to unmount before proceeding.")
+            # run diff tool
+            diff_cmd = differ.format(path, arch_path)
+            if diff_cmd == differ:
+                diff_cmd = f"{differ} '{path}' '{arch_path}'"
+            diff = Run(diff_cmd, 'SoeW1')
+
+        finally:
+            # run borg to un-mount
+            sleep(0.25)
+            settings.run_borg(
+                cmd="umount", args=[mount_point], emborg_opts=options,
+            )
+            try:
+                mount_point.rmdir()
+            except OSError as e:
+                warn(os_error(e), codicil="You will need to unmount before proceeding.")
+
+        return diff.status
 
 
 # ConfigsCommand command {{{1
@@ -666,7 +721,7 @@ class DiffCommand(Command):
 
         # resolve the path relative to working directory
         if path:
-            path = str(to_path(path).resolve().relative_to(settings.working_dir))
+            path = str(get_archive_path(path, settings))
         else:
             path = ''
 
@@ -700,6 +755,8 @@ class DiffCommand(Command):
             sep = num_spaces * ' '
             desc = type + sep + size
             print(desc, this_path)
+
+        return 1 if diffs else 0
 
 
 # DueCommand command {{{1
@@ -865,11 +922,11 @@ class ExtractCommand(Command):
 
             emborg extract home/ken/src/avendesora/doc/overview.rst
 
-        Use manifest to determine what path you should specify to identify the
-        desired file or directory (they will paths relative to the working
-        directory, which defaults to / but can be overridden in a configuration
-        file).  The paths may point to directories, in which case the entire
-        directory is extracted. It may also be a glob pattern.
+        The path or paths given should match those found in the Borg archive.
+        Use manifest to determine what path you should specify (the paths are
+        relative to the working directory, which defaults to / but can be
+        overridden in a configuration file).  The paths may point to
+        directories, in which case the entire directory is extracted.
 
         By default, the most recent archive is used, however, if desired you can
         explicitly specify a particular archive. For example:
@@ -899,6 +956,10 @@ class ExtractCommand(Command):
         file.  If your intent is to overwrite the existing file, you can specify
         the --force option. Or, consider using the restore command; it
         overwrites the existing file regardless of what directory you run from.
+
+        This command is very similar to the restore command except that it uses
+        paths as they are given in the archive and so need not extract the files
+        into their original location.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1202,7 +1263,7 @@ class ManifestCommand(Command):
 
         # resolve the path relative to working directory
         if path:
-            path = str(to_path(path).resolve().relative_to(settings.working_dir))
+            path = str(get_archive_path(path, settings))
         else:
             path = ''
 
@@ -1528,6 +1589,11 @@ class RestoreCommand(Command):
             -l, --list                          list the files and directories
                                                 as they are processed
 
+        The path or paths given are the paths on the local filesystem.  The
+        corresponding paths in the archive are computed by assuming that the
+        location of the files has not changed since the archive was created.
+        The intent is to replace the files in place.
+
         By default, the most recent archive is used, however, if desired you can
         explicitly specify a particular archive. For example:
 
@@ -1547,7 +1613,8 @@ class RestoreCommand(Command):
         represent seconds, minutes, hours, days, weeks, months, and years.
 
         This command is very similar to the extract command except that it is
-        meant to be replace files while in place.
+        meant to be replace files while in place.  The extract command is
+        preferred if you would like to extract the files to a new location.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1564,44 +1631,8 @@ class RestoreCommand(Command):
         if cmdline["--list"]:
             borg_opts.append("--list")
 
-        # need to construct a path to the file that is compatible with those
-        # paths stored in borg, thus it must begin with a src_dir (cannot just
-        # use the absolute path because the corresponding src_dir path may
-        # contain a symbolic link, in which the absolute path would not be found
-        # in the borg repository
-        # convert to paths relative to the working directory
-        try:
-            paths_not_found = set(paths)
-            resolved_paths = []
-            roots = settings.resolve_patterns([], skip_checks=True)
-            for root_dir in settings.roots:
-                resolved_root_dir = root_dir.resolve()
-                for name in paths:
-                    path = to_path(name)
-                    resolved_path = path.resolve()
-                    try:
-                        # get relative path from root_dir to path after resolving
-                        # symbolic links in both root_dir and path
-                        path = resolved_path.relative_to(resolved_root_dir)
-
-                        # add original root_dir (with sym links) to relative path
-                        path = to_path(settings.working_dir, root_dir, path)
-
-                        # get relative path from working dir to computed path
-                        # this will be the path contained in borg archive
-                        path = path.relative_to(settings.working_dir)
-                        resolved_paths.append(path)
-                        paths_not_found.remove(name)
-                    except ValueError as e:
-                        pass
-
-            if paths_not_found:
-                raise Error(
-                    'not contained in a source directory:',
-                    conjoin(paths_not_found)
-                )
-        except ValueError as e:
-            raise Error(e)
+        # convert given paths into the equivalent paths found in the archive
+        paths = get_archive_paths(paths, settings)
 
         # get the desired archive
         if date and not archive:
@@ -1614,7 +1645,7 @@ class RestoreCommand(Command):
         borg = settings.run_borg(
             cmd = "extract",
             borg_opts = borg_opts,
-            args = [settings.destination(archive)] + resolved_paths,
+            args = [settings.destination(archive)] + paths,
             emborg_opts = options,
             show_borg_output = bool(borg_opts),
             use_working_dir = True,

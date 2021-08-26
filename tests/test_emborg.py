@@ -1,9 +1,10 @@
-# Test Emborg
+# Tesr Emborg
 #
 # These tests require BorgBackup to be available.  As such, they are not really
 # suitable for public continuous integration services such as GitHub Actions.
 
 # Imports {{{1
+import arrow
 import nestedtext as nt
 import os
 import parametrize_from_file
@@ -35,28 +36,30 @@ emborg_schema = Schema({
     Optional('expected', default=""): str,
     Optional('expected_type', default=""): str,
     Optional('cmp_dirs', default=""): str,
-    Optional('rm', default=""): str,
+    Optional('remove', default=""): str,
 }, required=True)
 emborg_overdue_schema = Schema({
     Optional('conf', default=""): str,
     Optional('args', default=[]): Any(str, list),
     Required('expected', default=""): str,
+    Required('expected_type', default=""): str,
 }, required=True)
 
 # EmborgTester class {{{1
 class EmborgTester(object):
     # constructor {{{2
-    def __init__(self, args, expected, expected_type, cmp_dirs, rm):
+    def __init__(self, args, expected, expected_type, cmp_dirs, remove):
         # args are the arguments to the emborg command
         # If expected, stdout/stderr should match the given value
-        # expected_type may contain keywords, 'regex' and/or 'error', or 'ignore'
+        # expected_type may contain keywords, 'regex', 'diff', 'error', and/or
+        # 'ignore'
         # - if regex is given then expected is taken to be a regular expression
         #   otherwise the result much match expected precisely
-        # - if error is given then emborg is expected to exit with a non-zero
-        #   exit status
+        # - if diff is given then emborg is expected to exit with an exit status of 1
+        # - if error is given then emborg is expected to exit with an exit status of 2
         # - if ignore is given, stdout/stderr is not checked
         # cmp_dirs is a pair of directories that, if given, should match exactly
-        # rm contains files or directories to be deleted before the test runs
+        # remove contains files or directories to be deleted before the test runs
         #
         # args, expected, and cmp_dirs may contain the literal text fragment: «TESTS»
         # that is replaced by the path to the tests directory: .../emborg/tests
@@ -64,6 +67,7 @@ class EmborgTester(object):
         # expand «TESTS»
         if args:
             args = args.replace("«TESTS»", tests_dir_wo_slash)
+            args = args.replace("«DATE»", arrow.now().format("YYYY-MM-DD"))
         if expected is not None:
             expected = expected.replace("«TESTS»", tests_dir_wo_slash)
         if cmp_dirs:
@@ -75,17 +79,18 @@ class EmborgTester(object):
         self.cmp_dirs = cmp_dirs.split() if is_str(cmp_dirs) else cmp_dirs
         self.cmd = emborg_exe + self.args
         self.command = " ".join(self.cmd)
-        self.rm = rm
+        self.remove = remove
         self.diffout = None
 
     # run() {{{2
     def run(self):
         # remove requested files and directories
-        if self.rm:
-            rm(self.rm.split())
+        if self.remove:
+            rm(self.remove.split())
 
         # run command
         emborg = Run(self.cmd, "sOMW*")
+        print(emborg.stdout)
         self.result = dedent(Color.strip_colors(emborg.stdout)).strip("\n")
 
         # check stdout
@@ -107,9 +112,13 @@ class EmborgTester(object):
                 matches = False
 
         # check exit status
-        status = bool(emborg.status)
-        self.exit_status = 'failure' if status else 'success'
-        if status != ('error' in self.expected_type):
+        self.exit_status = emborg.status
+        self.expected_exit_status = 0
+        if 'diff' in self.expected_type:
+            self.expected_exit_status = 1
+        if 'error' in self.expected_type:
+            self.expected_exit_status = 2
+        if self.exit_status != self.expected_exit_status:
             matches = False
 
         return matches
@@ -120,7 +129,7 @@ class EmborgTester(object):
             expected = "\n" + indent(self.expected, stops=2)
         else:
             expected = self.expected
-        return dict(exit_status="success", output=expected)
+        return dict(exit_status=self.expected_exit_status, output=expected)
 
     # get_result() {{{2
     def get_result(self):
@@ -166,15 +175,16 @@ def initialize_configs(initialize):
     schema = emborg_schema
 )
 def test_emborg_without_configs(
-    initialize, args, expected, expected_type, cmp_dirs, rm
+    initialize, args, expected, expected_type, cmp_dirs, remove
 ):
     with cd(tests_dir):
-        tester = EmborgTester(args, expected, expected_type, cmp_dirs, rm)
+        tester = EmborgTester(args, expected, expected_type, cmp_dirs, remove)
         passes = tester.run()
         if not passes:
             result = tester.get_result()
             expected = tester.get_expected()
             assert result == expected
+            raise AssertionError('test code failure')
 
 # test_emborg_with_configs{{{2
 @parametrize(
@@ -183,15 +193,16 @@ def test_emborg_without_configs(
     schema = emborg_schema
 )
 def test_emborg_with_configs(
-    initialize_configs, args, expected, expected_type, cmp_dirs, rm
+    initialize_configs, args, expected, expected_type, cmp_dirs, remove
 ):
     with cd(tests_dir):
-        tester = EmborgTester(args, expected, expected_type, cmp_dirs, rm)
+        tester = EmborgTester(args, expected, expected_type, cmp_dirs, remove)
         passes = tester.run()
         if not passes:
             result = tester.get_result()
             expected = tester.get_expected()
             assert result == expected
+            raise AssertionError('test code failure')
 
 # test_emborg_overdue {{{2
 @parametrize(
@@ -199,7 +210,7 @@ def test_emborg_with_configs(
     key = 'emborg-overdue',
     schema = emborg_overdue_schema
 )
-def test_emborg_overdue(initialize, conf, args, expected):
+def test_emborg_overdue(initialize, conf, args, expected, expected_type):
     with cd(tests_dir):
         if conf:
             with open('.config/overdue.conf', 'w') as f:
@@ -207,6 +218,9 @@ def test_emborg_overdue(initialize, conf, args, expected):
         try:
             args = args.split() if is_str(args) else args
             overdue = Run(emborg_overdue_exe + args, "sOEW")
-            assert overdue.stdout == expected
+            if 'regex' in expected_type.split():
+                matches = bool(re.fullmatch(expected, overdue.stdout))
+            else:
+                matches = expected == overdue.stdout
         except Error as e:
             return str(e) == expected

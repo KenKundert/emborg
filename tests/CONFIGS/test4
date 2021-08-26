@@ -7,3 +7,4 @@ patterns = '''
     - **/.*.swo
 '''
 default_mount_point = '~/EMBORG'
+report_diffs_cmd = "diff -r"
