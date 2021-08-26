@@ -539,14 +539,14 @@ emborg with configs:
         remove: configs/test4
         args: --quiet --config test4 compare configs
         expected:
-            > Only in /home/ken/src/emborg/tests/EMBORG/configs: test4
+            > Only in /«TESTS»/EMBORG/configs: test4
         expected_type: diff
 
     -
         remove: configs/subdir/file
         args: --quiet --config test4 compare configs/subdir
         expected:
-            > Only in /home/ken/src/emborg/tests/EMBORG/configs/subdir: file
+            > Only in /«TESTS»/EMBORG/configs/subdir: file
         expected_type: diff
 
     -
@@ -784,8 +784,10 @@ emborg with configs:
         args: --quiet --config test8 files -D
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d configs.symlink/subdir/file
-            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d configs.symlink/subdir/
+            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d configs.symlink/subdir/(file|)
+            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d configs.symlink/subdir/(file|)
+                # unfortunately, we cannot check the order because they were created
+                # at the same time
         expected_type: regex
 
     -
@@ -795,11 +797,8 @@ emborg with configs:
 
     -
         args: --quiet --config test8 files --date «DATE» --sort-by-name
-        expected:
-            > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > configs.symlink/subdir/
-            > configs.symlink/subdir/file
-        expected_type: regex
+        expected: bu error: no archive available is older than «DATE» \(.* ago\)\.
+        expected_type: error regex
 
     -
         args: --quiet --config test8 files -O

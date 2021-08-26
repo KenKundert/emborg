@@ -314,15 +314,16 @@ explicitly specify a particular archive. For example:
 
     $ emborg extract --archive continuum-2020-12-05T12:54:26 home/shaunte/bin
 
-Alternatively you can specify a date.  The most recent archive that existed on 
-the specified date is used.  The date can be specified in absolute terms, as 
-in:
+Alternatively you can specify a date or date and time.  If only the date is 
+given the time is taken to be midnight.  The youngest archive that is older than 
+the specified date and time is used.  For example:
 
 .. code-block:: bash
 
-    $ emborg extract --date 2015-04-01 home/shaunte/bin
+    $ emborg extract --date 2021-04-01 home/shaunte/bin
+    $ emborg extract --date 2021-04-01T15:30 home/shaunte/bin
 
-Or you can specify the date in relative terms:
+Alternatively, you can specify the date in relative terms:
 
 .. code-block:: bash
 
@@ -446,13 +447,15 @@ You can explicitly specify an archive:
 
 .. code-block:: bash
 
-    $ emborg manifest --archive continuum-2015-04-01T12:19:58
+    $ emborg manifest --archive continuum-2021-04-01T12:19:58
 
-Or you can list the files that existed on a particular date using:
+Or you choose an archive based on a date and time.  The youngest archive that is 
+older than specified date and time is used.
 
 .. code-block:: bash
 
-    $ emborg manifest --date 2015-04-01
+    $ emborg manifest --date 2021-04-01
+    $ emborg manifest --date 2021-04-01T12:45
 
 You can also specify the date in relative terms:
 
@@ -538,16 +541,22 @@ You can mount the files that existed on a particular date using:
 
 .. code-block:: bash
 
-    $ emborg mount --date 2015-04-01 backups
+    $ emborg mount --date 2021-04-01 backups
+    $ emborg mount --date 2021-04-01T18:30 backups
+
+If the time is not given, it is taken to be midnight.
 
 You can also specify the date in relative terms:
 
 .. code-block:: bash
 
-    $ emborg mount --date 6M backups
+    $ emborg mount --date 1w backups
 
 where s, m, h, d, w, M, and y represents seconds, minutes, hours, days, weeks, 
 months, and years.
+
+When a date is given, the youngest archive that is older than the specified date 
+or time is used.
 
 Finally, you can mount all the available archives:
 
@@ -594,6 +603,24 @@ For example, the following commands restore your .bashrc file:
 
 *Emborg* runs the *restore* command from :ref:`working_dir` if it is specified 
 and the current directory if not.
+
+By default, the most recent archive is used, however, if desired you can 
+explicitly specify a particular archive. For example:
+
+    $ emborg restore --archive continuum-2020-12-05T12:54:26 resume.doc
+
+Or you choose an archive based on a date and time.  The youngest archive that is 
+older than specified date and time is used.
+
+    $ emborg restore --date 2021-04-01 resume.doc
+    $ emborg restore --date 2021-04-01T18:30 resume.doc
+
+Or you can specify the date in relative terms:
+
+    $ emborg restore --date 3d  resume.doc
+
+In this case 3d means 3 days. You can use s, m, h, d, w, M, and y to
+represent seconds, minutes, hours, days, weeks, months, and years.
 
 This command is very similar to the :ref:`extract <extract>` command except that 
 it is meant to replace files in place.  It also takes similar options.

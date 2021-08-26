@@ -91,11 +91,11 @@ def get_name_of_latest_archive(settings):
 def get_name_of_nearest_archive(settings, date):
     archives = get_available_archives(settings)
     try:
-        datetime = arrow.get(date)
+        target = arrow.get(date, tzinfo='local')
     except arrow.parser.ParserError as e:
         try:
             seconds = Quantity(date, 'd', scale='s')
-            datetime = arrow.now().shift(seconds=-seconds)
+            target = arrow.now().shift(seconds=-seconds)
         except QuantiPhyError:
             codicil = join(
                 full_stop(e),
@@ -106,10 +106,19 @@ def get_name_of_nearest_archive(settings, date):
                 "invalid date specification.",
                 culprit=date, codicil=codicil, wrap=True
             )
-    for archive in archives:
-        if arrow.get(archive["time"]) >= datetime:
-            return archive["name"]
-    raise Error(f"no archive available is older than {date} ({datetime.humanize()}).")
+
+    # find youngest archive that is older than specified target
+    prev_archive = None
+    for archive in reversed(archives):
+        archive_time = arrow.get(archive["time"], tzinfo='local')
+        if archive_time <= target:
+            if prev_archive:
+                return prev_archive["name"]
+            break
+        prev_archive = archive
+    raise Error(
+        f"no archive available is older than {date} ({target.humanize()})."
+    )
 
 
 # get_available_files() {{{2
@@ -214,7 +223,7 @@ class Command:
     @classmethod
     def execute_early(cls, name, args, settings, options):
         # execute_early() takes same arguments as run(), but is run before the
-        # settings files have been read. As such, the settings argument is None.
+        # settings files have been read.  As such, the settings argument is None.
         # run_early() is used for commands that do not need settings and should
         # work even if the settings files do not exist or are not valid.
         if hasattr(cls, "run_early"):
@@ -231,7 +240,7 @@ class Command:
     @classmethod
     def execute_late(cls, name, args, settings, options):
         # execute_late() takes same arguments as run(), but is run after all the
-        # configurations have been run. As such, the settings argument is None.
+        # configurations have been run.  As such, the settings argument is None.
         # run_late() is used for commands that want to create a summary that
         # includes the results from all the configurations.
         if hasattr(cls, "run_late"):
@@ -301,8 +310,8 @@ class BreakLockCommand(Command):
             emborg breaklock
             emborg break-lock
 
-        Breaks both the local and the repository locks. Be sure Borg is no longer
-        running before using this command.
+        Breaks both the local and the repository locks.  Be sure Borg is no
+        longer running before using this command.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = False
@@ -389,6 +398,49 @@ class CompareCommand(Command):
             -a <archive>, --archive <archive>   name of the archive to mount
             -d <date>, --date <date>            date of the desired archive
             -i, --interactive                   perform an interactive comparison
+
+
+        Reports and allows you to manage the differences between your local
+        files and those in an archive.  The base command simply reports the
+        differences:
+
+            $ emborg compare
+
+        The --interactive option allows you to manage those differences.
+        Specifically, it will open an interactive file comparison tool that
+        allows you to compare the contents of your files and copy differences
+        from the files in the archive to your local files:
+
+            $ emborg compare -i
+
+        You can specify the archive by name or by date or age.  If you do not
+        you will use the most recent archive:
+
+            $ emborg compare -a continuum-2020-12-04T17:41:28
+            $ emborg compare -d 2020-12-04
+            $ emborg compare -d 1w
+
+        You can specify a path to a file or directory to compare, if you do not
+        you will compare the files and directories of the current working
+        directory.
+
+            $ emborg compare tests
+            $ emborg compare ~/bin
+
+        This command requires that the following settings be specified in your
+        settings file: manage_diffs_cmd, report_diffs_cmd, and
+        default_mount_point.
+
+        The command operates by mounting the desired archive, performing the
+        comparison, and then unmounting the directory.  Problems sometimes occur
+        that can result in the archive remaining mounted.  In this case you will
+        need to resolve any issues that are preventing the unmounting, and then
+        explicitly run the :ref:`unmount command <umount>` before you can use
+        this *Borg* repository again.
+
+        This command differs from the :ref:`diff command <diff>` in that it
+        compares local files to those in an archive where as :ref:`diff <diff>`
+        compares the files contained in two archives.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -780,7 +832,7 @@ class DueCommand(Command):
                                        the oldest
 
         If you specify the days, then the message is only printed if the backup
-        is overdue.  If not overdue, nothing is printed. The message is always
+        is overdue.  If not overdue, nothing is printed.  The message is always
         printed if days is not specified.
 
         If you specify the message, the following replacements are available:
@@ -929,32 +981,33 @@ class ExtractCommand(Command):
         directories, in which case the entire directory is extracted.
 
         By default, the most recent archive is used, however, if desired you can
-        explicitly specify a particular archive. For example:
+        explicitly specify a particular archive.  For example:
 
-            $ emborg extract --archive continuum-2018-12-05T12:54:26 home/shaunte/bin
+            $ emborg extract --archive continuum-2020-12-05T12:54:26 home/shaunte/bin
 
-        Alternatively you can specify a date.  The most recent archive that
-        existed on the specified date is used.  The date can be specified in
-        absolute terms, as in:
+        Alternatively you can specify a date or date and time.  If only the date
+        is given the time is taken to be midnight.  The youngest archive that is
+        older than specified date and time is used.
 
-            $ emborg extract --date 2015-04-01 home/shaunte/bin
+            $ emborg extract --date 2021-04-01 home/shaunte/bin
+            $ emborg extract --date 2021-04-01T15:30 home/shaunte/bin
 
-        Or you can specify the date in relative terms:
+        Alternatively, you can specify the date and time in relative terms:
 
             $ emborg extract --date 3d  home/shaunte/bin
 
-        In this case 3d means 3 days. You can use s, m, h, d, w, M, and y to
+        In this case 3d means 3 days.  You can use s, m, h, d, w, M, and y to
         represent seconds, minutes, hours, days, weeks, months, and years.
 
         The extracted files are placed in the current working directory with
-        the original hierarchy. Thus, the above commands create the file:
+        the original hierarchy.  Thus, the above commands create the file:
 
             ./home/ken/src/avendesora/doc/overview.rst
 
         Normally, extract refuses to run if your current directory is the
         working directory used by Emborg so as to avoid overwriting an existing
         file.  If your intent is to overwrite the existing file, you can specify
-        the --force option. Or, consider using the restore command; it
+        the --force option.  Or, consider using the restore command; it
         overwrites the existing file regardless of what directory you run from.
 
         This command is very similar to the restore command except that it uses
@@ -1231,20 +1284,20 @@ class ManifestCommand(Command):
 
             emborg manifest --archive kundert-2018-12-05T12:54:26
 
-        Or you choose an archive based on a date. The first archive that was
-        created after the specified date is used:
+        Or you choose an archive based on a date and time.  The youngest archive
+        that is older than specified date and time is used.
 
-            emborg manifest --date 2015/04/01
-            emborg manifest --date 2015-04-01
-            emborg manifest --date 2018-12-05T12:39
+            emborg manifest --date 2021/04/01
+            emborg manifest --date 2021-04-01
+            emborg manifest --date 2020-12-05T12:39
 
         You can also the date in relative terms using s, m, h, d, w, M, y to
         indicate seconds, minutes, hours, days, weeks, months, and years:
 
             emborg manifest --date 2w
 
-        There are a variety of ways that you use to sort the output. For example,
-        sort by size, use:
+        There are a variety of ways that you use to sort the output.  For
+        example, sort by size, use:
 
             emborg manifest -S
         """
@@ -1445,16 +1498,18 @@ class MountCommand(Command):
             emborg mount backups
 
         If the specified mount point (backups in this example) exists in the
-        current directory, it must be a directory. If it does not exist, it is
+        current directory, it must be a directory.  If it does not exist, it is
         created.  If you do not specify a mount point, the value of the
         default_mount_point setting is used if provided.
 
         If you do not specify an archive or date, the most recently created
         archive is mounted.
 
-        You can mount an archive that existed on a particular date using:
+        Or you choose an archive based on a date and time.  The youngest archive
+        that is older than specified date and time is used.
 
-            emborg mount --date 2015-04-01 backups
+            emborg mount --date 2021-04-01 backups
+            emborg mount --date 2021-04-01T18:30 backups
 
         You can also specify the date in relative terms::
 
@@ -1595,21 +1650,21 @@ class RestoreCommand(Command):
         The intent is to replace the files in place.
 
         By default, the most recent archive is used, however, if desired you can
-        explicitly specify a particular archive. For example:
+        explicitly specify a particular archive.  For example:
 
-            $ emborg restore --archive continuum-2018-12-05T12:54:26 resume.doc
+            $ emborg restore --archive continuum-2020-12-05T12:54:26 resume.doc
 
-        Alternatively you can specify a date.  The most recent archive that
-        existed on the specified date is used.  The date can be specified in
-        absolute terms, as in:
+        Or you choose an archive based on a date and time.  The youngest archive
+        that is older than specified date and time is used.
 
-            $ emborg restore --date 2015-04-01 resume.doc
+            $ emborg restore --date 2021-04-01 resume.doc
+            $ emborg restore --date 2021-04-01T18:30 resume.doc
 
         Or you can specify the date in relative terms:
 
             $ emborg restore --date 3d  resume.doc
 
-        In this case 3d means 3 days. You can use s, m, h, d, w, M, and y to
+        In this case 3d means 3 days.  You can use s, m, h, d, w, M, and y to
         represent seconds, minutes, hours, days, weeks, months, and years.
 
         This command is very similar to the extract command except that it is
@@ -1798,7 +1853,7 @@ class VersionCommand(Command):
 
         output("emborg version: %s (%s) [%s]." % (__version__, __released__, python))
 
-        # Need to quit now. The version command need not have a valid settings
+        # Need to quit now.  The version command need not have a valid settings
         # file, so if we keep going emborg might emit spurious errors if the
         # settings files are not yet properly configured.
         return 0

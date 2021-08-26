@@ -64,14 +64,17 @@ class EmborgTester(object):
         # args, expected, and cmp_dirs may contain the literal text fragment: «TESTS»
         # that is replaced by the path to the tests directory: .../emborg/tests
 
-        # expand «TESTS»
+        # expand «TESTS» and «DATE»
+        date = arrow.now().format("YYYY-MM-DD")
         if args:
             args = args.replace("«TESTS»", tests_dir_wo_slash)
-            args = args.replace("«DATE»", arrow.now().format("YYYY-MM-DD"))
+            args = args.replace("«DATE»", date)
         if expected is not None:
             expected = expected.replace("«TESTS»", tests_dir_wo_slash)
+            expected = expected.replace("«DATE»", date)
         if cmp_dirs:
             cmp_dirs = cmp_dirs.replace("«TESTS»", tests_dir_wo_slash)
+            cmp_dirs = cmp_dirs.replace("«DATE»", date)
 
         self.args = args.split() if is_str(args) else args
         self.expected = expected.strip("\n")
