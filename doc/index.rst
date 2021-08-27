@@ -13,10 +13,10 @@ What is Emborg?
 ---------------
 
 *Emborg* is a simple command line utility to orchestrate backups. It is built as 
-a front-end to `Borg <https://borgbackup.readthedocs.io>`_, a powerful and fast 
-deduplicating backup program.  With *Emborg*, you specify all the details about 
-your backups once in advance, and then use a very simple command line interface 
-for your day-to-day activities.
+a front-end to `Borg Backup <https://borgbackup.readthedocs.io>`_, a powerful 
+and fast deduplicating backup program.  With *Emborg*, you specify all the 
+details about your backups once in advance, and then use a very simple command 
+line interface for your day-to-day activities.
 
 Use of *Emborg* does not preclude the use of Borg directly on the same 
 repository.  The philosophy of *Emborg* is to provide commands that you would 
@@ -105,130 +105,162 @@ Quick Tour
 ----------
 
 You must initially describe your repository or repositories to *Emborg*.  You do 
-so by adding configuration files to ~/.config/emborg. Once you have done that, 
-you can use *Emborg* to perform common tasks that involve you backups.
+so by adding configuration files to ~/.config/emborg. At least two are required.  
+First is the file that contains settings that are shared between all 
+configurations. This is a Python file located at ``~/.config/emborg/settings``.  
+Here is an example:
 
-For example:
+.. code-block:: bash
+
+    # configurations
+    configurations = ['root']
+    default_configurations = 'root'
+
+    # things to exclude
+    exclude_caches = True
+    exclude_if_present = '.nobackup'
+    exclude_nodump = True
+
+There also must be individual settings files for each backup configuration.  
+They are also a Python files.  The above file defines the *root* configuration.  
+The configuration is described in ``~/.config/emborg/root``, an example of which 
+is given below.  It is designed to back up the whole machine:
+
+.. code-block:: bash
+
+    # destination repository
+    repository = 'borgbase:backups'
+    prefix = '{host_name}-{config_name}-'
+
+    # directories to back up
+    src_dirs = ['/']
+
+    # directories to exclude
+    excludes = [
+        "/dev",
+        "/proc",
+        "/run",
+        "/sys",
+        "/tmp",
+        "/var/cache",
+        "/var/tmp",
+    ]
+
+Since this configuration needs to back up files that may not be accessible by 
+normal users, it should be run by the root user.
+
+Once you have created these files, you can use *Emborg* to perform common tasks 
+that involve you backups.
+
+The first step would be to initialize the remote repository.  A repository must 
+be initialized before it can first used.  To do so, one uses the :ref:`init 
+command <init>`:
 
 .. code-block:: bash
 
     $ emborg init
 
-The :ref:`init command <init>` initializes a repository, which is necessary 
-before it can be used.
+Once the repository is initialized, it is ready for use.  The :ref:`create 
+command <create>` creates an archive, meaning that it backs up your current 
+files.
 
 .. code-block:: bash
 
     $ emborg create
 
-The :ref:`create command <create>` creates an archive, meaning that it backs up 
-your current files.
+Once one or more archives have been created, you can list the available archives 
+using the :ref:`list command <list>`.
 
 .. code-block:: bash
 
     $ emborg list
-
-The :ref:`list command <list>` displays a list of all existing archives.
-
-.. code-block:: bash
-
-    $ emborg manifest
-    $ emborg files
 
 The :ref:`manifest or files command <manifest>` displays all the files in the 
 most recent archive.
 
 .. code-block:: bash
 
-    $ emborg manifest -a continuum-2019-04-23T18:35:33
+    $ emborg manifest
+    $ emborg files
+
+You can restrict the listing to those file contained in the current working 
+directory using:
+
+.. code-block:: bash
+
+    $ emborg manifest .
 
 If you give the name of an archive, it displays all the files in the specified 
 archive.
 
 .. code-block:: bash
 
-    $ emborg diff continuum-2019-04-23T18:35:33 continuum-2019-04-22T17:24:06
+    $ emborg manifest -a continuum-2019-04-23T18:35:33
 
-The :ref:`diff command <diff>` shows you the difference between two archives.
+Or, you can give a date, in which case the first archive created after that date 
+is used.
+
+.. code-block:: bash
+
+    $ emborg manifest -d 2019-04-23
+
+The :ref:`compare command <compare>` allows you to see and manage the 
+differences between your local files and those in an archive.  You can compare 
+individual files or entire directories.  You can used the date and archive 
+options to select the particular archive to compare against.
 
 .. code-block:: bash
 
     $ emborg compare doc/thesis
 
-The :ref:`compare command <compare>` allows you to see and manage the 
-differences between your local files and those in an archive.
-
-.. code-block:: bash
-
-    $ emborg extract home/seven/bin/vu
-
-The :ref:`extract command <extract>` extracts a file or directory from the most 
-recent archive.
+The :ref:`restore command <restore>` restores files or directories in place, 
+meaning it replaces the current version with the one from the archive.
+You can used the date and archive options to select the particular archive to 
+draw from.
 
 .. code-block:: bash
 
     $ cd ~/bin
     $ emborg restore vu
 
-The :ref:`restore command <restore>` restores files or directories in place, 
-meaning it replaces the current version with the one from the archive.
+The :ref:`mount command <mount>` creates a directory 'BACKUPS' and then mounts 
+an archive or the whole repository on this directory.  This allows you to move 
+into the archive or repository, navigating, examining, and retrieving files as 
+if it were a file system.  You can used the date and archive options to select 
+the particular archive to mount.
 
 .. code-block:: bash
 
     $ emborg mount BACKUPS
-
-The :ref:`mount command <mount>` creates a directory 'BACKUPS' and then mounts 
-an archive or the whole repository on this directory.  This allows you to move 
-into the archive or repository, navigating, examining, and retrieving files as 
-if it were a file system.
-
-.. code-block:: bash
-
-    $ emborg umount BACKUPS
 
 The :ref:`umount command <umount>` un-mounts the archive or repository after you 
 are done with it.
 
 .. code-block:: bash
 
-    $ emborg due
+    $ emborg umount BACKUPS
 
 The :ref:`due command <due>` tells you when the last successful backup was 
 performed.
 
 .. code-block:: bash
 
-    $ emborg info
+    $ emborg due
 
 The :ref:`info command <info>` shows you information about your repository such 
 as where it is located and how large it is.
 
 .. code-block:: bash
 
-    $ emborg check
+    $ emborg info
 
-The :ref:`check command <check>` performs internal consistency checking on your 
-repository.
-
-.. code-block:: bash
-
-    $ emborg prune
-
-The :ref:`prune command <prune>` removes redundant archives.
-
-.. code-block:: bash
-
-    $ emborg borg check --repair @repo
-
-The :ref:`borg command <borg>` runs a raw *Borg* command for you.  The benefit 
-of having *Emborg* run *Borg* for you is that it automatically sets the 
-passphrase and the path to the repository so you do not need to remember them.
+The :ref:`help command <help>` shows you information on how to use *Emborg*.
 
 .. code-block:: bash
 
     $ emborg help
 
-The :ref:`help command <help>` shows you information on how to use *Emborg*.
+There are more commands, but the above are the most commonly used.
 
 
 Status
@@ -244,10 +276,10 @@ have not completed successfully in a specified period of time.  In addition,
 Borg
 ----
 
-*Borg* has considerably more power than what is exposed with *Emborg*.  You may
-use it directly or through the *Emborg* *borg* command when you need that power.
-More information about *Borg* can be found at `borgbackup on readthedocs
-<https://borgbackup.readthedocs.io/en/stable/index.html>`_.
+*Borg* has more power than what is exposed with *Emborg*.  You may
+use it directly or through the *Emborg* :ref:`borg command <borg>` when you need 
+that power.  More information about *Borg* can be found at `borgbackup on 
+readthedocs <https://borgbackup.readthedocs.io/en/stable/index.html>`_.
 
 
 Precautions
