@@ -8,4 +8,4 @@ set nonomatch
 rm -f *.pyc *.pyo */*.pyc */*.pyo .test*.sum expected result install.out
 rm -rf build *.egg-info dist __pycache__ */__pycache__ .coverage
 rm -rf tests/home/.python-eggs .eggs tests/.coverage htmlcov tests/htmlcov
-rm -rf .cache tests/.cache tests/home/.cache .tox
+rm -rf .cache tests/.cache tests/home/.cache .tox .hypothesis .pytest_cache
