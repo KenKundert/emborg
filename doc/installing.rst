@@ -16,8 +16,8 @@ the following:
 
 Alternately, you can download a precompiled version from `Borg Github Releases 
 <https://github.com/borgbackup/borg/releases/>`_, which allows you to install 
-Borg as an unprivileged user.  You can do so with following commands (they will 
-need to be adjusted for to get the latest version):
+Borg as an unprivileged user.  You can do so with following commands (they may 
+need to be adjusted to get the latest version):
 
 .. code-block:: bash
 
