@@ -496,9 +496,9 @@ emborg with configs:
         args: --quiet --config test0 create
         expected:
             > bu error: borg create:
-            >     Failed to create/acquire the lock [^ ]*/emborg/tests/repositories/lock \(timeout\)\.
-            >         Perhaps your still have an archive mounted\?
-        expected_type: error regex
+            >     Failed to create/acquire the lock /«TESTS»/repositories/lock (timeout).
+            >         Perhaps your still have an archive mounted?
+        expected_type: error
         dependencies: fuse
 
     -
@@ -785,8 +785,8 @@ emborg with configs:
         args: --config test7 list
         expected:
             > bu error: borg list:
-            >     Repository [^ ]*/emborg/tests/repositories does not exist\.
-        expected_type: error regex
+            >     Repository /«TESTS»/repositories does not exist.
+        expected_type: error
 
     -
         args: --quiet --config test8 init
