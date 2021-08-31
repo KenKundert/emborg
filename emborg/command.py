@@ -473,6 +473,7 @@ class CompareCommand(Command):
                 archive = get_name_of_nearest_archive(settings, date)
             else:
                 archive = get_name_of_latest_archive(settings)
+            display(f'Using {archive}.')
 
         # get diff tool
         if cmdline['--interactive']:

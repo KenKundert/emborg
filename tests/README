@@ -1,0 +1,17 @@
+Certain CI environments make it difficult or impossible to install all of
+the dependencies needed to test Emborg.   This is common with two important
+dependencies: Borg and Fuse.
+
+Borg is needed for virtually all tests, so no accommodations are made for any 
+testing if Borg is missing.
+
+Fuse is needed by the mount and compare commands; it is used by Borg when 
+mounting remote archives.
+
+You can skip tests dependent on Fuse by defining the MISSING_DEPENDENCIES 
+environment variable.  To do so, add the following lines to the tox.ini file:
+
+    [testenv:pytest]
+    setenv =                                 ← add
+        MISSING_DEPENDENCIES = fuse          ← add
+    commands = py.test -vv --cov {posargs}

@@ -37,13 +37,23 @@ emborg_schema = Schema({
     Optional('expected_type', default=""): str,
     Optional('cmp_dirs', default=""): str,
     Optional('remove', default=""): str,
+    Optional('dependencies', default=""): str,
 }, required=True)
 emborg_overdue_schema = Schema({
     Optional('conf', default=""): str,
     Optional('args', default=[]): Any(str, list),
     Required('expected', default=""): str,
     Required('expected_type', default=""): str,
+    Optional('dependencies', default=""): str,
 }, required=True)
+
+# missing dependencies {{{2
+missing_dependencies = set(
+    os.environ.get('MISSING_DEPENDENCIES', '').lower().split()
+)
+def skip_test(dependencies):
+    return set(dependencies.lower().split()) & missing_dependencies
+
 
 # EmborgTester class {{{1
 class EmborgTester(object):
@@ -178,8 +188,12 @@ def initialize_configs(initialize):
     schema = emborg_schema
 )
 def test_emborg_without_configs(
-    initialize, args, expected, expected_type, cmp_dirs, remove
+    initialize,
+    args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
+    print(dependencies, missing_dependencies, skip_test(dependencies))
+    if skip_test(dependencies):
+        return
     with cd(tests_dir):
         tester = EmborgTester(args, expected, expected_type, cmp_dirs, remove)
         passes = tester.run()
@@ -196,8 +210,12 @@ def test_emborg_without_configs(
     schema = emborg_schema
 )
 def test_emborg_with_configs(
-    initialize_configs, args, expected, expected_type, cmp_dirs, remove
+    initialize_configs,
+    args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
+    print(dependencies, missing_dependencies, skip_test(dependencies))
+    if skip_test(dependencies):
+        return
     with cd(tests_dir):
         tester = EmborgTester(args, expected, expected_type, cmp_dirs, remove)
         passes = tester.run()
@@ -213,7 +231,12 @@ def test_emborg_with_configs(
     key = 'emborg-overdue',
     schema = emborg_overdue_schema
 )
-def test_emborg_overdue(initialize, conf, args, expected, expected_type):
+def test_emborg_overdue(
+    initialize,
+    conf, args, expected, expected_type, dependencies
+):
+    if skip_test(dependencies):
+        return
     with cd(tests_dir):
         if conf:
             with open('.config/overdue.conf', 'w') as f:

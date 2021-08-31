@@ -488,8 +488,9 @@ emborg with configs:
     -
         args: --quiet --config test0 mount EMBORG
         cmp_dirs: EMBORG/«TESTS»/configs configs
-        # if this test fails with 'EMBORG: Mountpoint must be a writable', it is 
-        # because EMBORG is still mounted from a previous run.
+        dependencies: fuse
+            # if this test fails with 'EMBORG: Mountpoint must be a writable', 
+            # it is because EMBORG is still mounted from a previous run.
 
     -
         args: --quiet --config test0 create
@@ -498,9 +499,11 @@ emborg with configs:
             >     Failed to create/acquire the lock [^ ]*/emborg/tests/repositories/lock \(timeout\)\.
             >         Perhaps your still have an archive mounted\?
         expected_type: error regex
+        dependencies: fuse
 
     -
         args: --quiet --config test0 umount EMBORG
+        dependencies: fuse
 
     -
         args: --quiet --config test4 create
@@ -541,6 +544,7 @@ emborg with configs:
         expected:
             > Only in /«TESTS»/EMBORG/configs: test4
         expected_type: diff
+        dependencies: fuse
 
     -
         remove: configs/subdir/file
@@ -548,6 +552,7 @@ emborg with configs:
         expected:
             > Only in /«TESTS»/EMBORG/configs/subdir: file
         expected_type: diff
+        dependencies: fuse
 
     -
         remove: configs
@@ -567,9 +572,11 @@ emborg with configs:
     -
         args: --quiet --config test4 mount
         cmp_dirs: EMBORG/configs configs
+        dependencies: fuse
 
     -
         args: --quiet --config test4 umount
+        dependencies: fuse
 
     -
         args: --quiet --config test4 borg list --prefix test4- --short @repo
@@ -578,12 +585,15 @@ emborg with configs:
 
     -
         args: --quiet --config test4 compare configs
+        dependencies: fuse
 
     -
         args: --quiet --config test4 compare configs/subdir
+        dependencies: fuse
 
     -
         args: --quiet --config test4 compare --interactive configs
+        dependencies: fuse
 
     -
         args: --quiet --config test5 create
@@ -636,9 +646,11 @@ emborg with configs:
     -
         args: --quiet --config test5 mount
         cmp_dirs: EMBORG/«TESTS»/configs CONFIGS
+        dependencies: fuse
 
     -
         args: --quiet --config test5 umount
+        dependencies: fuse
 
     -
         args: --quiet --config test5 borg list --prefix test5- --short @repo
@@ -647,9 +659,11 @@ emborg with configs:
 
     -
         args: --quiet --config test5 compare configs
+        dependencies: fuse
 
     -
         args: --quiet --config test5 compare --interactive configs
+        dependencies: fuse
 
     -
         args: --quiet --config test6 create
@@ -702,9 +716,11 @@ emborg with configs:
     -
         args: --quiet --config test6 mount
         cmp_dirs: EMBORG/configs configs
+        dependencies: fuse
 
     -
         args: --quiet --config test6 umount
+        dependencies: fuse
 
     -
         args: --quiet --config test6 borg list --prefix test6- --short @repo
@@ -715,6 +731,7 @@ emborg with configs:
         args: --quiet --config test6 compare
         expected: bu error: no diff command available.
         expected_type: error
+        dependencies: fuse
 
     -
         args: --quiet --config test7 create
@@ -750,9 +767,11 @@ emborg with configs:
     -
         args: --quiet --config test7 mount
         cmp_dirs: EMBORG/«TESTS»/configs CONFIGS
+        dependencies: fuse
 
     -
         args: --quiet --config test7 umount
+        dependencies: fuse
 
     -
         args: --quiet --config test7 borg list --prefix test7- --short @repo
@@ -905,9 +924,11 @@ emborg with configs:
     -
         args: --quiet --config test8 mount
         cmp_dirs: EMBORG/configs.symlink/subdir configs.symlink/subdir
+        dependencies: fuse
 
     -
         args: --quiet --config test8 umount
+        dependencies: fuse
 
     -
         args: --quiet --config test8 borg list --prefix test8- --short @repo
