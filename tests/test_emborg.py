@@ -191,7 +191,6 @@ def test_emborg_without_configs(
     initialize,
     args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
-    print(dependencies, missing_dependencies, skip_test(dependencies))
     if skip_test(dependencies):
         return
     with cd(tests_dir):
@@ -213,7 +212,6 @@ def test_emborg_with_configs(
     initialize_configs,
     args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
-    print(dependencies, missing_dependencies, skip_test(dependencies))
     if skip_test(dependencies):
         return
     with cd(tests_dir):
