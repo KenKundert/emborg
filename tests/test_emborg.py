@@ -100,6 +100,8 @@ class EmborgTester(object):
         # remove requested files and directories
         if self.remove:
             rm(self.remove.split())
+        if not self.args:
+            return True
 
         # run command
         emborg = Run(self.cmd, "sOMW*")

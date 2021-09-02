@@ -159,6 +159,20 @@ emborg without configs:
             >                      umask: set umask to M (local and remote, default:
             >                             0077)
 
+    -
+        args: init
+        expected:
+            > Configuration directory created: /«TESTS»/.config/emborg.
+            > Includes example settings files. Edit them to suit your needs.
+            > Search for and replace any fields delimited with << and >>.
+            > Delete any configurations you do not need.
+            > Generally you will use either home or root, but not both.
+        cmp_dirs: /«TESTS»/INITIAL_CONFIGS .config/emborg
+
+    -
+        remove: .config
+
+
 emborg with configs:
 
     -

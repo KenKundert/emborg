@@ -1,0 +1,18 @@
+# Settings for root configuration
+# use of absolute paths is recommended
+src_dirs = '/'           # paths to directories to be backed up
+excludes = '''
+    /dev
+    /home/*/.cache
+    /mnt
+    /proc
+    /root/.cache
+    /run
+    /sys
+    /tmp
+    /var/cache
+    /var/lib/dnf
+    /var/lock
+    /var/run
+    /var/tmp
+'''                      # list of files or directories to skip
