@@ -91,8 +91,8 @@ The first file is the shared configuration file:
 This is basically the minimum you can give. Your two configurations are listed 
 in *configurations*. It could be a list of strings, but you can also give 
 a single string, in which case the string is split on white space. Then you 
-specify your default configuration. In this case *backups* will be run 
-interactively and *snapshots* will be run on a schedule by *cron*, so the 
+specify your default configuration. In this example *backups* is to be run 
+interactively and *snapshots* is to be run on a schedule by *cron*, so the 
 default is set to *backups* to make it easier to run interactively.
 
 
@@ -202,7 +202,7 @@ The third file is the configuration file for *snapshots*:
         **/.*.swp
     '''
     prune_after_create = True
-    keep_within = '1d'   keep_daily = 7
+    keep_within = '1d'
 
 In this case the repository is on the local machine and it is not encrypted. It 
 again backs up your home directory, but for this configuration the archives are 
@@ -226,7 +226,7 @@ Once it has run, you can pull a file from the latest snapshot using:
 
 .. code-block:: bash
 
-    $ emborg restore passwords.gpg
+    $ emborg -c snapshots restore passwords.gpg
 
 
 Overdue Backups
@@ -288,15 +288,15 @@ needs to be configured and run by *root*. This allows all the files on the
 machine to be backed up regardless of who owns them.  Other than being root, the 
 mechanics are very much the same.
 
-To start, run emborg to create the initial configuration files:
+To start, run *emborg* as root to create the initial configuration files:
 
 .. code-block:: bash
 
     # emborg
 
-This creates the ~/.config/emborg directory in the root account and populates it 
-with three files: *settings*, *root*, *home*. You can delete *home* and remove 
-the reference to it in *settings*, leaving only:
+This creates the /root/.config/emborg directory in the root account and 
+populates it with three files: *settings*, *root*, *home*. You can delete *home* 
+and remove the reference to it in *settings*, leaving only:
 
 .. code-block:: python
 

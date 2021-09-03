@@ -160,7 +160,6 @@ emborg without configs:
             >                             0077)
 
     -
-        args: init
         expected:
             > Configuration directory created: /«TESTS»/.config/emborg.
             > Includes example settings files. Edit them to suit your needs.

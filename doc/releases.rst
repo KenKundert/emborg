@@ -7,6 +7,11 @@ Latest development release
 | Released: 2021-08-28
 
 
+1.26 (2021-09-03)
+-----------------
+- Improve the tests.
+
+
 1.25 (2021-08-28)
 -----------------
 - Added the :ref:`compare command <compare>`.
@@ -75,9 +80,11 @@ Latest development release
 - Add ``--progress`` command-line option and :ref:`show_progress` option to 
   the :ref:`create <create>` command.
 
+
 1.19 (2021-01-02)
 -----------------
 - Added ``--list`` command-line option to the :ref:`prune <prune>` command.
+
 
 1.18 (2020-07-19)
 -----------------
@@ -86,14 +93,17 @@ Latest development release
 - *Emborg* now automatically confirms to *Borg* that you know what you are doing 
   when you delete a repository or repair an archive.
 
+
 1.17 (2020-04-15)
 -----------------
 - :ref:`Borg <borg>` command allows archive to be added to ``@repo``.
 - Added :ref:`encoding` setting.
 
+
 1.16 (2020-03-17)
 -----------------
 - Refinements and bug fixes.
+
 
 1.15 (2020-03-06)
 -----------------
@@ -119,13 +129,16 @@ Latest development release
   running
 - Support ``--repair`` option on :ref:`check command <check>`.
 
+
 1.14 (2019-12-31)
 -----------------
 - Remove debug message accidentally left in *emborg-overdue*
 
+
 1.13 (2019-12-31)
 -----------------
 - Enhance *emborg-overdue* to work on clients as well as servers
+
 
 1.12 (2019-12-25)
 -----------------
@@ -133,13 +146,16 @@ Latest development release
 - Fixed some issues with :ref:`borg <borg>` command.
 - Added ``--oldest`` option to :ref:`due <due>` command.
 
+
 1.11 (2019-11-27)
 -----------------
 - Bug fix release.
 
+
 1.10 (2019-11-11)
 -----------------
 - Bug fix release.
+
 
 1.9 (2019-11-08)
 ----------------
@@ -148,9 +164,11 @@ Latest development release
 - Made latest archive the default for :ref:`check <check>` command.
 - Allow :ref:`exclude_from <exclude_from>` setting to be a list of file names.
 
+
 1.8 (2019-10-12)
 ----------------
 - Remove duplicated commands.
+
 
 1.7 (2019-10-07)
 ----------------
@@ -158,10 +176,12 @@ Latest development release
   (:ref:`one_file_system <one_file_system>`, :ref:`exclude_caches 
   <exclude_caches>`, ...)
 
+
 1.6 (2019-10-04)
 ----------------
 - Added :ref:`restore <restore>` command.
 - Added :ref:`verbose <verbose>` setting.
+
 
 1.5 (2019-09-30)
 ----------------
@@ -180,6 +200,7 @@ Latest development release
   (run 'mv ~/.config/emborg/\*.{log,lastbackup}\* ~/.local/share/emborg' before 
   using this version).
 
+
 1.4 (2019-04-24)
 ----------------
 - Added *ssh_command* setting
@@ -188,14 +209,17 @@ Latest development release
 - Allow :ref:`run_before_backup <run_before_backup>` and :ref:`run_after_backup 
   <run_after_backup>` to be simple strings
 
+
 1.3 (2019-01-16)
 ----------------
 - Added the raw :ref:`borg <borg>` command.
+
 
 1.2 (2019-01-16)
 ----------------
 - Added the :ref:`borg_executable <borg_executable>` and :ref:`passcommand 
   <passcommand>` settings.
+
 
 1.1 (2019-01-13)
 ----------------
@@ -205,14 +229,17 @@ Latest development release
 - Support multiple email addresses in :ref:`notify <notify>`.
 - Added warning if settings file is world readable and contains a passphrase.
 
+
 1.0 (2019-01-09)
 ----------------
 - Added :ref:`remote_path <remote_path>` setting.
 - Formal public release.
 
+
 0.3 (2018-12-25)
 ----------------
 - Initial public release (beta).
+
 
 0.0 (2018-12-05)
 ----------------

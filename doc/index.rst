@@ -150,7 +150,7 @@ Since this configuration needs to back up files that may not be accessible by
 normal users, it should be run by the root user.
 
 Once you have created these files, you can use *Emborg* to perform common tasks 
-that involve you backups.
+that involve your backups.
 
 The first step would be to initialize the remote repository.  A repository must 
 be initialized before it can first used.  To do so, one uses the :ref:`init 
@@ -204,9 +204,15 @@ is used.
 
     $ emborg manifest -d 2019-04-23
 
+You can also specify the date and time relative to the current moment:
+
+.. code-block:: bash
+
+    $ emborg manifest -d 1w
+
 The :ref:`compare command <compare>` allows you to see and manage the 
 differences between your local files and those in an archive.  You can compare 
-individual files or entire directories.  You can used the date and archive 
+individual files or entire directories.  You can use the date and archive 
 options to select the particular archive to compare against.
 
 .. code-block:: bash
@@ -215,8 +221,8 @@ options to select the particular archive to compare against.
 
 The :ref:`restore command <restore>` restores files or directories in place, 
 meaning it replaces the current version with the one from the archive.
-You can used the date and archive options to select the particular archive to 
-draw from.
+You can also use the date and archive options to select the particular archive 
+to draw from.
 
 .. code-block:: bash
 
@@ -226,8 +232,8 @@ draw from.
 The :ref:`mount command <mount>` creates a directory 'BACKUPS' and then mounts 
 an archive or the whole repository on this directory.  This allows you to move 
 into the archive or repository, navigating, examining, and retrieving files as 
-if it were a file system.  You can used the date and archive options to select 
-the particular archive to mount.
+if it were a file system.  Again, you can use the date and archive options to 
+select the particular archive to mount.
 
 .. code-block:: bash
 
@@ -303,7 +309,7 @@ the permissions for that file so that it is not readable by others:
    chmod 600 ~/.config/emborg/*
 
 Better is to simply not store the passphrase in *Emborg* configuration files.
-You can use the *passcommand* setting for this, or you use
+You can use the *passcommand* setting for this, or you can use
 `Avendesora <https://avendesora.readthedocs.io>`_, which is a flexible password
 management system. The interface to *Avendesora* is already built in to 
 *Emborg,* but its use is optional (it need not be installed).
