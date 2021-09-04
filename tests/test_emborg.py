@@ -32,7 +32,7 @@ tests_dir_wo_slash = tests_dir.strip('/')
 
 # schema for test cases {{{2
 emborg_schema = Schema({
-    Optional('args', default=[]): Any(str, list),
+    Optional('args', default='<PASS>'): Any(str, list),
     Optional('expected', default=""): str,
     Optional('expected_type', default=""): str,
     Optional('cmp_dirs', default=""): str,
@@ -76,9 +76,11 @@ class EmborgTester(object):
 
         # expand «TESTS» and «DATE»
         date = arrow.now().format("YYYY-MM-DD")
-        if args:
-            args = args.replace("«TESTS»", tests_dir_wo_slash)
-            args = args.replace("«DATE»", date)
+
+        # replace «TESTS» and «DATE» macros
+        args = args.split() if is_str(args) else args
+        args = [a.replace("«TESTS»", tests_dir_wo_slash) for a in args]
+        args = [a.replace("«DATE»", date) for a in args]
         if expected is not None:
             expected = expected.replace("«TESTS»", tests_dir_wo_slash)
             expected = expected.replace("«DATE»", date)
@@ -86,7 +88,7 @@ class EmborgTester(object):
             cmp_dirs = cmp_dirs.replace("«TESTS»", tests_dir_wo_slash)
             cmp_dirs = cmp_dirs.replace("«DATE»", date)
 
-        self.args = args.split() if is_str(args) else args
+        self.args = args
         self.expected = expected.strip("\n")
         self.expected_type = expected_type.split()
         self.cmp_dirs = cmp_dirs.split() if is_str(cmp_dirs) else cmp_dirs
@@ -100,7 +102,7 @@ class EmborgTester(object):
         # remove requested files and directories
         if self.remove:
             rm(self.remove.split())
-        if not self.args:
+        if '<PASS>' in self.args:
             return True
 
         # run command

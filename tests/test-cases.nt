@@ -4,6 +4,7 @@ emborg without configs:
         args: version
         expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
         expected_type: regex
+        remove: .config
 
     -
         args: help
@@ -160,6 +161,7 @@ emborg without configs:
             >                             0077)
 
     -
+        args:
         expected:
             > Configuration directory created: /«TESTS»/.config/emborg.
             > Includes example settings files. Edit them to suit your needs.
