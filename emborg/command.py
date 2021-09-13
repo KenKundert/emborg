@@ -1124,10 +1124,14 @@ class InfoCommand(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         fast = cmdline["--fast"]
 
-        # report local information
         # run borg_options('create') to populate settings.roots
-        settings.borg_options('create', None, (), False)
-        roots = (str(r) for r in settings.roots)
+        try:
+            settings.borg_options('create', None, (), False)
+            roots = (str(r) for r in settings.roots)
+        except Error:
+            roots = ['not set']
+
+        # report local information
         output(f"              config: {settings.config_name}")
         output(f'               roots: {", ".join(roots)}')
         output(f"         destination: {settings.destination()}")

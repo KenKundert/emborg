@@ -512,7 +512,10 @@ emborg with configs:
         expected:
             > bu error: borg create:
             >     Failed to create/acquire the lock /«TESTS»/repositories/lock (timeout).
-            >         Perhaps your still have an archive mounted?
+            >         Perhaps you still have an archive mounted?
+            >         If so, use umount to unmount it.
+            >         Perhaps a previous run was killed or terminated with an error?
+            >         If so, use breaklock to clear the lock.
         expected_type: error
         dependencies: fuse
 

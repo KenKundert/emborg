@@ -712,7 +712,13 @@ class Settings:
                         emborg --relocated {cmd} ...
                 ''')
             if 'Failed to create/acquire the lock' in e.stderr:
-                codicil = 'Perhaps your still have an archive mounted?'
+                codicil = [
+                    'Perhaps you still have an archive mounted?',
+                    'If so, use umount to unmount it.',
+                    'Perhaps a previous run was killed or terminated with an error?',
+                    'If so, use breaklock to clear the lock.',
+                ]
+
             if 'Mountpoint must be a writable directory' in e.stderr:
                 codicil = 'Perhaps an archive is already mounted there?'
         e.reraise(culprit=f"borg {cmd}", codicil=codicil)
