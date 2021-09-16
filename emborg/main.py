@@ -39,7 +39,9 @@ Options:
 import os
 import sys
 from docopt import docopt
-from inform import Error, Inform, cull, display, fatal, os_error, terminate
+from inform import (
+    Error, Inform, LoggingCache, cull, display, fatal, os_error, terminate
+)
 from . import __released__, __version__
 from .command import Command
 from .hooks import Hooks
@@ -60,7 +62,14 @@ expanded_synopsis = synopsis + commands.format(commands=Command.summarize())
 
 # Main {{{1
 def main():
-    with Inform(error_status=2, flush=True, version=version) as inform:
+    with Inform(
+        error_status=2,
+        flush=True,
+        logfile=LoggingCache(),
+        prog_name='emborg',
+        version=version,
+    ) as inform:
+
         # read command line
         cmdline = docopt(expanded_synopsis, options_first=True, version=version)
         config = cmdline["--config"]

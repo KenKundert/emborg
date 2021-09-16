@@ -27,6 +27,7 @@ import arrow
 from inform import (
     Color,
     Error,
+    LoggingCache,
     codicil,
     comment,
     conjoin,
@@ -183,6 +184,10 @@ class Settings:
         self.settings = dict()
         self.do_not_expand = ()
         self.emborg_opts = emborg_opts
+
+        # reset the logfile so anything logged after this is placed in the
+        # logfile for this config
+        get_informer().set_logfile(LoggingCache())
         self.config_dir = to_path(CONFIG_DIR)
         self.read(name)
         self.check()
@@ -214,6 +219,7 @@ class Settings:
         """
 
         if path:
+            # we are reading an include file
             settings = PythonFile(path).run()
             parent = path.parent
             includes = Collection(
@@ -224,7 +230,7 @@ class Settings:
                 cull=True,
             )
         else:
-            # this is the generic settings file
+            # this is the base-level settings file
             parent = self.config_dir
             if not parent.exists():
                 # config dir does not exist, create and populate it
@@ -644,6 +650,11 @@ class Settings:
                 borg = Run(command, modes=modes, stdin="", env=os.environ, log=False)
             except Error as e:
                 self.report_borg_error(e, cmd)
+            finally:
+                # remove passcode env variables created by emborg
+                if self.borg_passcode_env_var_set_by_emborg:
+                    narrate(f"Unsetting {self.borg_passcode_env_var_set_by_emborg}.")
+                    del os.environ[self.borg_passcode_env_var_set_by_emborg]
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))
@@ -849,8 +860,3 @@ class Settings:
         # delete lockfile
         if self.requires_exclusivity:
             self.lockfile.unlink()
-
-        # remove passcode env variables created by emborg
-        if self.borg_passcode_env_var_set_by_emborg:
-            narrate(f"Unsetting {self.borg_passcode_env_var_set_by_emborg}.")
-            del os.environ[self.borg_passcode_env_var_set_by_emborg]

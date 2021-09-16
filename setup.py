@@ -29,7 +29,7 @@ setup(
         appdirs
         arrow>=0.15
         docopt
-        inform>=1.21
+        inform>=1.26
         quantiphy
         requests
         shlib>=1.0
