@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.26.0
-| Released: 2021-09-03
+| Version: 1.26.1
+| Released: 2021-09-16
 
 - Improve the logging for composite configurations.
 
