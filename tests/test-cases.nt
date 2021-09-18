@@ -661,25 +661,25 @@ emborg with configs:
     -
         args: --quiet --config test5 extract /«TESTS»/configs
         expected:
-            > home/ken/src/emborg/tests/configs
-            > home/ken/src/emborg/tests/configs/test6patterns
-            > home/ken/src/emborg/tests/configs/test2excludes
-            > home/ken/src/emborg/tests/configs/test2
-            > home/ken/src/emborg/tests/configs/test2passphrase
-            > home/ken/src/emborg/tests/configs/test7patterns
-            > home/ken/src/emborg/tests/configs/overdue.conf
-            > home/ken/src/emborg/tests/configs/test3
-            > home/ken/src/emborg/tests/configs/README
-            > home/ken/src/emborg/tests/configs/settings
-            > home/ken/src/emborg/tests/configs/test6
-            > home/ken/src/emborg/tests/configs/test7
-            > home/ken/src/emborg/tests/configs/test8
-            > home/ken/src/emborg/tests/configs/test0
-            > home/ken/src/emborg/tests/configs/test5
-            > home/ken/src/emborg/tests/configs/test1
-            > home/ken/src/emborg/tests/configs/test4
-            > home/ken/src/emborg/tests/configs/subdir
-            > home/ken/src/emborg/tests/configs/subdir/file
+            > «TESTS»/configs
+            > «TESTS»/configs/test6patterns
+            > «TESTS»/configs/test2excludes
+            > «TESTS»/configs/test2
+            > «TESTS»/configs/test2passphrase
+            > «TESTS»/configs/test7patterns
+            > «TESTS»/configs/overdue.conf
+            > «TESTS»/configs/test3
+            > «TESTS»/configs/README
+            > «TESTS»/configs/settings
+            > «TESTS»/configs/test6
+            > «TESTS»/configs/test7
+            > «TESTS»/configs/test8
+            > «TESTS»/configs/test0
+            > «TESTS»/configs/test5
+            > «TESTS»/configs/test1
+            > «TESTS»/configs/test4
+            > «TESTS»/configs/subdir
+            > «TESTS»/configs/subdir/file
         expected_type: sort-lines
         cmp_dirs: «TESTS»/configs configs
 
@@ -687,25 +687,25 @@ emborg with configs:
         remove: configs
         args: --quiet --config test5 restore configs
         expected:
-            > home/ken/src/emborg/tests/configs
-            > home/ken/src/emborg/tests/configs/test6patterns
-            > home/ken/src/emborg/tests/configs/test2excludes
-            > home/ken/src/emborg/tests/configs/test2
-            > home/ken/src/emborg/tests/configs/test2passphrase
-            > home/ken/src/emborg/tests/configs/test7patterns
-            > home/ken/src/emborg/tests/configs/overdue.conf
-            > home/ken/src/emborg/tests/configs/test3
-            > home/ken/src/emborg/tests/configs/README
-            > home/ken/src/emborg/tests/configs/settings
-            > home/ken/src/emborg/tests/configs/test6
-            > home/ken/src/emborg/tests/configs/test7
-            > home/ken/src/emborg/tests/configs/test8
-            > home/ken/src/emborg/tests/configs/test0
-            > home/ken/src/emborg/tests/configs/test5
-            > home/ken/src/emborg/tests/configs/test1
-            > home/ken/src/emborg/tests/configs/test4
-            > home/ken/src/emborg/tests/configs/subdir
-            > home/ken/src/emborg/tests/configs/subdir/file
+            > «TESTS»/configs
+            > «TESTS»/configs/test6patterns
+            > «TESTS»/configs/test2excludes
+            > «TESTS»/configs/test2
+            > «TESTS»/configs/test2passphrase
+            > «TESTS»/configs/test7patterns
+            > «TESTS»/configs/overdue.conf
+            > «TESTS»/configs/test3
+            > «TESTS»/configs/README
+            > «TESTS»/configs/settings
+            > «TESTS»/configs/test6
+            > «TESTS»/configs/test7
+            > «TESTS»/configs/test8
+            > «TESTS»/configs/test0
+            > «TESTS»/configs/test5
+            > «TESTS»/configs/test1
+            > «TESTS»/configs/test4
+            > «TESTS»/configs/subdir
+            > «TESTS»/configs/subdir/file
         expected_type: sort-lines
         cmp_dirs: CONFIGS configs
 
