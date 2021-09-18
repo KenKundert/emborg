@@ -41,7 +41,9 @@ from inform import (
     warn,
 )
 from quantiphy import Quantity, UnitConversion, QuantiPhyError
-from shlib import Run, cwd, mkdir, rm, set_prefs, split_cmd, to_path
+from shlib import (
+    Run, cwd, mkdir, rm, set_prefs as set_shlib_prefs, split_cmd, to_path
+)
 from time import sleep
 from .collection import Collection
 from .preferences import BORG_SETTINGS, DEFAULT_COMMAND, EMBORG_SETTINGS, PROGRAM_NAME
@@ -50,7 +52,7 @@ from .utilities import gethostname, two_columns
 
 # Utilities {{{1
 hostname = gethostname()
-set_prefs(use_inform=True, log_cmd=True)
+set_shlib_prefs(use_inform=True, log_cmd=True)
 
 
 # time conversions {{{2

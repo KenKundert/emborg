@@ -83,14 +83,17 @@ from .preferences import (
 from .python import PythonFile
 from .utilities import getfullhostname, gethostname, getusername
 
+# Globals {{{1
+borg_commands_with_dryrun = "create extract delete prune upgrade recreate".split()
+set_shlib_prefs(use_inform=True, log_cmd=True, encoding=DEFAULT_ENCODING)
+
 # Utilities {{{1
 hostname = gethostname()
 fullhostname = getfullhostname()
 username = getusername()
 
-borg_commands_with_dryrun = "create extract delete prune upgrade recreate".split()
 
-# borg_options_arg_count {{{2
+# borg_options_arg_count {{{1
 borg_options_arg_count = {
     "borg": 1,
     "--exclude": 1,
@@ -103,84 +106,98 @@ for name, attrs in BORG_SETTINGS.items():
     if "arg" in attrs and attrs["arg"]:
         borg_options_arg_count[convert_name_to_option(name)] = 1
 
-# get_config {{{2
-config_queue = None
-first_config = None
-last_config = None
-
-
-class NoMoreConfigs(Exception):
-    pass
-
-
-def get_config(name, settings, composite_config_response, show_config_name):
-    global config_queue, first_config, last_config
-
-    if config_queue is not None:
-        try:
-            active_config = config_queue.pop(0)
-            if show_config_name:
-                display("\n===", active_config, "===")
-            return active_config
-        except IndexError:
-            raise NoMoreConfigs()
-
-    configs = Collection(settings.get(CONFIGS_SETTING, ""))
-    default = settings.get(DEFAULT_CONFIG_SETTING)
-
-    config_groups = {}
-    for config in configs:
-        if "=" in config:
-            group, _, sub_configs = config.partition("=")
-            sub_configs = sub_configs.split(",")
-        else:
-            group = config
-            sub_configs = [config]
-        config_groups[group] = sub_configs
-
-    if not name:
-        name = default
-    if name:
-        if name not in config_groups:
-            raise Error(
-                "unknown configuration.",
-                culprit = name,
-                codicil = "Perhaps you forgot to add it to the 'configurations' setting?.",
-            )
-    else:
-        if len(configs) > 0:
-            name = configs[0]
-        else:
-            raise Error("no known configurations.", culprit=CONFIGS_SETTING)
-    configs = list(config_groups[name])
-    num_configs = len(configs)
-    if num_configs > 1 and composite_config_response == "error":
-        raise Error("command does not support composite configs.", culprit=name)
-    elif num_configs < 1:
-        raise Error("empty composite config.", culprit=name)
-    first_config = configs[0]
-    last_config = configs[-1]
-    active_config = configs.pop(0)
-    if composite_config_response == "all":
-        config_queue = configs
-    else:
-        config_queue = []
-    if config_queue and show_config_name:
-        display("===", active_config, "===")
-    return active_config
-
-# Settings class {{{1
-class Settings:
-    # Constructor {{{2
-    def __init__(self, name=None, command=None, emborg_opts=()):
+# ConfigQueue {{{2
+class ConfigQueue:
+    def __init__(self, command=None):
+        self.uninitialized = True
         if command:
             self.requires_exclusivity = command.REQUIRES_EXCLUSIVITY
             self.composite_config_response = command.COMPOSITE_CONFIGS
             self.show_config_name = command.SHOW_CONFIG_NAME
         else:
+            # This is a result of an API call.
+            # This will largely constrain use to scalar configs, if a composite
+            # config is given, the only thing the user will be able to do is to
+            # ask for the child configs.
+            self.composite_config_response = None
             self.requires_exclusivity = True
-            self.composite_config_response = "error"
+            self.composite_config_response = 'restricted'
             self.show_config_name = False
+
+    def initialize(self, name, settings):
+        self.uninitialized = False
+        all_configs = Collection(settings.get(CONFIGS_SETTING, ""))
+        default = settings.get(DEFAULT_CONFIG_SETTING)
+
+        # identify the available configurations and config groups
+        config_groups = {}
+        for config in all_configs:
+            if "=" in config:
+                group, _, sub_configs = config.partition("=")
+                sub_configs = sub_configs.split(",")
+            else:
+                group = config
+                sub_configs = [config]
+            config_groups[group] = sub_configs
+
+        # get the name of the desired configuration and assure it exists
+        if not name:
+            name = default
+        if name:
+            if name not in config_groups:
+                raise Error(
+                    "unknown configuration.",
+                    culprit = name,
+                    codicil = "Perhaps you forgot to add it to the 'configurations' setting?.",
+                )
+        else:
+            if len(configs) > 0:
+                name = configs[0]
+            else:
+                raise Error("no known configurations.", culprit=CONFIGS_SETTING)
+
+        # set the config queue
+        # convert configs to list while preserving order and eliminating dupes
+        configs = list(dict.fromkeys(config_groups[name]))
+        self.configs = configs[:]
+        num_configs = len(configs)
+        if num_configs > 1:
+            if self.composite_config_response == "error":
+                raise Error("command does not support composite configs.", culprit=name)
+        elif num_configs < 1:
+            raise Error("empty composite config.", culprit=name)
+
+        if self.composite_config_response == "first":
+            self.remaining_configs = configs[0:]
+        elif self.composite_config_response == "none":
+            self.remaining_configs = [None]
+        else:
+            self.remaining_configs = list(reversed(configs))
+
+        # determine whether to display sub-config name
+        if self.show_config_name:
+            self.show_config_name = 'first'
+            if len(self.remaining_configs) <= 1:
+                self.show_config_name = False
+
+
+    def get_active_config(self):
+        active_config = self.remaining_configs.pop()
+        if self.show_config_name:
+            if self.show_config_name != 'first':
+                display()
+            display("⟫⟫⟫", active_config, "⟪⟪⟪")
+            self.show_config_name = True
+        return active_config
+
+    def __bool__(self):
+        return bool(self.uninitialized or self.remaining_configs)
+
+
+# Settings class {{{1
+class Settings:
+    # Constructor {{{2
+    def __init__(self, config=None, emborg_opts=(), _queue=None):
         self.settings = dict()
         self.do_not_expand = ()
         self.emborg_opts = emborg_opts
@@ -189,7 +206,7 @@ class Settings:
         # logfile for this config
         get_informer().set_logfile(LoggingCache())
         self.config_dir = to_path(CONFIG_DIR)
-        self.read(name)
+        self.read_config(name=config, queue=_queue)
         self.check()
         set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)
         self.hooks = Hooks(self)
@@ -204,8 +221,8 @@ class Settings:
             else:
                 warn(f'unknown colorscheme: {self.colorscheme}.')
 
-    # read() {{{2
-    def read(self, name=None, path=None):
+    # read_config() {{{2
+    def read_config(self, name=None, path=None, queue=None):
         """Recursively read configuration files.
 
         name (str):
@@ -254,15 +271,30 @@ class Settings:
                 )
                 done()
 
+            # read the shared settings file
             path = PythonFile(parent, SETTINGS_FILE)
             self.settings_filename = path.path
             settings = path.run()
 
-            config = get_config(
-                name, settings, self.composite_config_response, self.show_config_name
-            )
+            # initialize the config queue
+            if not queue:
+                # this is a request through the API
+                queue = ConfigQueue()
+            if queue.uninitialized:
+                queue.initialize(name, settings)
+            config = queue.get_active_config()
+            self.configs = queue.configs
+
+            # save config name
             settings["config_name"] = config
             self.config_name = config
+            if not config:
+                # this happens on composite configs for commands that do not
+                # need access to a specific config, such as help and configs
+                self.settings.update(settings)
+                return
+
+            # get includes
             includes = Collection(settings.get(INCLUDE_SETTING))
             includes = [config] + list(includes.values())
 
@@ -276,7 +308,7 @@ class Settings:
         # read include files, if any are specified
         for include in includes:
             path = to_path(parent, include)
-            self.read(path=path)
+            self.read_config(path=path)
 
     # check() {{{2
     def check(self):
@@ -291,6 +323,10 @@ class Settings:
         # gather the string valued settings together (can be used by resolve)
         self.str_settings = {k: v for k, v in self.settings.items() if is_str(v)}
 
+        if not self.config_name:
+            # running a command that does not need settings, such as configs
+            return
+
         # complain about required settings that are missing
         missing = []
         required_settings = "repository".split()
@@ -299,7 +335,7 @@ class Settings:
                 missing.append(each)
         if missing:
             m = conjoin(missing)
-            raise Error(f"{m}: no value given for {plural(m):setting}.")
+            raise Error(f"{m}: no value given for {plural(missing):setting}.")
 
         self.working_dir = to_path(self.settings.get("working_dir", "/"))
         if not self.working_dir.exists():
@@ -365,7 +401,7 @@ class Settings:
 
     # get values {{{2
     def values(self, name, default=()):
-        """Gets value of string setting."""
+        """Gets value of list setting."""
         values = Collection(
             self.settings.get(name, default),
             split_lines,
@@ -568,9 +604,13 @@ class Settings:
                 from avendesora import PasswordGenerator
 
                 pw = PasswordGenerator()
-                account = pw.get_account(self.value("avendesora_account"))
-                field = self.value("avendesora_field", None)
-                passcode = str(account.get_value(field))
+                account_spec = self.value("avendesora_account")
+                if ':' in account_spec:
+                    passcode = str(pw.get_value(account_spec))
+                else:
+                    account = pw.get_account(self.value("avendesora_account"))
+                    field = self.value("avendesora_field", None)
+                    passcode = str(account.get_value(field))
             except ImportError:
                 raise Error(
                     "Avendesora is not available",
@@ -632,13 +672,16 @@ class Settings:
         )
         with cd(self.working_dir if use_working_dir else "."):
             narrate("running in:", cwd())
-            narrating = (
-                show_borg_output
-                or "--verbose" in borg_opts
-                or "--progress" in borg_opts
-                or "verbose" in emborg_opts
-                or "narrate" in emborg_opts
-            ) and "--json" not in command
+            if "--json" in command or "--json-lines" in command:
+                narrating = False
+            else:
+                narrating = (
+                    show_borg_output
+                    or "--verbose" in borg_opts
+                    or "--progress" in borg_opts
+                    or "verbose" in emborg_opts
+                    or "narrate" in emborg_opts
+                )
             if narrating:
                 modes = "soeW"
                 display("\nRunning Borg {} command ...".format(cmd))
@@ -724,10 +767,12 @@ class Settings:
                 ''')
             if 'Failed to create/acquire the lock' in e.stderr:
                 codicil = [
+                    'If another Emborg or Borg process is using this repository,',
+                    'please wait for it to finish.',
                     'Perhaps you still have an archive mounted?',
-                    'If so, use umount to unmount it.',
+                    'If so, use ‘emborg umount’ to unmount it.',
                     'Perhaps a previous run was killed or terminated with an error?',
-                    'If so, use breaklock to clear the lock.',
+                    'If so, use ‘emborg breaklock’ to clear the lock.',
                 ]
 
             if 'Mountpoint must be a writable directory' in e.stderr:
@@ -746,10 +791,10 @@ class Settings:
 
     # is_config() {{{2
     def is_first_config(self):
-        return self.config_name == first_config
+        return self.config_name == self.configs[0]
 
     def is_last_config(self):
-        return self.config_name == last_config
+        return self.config_name == self.configs[-1]
 
     # get attribute {{{2
     def __getattr__(self, name):
@@ -762,6 +807,10 @@ class Settings:
 
     # enter {{{2
     def __enter__(self):
+        if not self.config_name:
+            # this command does not require config
+            return self
+
         self.borg_passcode_env_var_set_by_emborg = None
 
         # resolve src directories

@@ -5,6 +5,7 @@
 
 # Imports {{{1
 import arrow
+import json
 import nestedtext as nt
 import os
 import parametrize_from_file
@@ -89,7 +90,7 @@ class EmborgTester(object):
             cmp_dirs = cmp_dirs.replace("«DATE»", date)
 
         self.args = args
-        self.expected = expected.strip("\n")
+        self.expected = expected
         self.expected_type = expected_type.split()
         self.cmp_dirs = cmp_dirs.split() if is_str(cmp_dirs) else cmp_dirs
         self.cmd = emborg_exe + self.args
@@ -107,20 +108,23 @@ class EmborgTester(object):
 
         # run command
         emborg = Run(self.cmd, "sOMW*")
-        print(emborg.stdout)
         self.result = dedent(Color.strip_colors(emborg.stdout)).strip("\n")
 
         # check stdout
         matches = True
         if 'ignore' not in self.expected_type:
+            expected, result = self.expected, self.result
+            if 'sort-lines' in self.expected_type:
+                expected = '\n'.join(sorted(expected.splitlines()))
+                result = '\n'.join(sorted(result.splitlines()))
             if 'regex' in self.expected_type:
-                matches = bool(re.fullmatch(self.expected, self.result))
+                matches = bool(re.fullmatch(expected, result))
             else:
-                matches = self.expected == self.result
+                matches = expected == result
 
         if matches and self.cmp_dirs:
             gen_dir, ref_dir = self.cmp_dirs
-            self.expected = ''
+            #self.expected = ''
             try:
                 diff = Run(["diff", "--recursive", gen_dir, ref_dir], "sOMW")
                 self.result = diff.stdout
@@ -170,6 +174,7 @@ def initialize():
         ln("~/.local/lib", ".local/lib")
         ln("configs", "configs.symlink")
         os.environ["HOME"] = str(cwd())
+
 
 # initialize_configs {{{3
 @pytest.fixture(scope="session")
@@ -252,3 +257,56 @@ def test_emborg_overdue(
                 matches = expected == overdue.stdout
         except Error as e:
             return str(e) == expected
+
+
+# test_emborg_api {{{2
+def test_emborg_api(initialize):
+    with cd(tests_dir):
+        from emborg import Emborg
+
+        with Emborg('tests') as emborg:
+            configs = emborg.configs
+        assert configs == 'test0 test1 test2 test3'.split()
+
+        for config in configs:
+            # get the name of latest archive
+            with Emborg(config) as emborg:
+                borg = emborg.run_borg(
+                    cmd = 'list',
+                    args = ['--json', emborg.destination()]
+                )
+                response = json.loads(borg.stdout)
+                print(response)
+                archive = response['archives'][-1]['archive']
+
+                # list files in latest archive
+                borg = emborg.run_borg(
+                    cmd = 'list',
+                    args = ['--json-lines', emborg.destination(archive)]
+                )
+                json_data = '[' + ','.join(borg.stdout.splitlines()) + ']'
+                response = json.loads(json_data)
+                paths = sorted([entry['path'] for entry in response])
+                for each in [
+                    'home/ken/src/emborg/tests/configs',
+                    'home/ken/src/emborg/tests/configs/README',
+                    'home/ken/src/emborg/tests/configs/overdue.conf',
+                    'home/ken/src/emborg/tests/configs/settings',
+                    'home/ken/src/emborg/tests/configs/subdir',
+                    'home/ken/src/emborg/tests/configs/subdir/file',
+                    'home/ken/src/emborg/tests/configs/test0',
+                    'home/ken/src/emborg/tests/configs/test1',
+                    'home/ken/src/emborg/tests/configs/test2',
+                    'home/ken/src/emborg/tests/configs/test2excludes',
+                    'home/ken/src/emborg/tests/configs/test2passphrase',
+                    'home/ken/src/emborg/tests/configs/test3',
+                    'home/ken/src/emborg/tests/configs/test4',
+                    'home/ken/src/emborg/tests/configs/test5',
+                    'home/ken/src/emborg/tests/configs/test6',
+                    'home/ken/src/emborg/tests/configs/test6patterns',
+                    'home/ken/src/emborg/tests/configs/test7',
+                    'home/ken/src/emborg/tests/configs/test7patterns',
+                    'home/ken/src/emborg/tests/configs/test8',
+                ]:
+                    assert each in paths
+

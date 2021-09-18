@@ -8,3 +8,4 @@ patterns = '''
 '''
 default_mount_point = '{home_dir}/EMBORG'
 manage_diffs_cmd = "diff -r"
+verbose = True

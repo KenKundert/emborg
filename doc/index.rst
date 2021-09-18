@@ -344,6 +344,7 @@ Contents
    commands
    configuring
    monitoring
+   accessories
    examples
    api
    releases

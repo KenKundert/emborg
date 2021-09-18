@@ -45,7 +45,7 @@ from inform import (
 from . import __released__, __version__
 from .command import Command
 from .hooks import Hooks
-from .settings import NoMoreConfigs, Settings
+from .settings import ConfigQueue, Settings
 
 # Globals {{{1
 version = f"{__version__} ({__released__})"
@@ -104,21 +104,19 @@ def main():
                 terminate(exit_status)
 
             worst_exit_status = 0
-            try:
-                while True:
-                    with Settings(config, cmd, emborg_opts) as settings:
-                        try:
-                            exit_status = cmd.execute(
-                                cmd_name, args, settings, emborg_opts
-                            )
-                        except Error as e:
-                            settings.fail(e, cmd=' '.join(sys.argv))
-                            e.terminate()
+            queue = ConfigQueue(cmd)
+            while queue:
+                with Settings(config, emborg_opts, queue) as settings:
+                    try:
+                        exit_status = cmd.execute(
+                            cmd_name, args, settings, emborg_opts
+                        )
+                    except Error as e:
+                        settings.fail(e, cmd=' '.join(sys.argv))
+                        e.terminate()
 
-                    if exit_status and exit_status > worst_exit_status:
-                        worst_exit_status = exit_status
-            except NoMoreConfigs:
-                pass
+                if exit_status and exit_status > worst_exit_status:
+                    worst_exit_status = exit_status
 
             # execute the command termination
             exit_status = cmd.execute_late(cmd_name, args, None, emborg_opts)

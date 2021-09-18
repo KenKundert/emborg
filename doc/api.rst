@@ -1,3 +1,5 @@
+.. currentmodule:: emborg
+
 .. _emborg_api:
 
 Python API
@@ -11,17 +13,28 @@ separately:
 .. code-block:: python
 
     from emborg import Emborg
+    from pathlib import Path
+
+    destination = Path('keys')
 
     with Emborg('home') as emborg:
         borg = emborg.run_borg(
             cmd = 'key export',
-            args = [emborg.destination(), archive / '.config/borg.repokey']
+            args = [emborg.destination(), destination / '.config/borg.repokey']
         )
         if borg.stdout:
             print(borg.stdout.rstrip())
 
 *Emborg* takes the config name as an argument, if not given the default config 
 is used. It provides the following useful methods and attributes:
+
+
+**configs**
+
+The list of configs associated with the requested config.  If a scalar config 
+was requested, the list be a list with a single member, the requested config.  
+If the requested config is a composite config, the list consists of all the 
+member configs of the requested config.
 
 
 **repository**
@@ -76,9 +89,102 @@ constructing a custom *borg_opts*.
 
 **value(name, default='')**
 
-Returns the value of a setting from an *Emborg* configuration. If not set, 
+Returns the value of a scalar setting from an *Emborg* configuration. If not 
+set, *default* is returned.
+
+
+**values(name, default=())**
+
+Returns the value of a list setting from an *Emborg* configuration. If not set, 
 *default* is returned.
 
 
+Of these entry points, only *configs* works with composite configurations.
+
 You can examine the emborg/command.py file for inspiration and examples on how 
 to use the *Emborg* API.
+
+
+Example
+=======
+
+A command that queries one or more configs and prints the total size of its 
+archives.  This example is a simplified version of the *Emborg* accessory 
+available from `Borg-Space <https://github.com/KenKundert/borg-space>`_.
+
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    """
+    Borg Repository Size
+
+    Reports on the current size of one or more Borg repositories managed by Emborg.
+
+    Usage:
+        borg-space [options] [<config>...]
+
+    Options:
+        -m <msg>, --message <msg>   template to use when building output message
+
+    <msg> may contain {size}, which is replaced with the measured size, and 
+    {config}, which is replaced by the config name.
+    If no replacements are made, size is appended to the end of the message.
+    """
+
+    import arrow
+    from docopt import docopt
+    from emborg import Emborg
+    from quantiphy import Quantity
+    from inform import Error, display
+    import json
+
+    now = str(arrow.now())
+
+    cmdline = docopt(__doc__)
+    show_size = not cmdline['--quiet']
+    record_size = cmdline['--record']
+    message = cmdline['--message']
+
+    try:
+        requests = cmdline['<config>']
+        if not requests:
+            requests = ['']  # this gets the default config
+
+        for request in requests:
+            # expand composite configs
+            with Emborg(request, emborg_opts=['no-log']) as emborg:
+                configs = emborg.configs
+
+            for config in configs:
+                with Emborg(config, emborg_opts=['no-log']) as emborg:
+
+                    # get name of latest archive
+                    borg = emborg.run_borg(
+                        cmd = 'list',
+                        args = ['--json', emborg.destination()]
+                    )
+                    response = json.loads(borg.stdout)
+                    try:
+                        archive = response['archives'][-1]['archive']
+                    except IndexError:
+                        raise Error('no archives available.', culprit=config)
+
+                    # get size info for latest archive
+                    borg = emborg.run_borg(
+                        cmd = 'info',
+                        args = ['--json', emborg.destination(archive)]
+                    )
+                    response = json.loads(borg.stdout)
+                    size = response['cache']['stats']['unique_csize']
+
+                    # report the size
+                    size_in_bytes = Quantity(size, 'B')
+                    if not message:
+                        message = '{config}: {size}'
+                    msg = message.format(config=config, size=size_in_bytes)
+                    if msg == message:
+                        msg = f'{message}: {size_in_bytes}'
+                    display(msg)
+
+    except Error as e:
+        e.report()
