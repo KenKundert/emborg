@@ -186,7 +186,7 @@ class ConfigQueue:
         if self.show_config_name:
             if self.show_config_name != 'first':
                 display()
-            display("⟫⟫⟫", active_config, "⟪⟪⟪")
+            display("===", active_config, "===")
             self.show_config_name = True
         return active_config
 
