@@ -12,6 +12,7 @@ Latest development release
 1.26 (2021-09-03)
 -----------------
 - Improve the tests.
+- Allow access to names of child configs through API.
 
 
 1.25 (2021-08-28)
