@@ -612,21 +612,13 @@ class CreateCommand(Command):
                 )
 
         # run prerequisites
-        if settings.is_first_config():
-            cmds = settings.values("run_before_first_backup")
-        else:
-            cmds = []
-        cmds += settings.values("run_before_backup")
-        for cmd in cmds:
-            narrate("running pre-backup script:", cmd)
-            try:
-                Run(cmd, "SoEW")
-            except Error as e:
-                if cmd in settings.values("run_before_first_backup"):
-                    setting = "run_before_first_backup"
-                else:
-                    setting = "run_before_backup"
-                e.reraise(culprit=(setting, cmd.split()[0]))
+        for setting in ["run_before_first_backup", "run_before_backup"]:
+            for i, cmd in enumerate(settings.values(setting, [])):
+                narrate(f"staging {setting}[{i}] pre-backup script")
+                try:
+                    Run(cmd, "SoEW")
+                except Error as e:
+                    e.reraise(culprit=(setting, cmd.split()[0]))
 
         # run borg
         src_dirs = settings.src_dirs
@@ -652,22 +644,16 @@ class CreateCommand(Command):
         now = arrow.now()
         settings.date_file.write_text(str(now))
 
-        # run any every-time scripts specified to be run after a backup
-        if settings.is_last_config():
-            cmds = settings.values("run_after_last_backup")
-        else:
-            cmds = []
-        cmds += settings.values("run_after_backup")
-        for cmd in cmds:
-            narrate("running post-backup script:", cmd)
-            try:
-                Run(cmd, "SoEW")
-            except Error as e:
-                if cmd in settings.values("run_after_last_backup"):
-                    setting = "run_after_last_backup"
-                else:
-                    setting = "run_after_backup"
-                e.reraise(culprit=(setting, cmd.split()[0]))
+
+
+        # run scripts specified to be run after a backup
+        for setting in ["run_after_backup", "run_after_last_backup"]:
+            for i, cmd in enumerate(settings.values(setting, [])):
+                narrate(f"staging {setting}[{i}] post-backup script")
+                try:
+                    Run(cmd, "SoEW")
+                except Error as e:
+                    e.reraise(culprit=(setting, cmd.split()[0]))
 
         if cmdline["--fast"]:
             return

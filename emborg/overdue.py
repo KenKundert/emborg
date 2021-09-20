@@ -61,14 +61,14 @@ from inform import (
     terminate,
     warn,
 )
-from shlib import Run, set_prefs, to_path
+from shlib import Run, to_path, set_prefs as set_shlib_prefs
 
 from . import __released__, __version__
 from .preferences import CONFIG_DIR, DATA_DIR, OVERDUE_FILE, OVERDUE_LOG_FILE
 from .python import PythonFile
 
 # Globals {{{1
-set_prefs(use_inform=True)
+set_shlib_prefs(use_inform=True, log_cmd=True)
 username = pwd.getpwuid(os.getuid()).pw_name
 hostname = socket.gethostname()
 now = arrow.now()

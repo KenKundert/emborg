@@ -19,8 +19,8 @@ import os
 import pwd
 import socket
 
-from shlib import Run, set_prefs
-set_prefs(use_inform=True, log_cmd=True)
+from shlib import Run, set_prefs as set_shlib_prefs
+set_shlib_prefs(use_inform=True, log_cmd=True)
 
 
 # gethostname {{{1
