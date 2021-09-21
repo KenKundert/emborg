@@ -6,14 +6,10 @@ Latest development release
 | Version: 1.27.0
 | Released: 2021-09-21
 
-
-1.27 (2021-09-21)
------------------
 - Improve the logging for composite configurations.
 - Add support for `Borg-Space <https://github.com/KenKundert/borg-space>`_, 
   a utility that allows you to track and plot disk space usage for your *Borg* 
   repositories over time.
-
 
 1.26 (2021-09-03)
 -----------------
