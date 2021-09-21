@@ -612,8 +612,12 @@ class CreateCommand(Command):
                 )
 
         # run prerequisites
-        for setting in ["run_before_first_backup", "run_before_backup"]:
-            for i, cmd in enumerate(settings.values(setting, [])):
+        if settings.is_first_config():
+            pre_script_settings = ["run_before_first_backup", "run_before_backup"]
+        else:
+            pre_script_settings = ["run_before_backup"]
+        for setting in pre_script_settings:
+            for i, cmd in enumerate(settings.values(setting)):
                 narrate(f"staging {setting}[{i}] pre-backup script")
                 try:
                     Run(cmd, "SoEW")
@@ -647,8 +651,12 @@ class CreateCommand(Command):
 
 
         # run scripts specified to be run after a backup
-        for setting in ["run_after_backup", "run_after_last_backup"]:
-            for i, cmd in enumerate(settings.values(setting, [])):
+        if settings.is_last_config():
+            post_script_settings = ["run_after_backup", "run_after_last_backup"]
+        else:
+            post_script_settings = ["run_after_backup"]
+        for setting in post_script_settings:
+            for i, cmd in enumerate(settings.values(setting)):
                 narrate(f"staging {setting}[{i}] post-backup script")
                 try:
                     Run(cmd, "SoEW")
