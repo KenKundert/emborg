@@ -151,8 +151,8 @@ class ConfigQueue:
                     codicil = "Perhaps you forgot to add it to the 'configurations' setting?.",
                 )
         else:
-            if len(configs) > 0:
-                name = configs[0]
+            if len(config_groups) > 0:
+                name = list(config_groups.keys())[0]
             else:
                 raise Error("no known configurations.", culprit=CONFIGS_SETTING)
 
