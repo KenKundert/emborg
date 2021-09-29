@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.27.0
-| Released: 2021-09-21
+| Version: 1.27.1
+| Released: 2021-09-29
 
 - Improve the logging for composite configurations.
 - Add support for `Borg-Space <https://github.com/KenKundert/borg-space>`_, 
