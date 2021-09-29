@@ -51,6 +51,7 @@ from shlib import (
     set_prefs as set_shlib_prefs
 )
 
+from . import __version__
 from .collection import Collection, split_lines
 from .hooks import Hooks
 from .patterns import (
@@ -201,6 +202,7 @@ class Settings:
         self.settings = dict()
         self.do_not_expand = ()
         self.emborg_opts = emborg_opts
+        self.version = tuple(int(p) for p in __version__.split('.'))
 
         # reset the logfile so anything logged after this is placed in the
         # logfile for this config

@@ -42,6 +42,11 @@ member configs of the requested config.
 The path to the repository.
 
 
+**version**
+
+The *Emborg* version number as a 3-tuple (major, minor, patch).
+
+
 **destination(archive)**
 
 Returns the full path to the archive. If Archive is False or None, then the path 
