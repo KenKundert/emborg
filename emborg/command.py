@@ -208,6 +208,7 @@ class Command:
     #     'first': only use the first config in a composite config
     #     'none' : do not use any of configs in composite config
     SHOW_CONFIG_NAME = True
+    LOG_COMMAND = True
 
     @classmethod
     def commands(cls):
@@ -298,6 +299,7 @@ class BorgCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "error"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -328,6 +330,7 @@ class BreakLockCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "error"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -366,6 +369,7 @@ class CheckCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -457,6 +461,7 @@ class CompareCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "first"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -543,6 +548,7 @@ class ConfigsCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "none"
+    LOG_COMMAND = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -586,6 +592,7 @@ class CreateCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -647,8 +654,6 @@ class CreateCommand(Command):
         narrate("update date file")
         now = arrow.now()
         settings.date_file.write_text(str(now))
-
-
 
         # run scripts specified to be run after a backup
         if settings.is_last_config():
@@ -722,6 +727,7 @@ class DeleteCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "error"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -768,6 +774,7 @@ class DiffCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "error"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -859,6 +866,7 @@ class DueCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = False
     MESSAGES = {}
     SHOW_CONFIG_NAME = False
     OLDEST_DATE = None
@@ -1024,6 +1032,7 @@ class ExtractCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "first"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1086,6 +1095,7 @@ class HelpCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "none"
+    LOG_COMMAND = False
 
     @classmethod
     def run_early(cls, command, args, settings, options):
@@ -1113,6 +1123,7 @@ class InfoCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1168,6 +1179,7 @@ class InitializeCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1201,6 +1213,7 @@ class ListCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "first"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1232,6 +1245,7 @@ class LogCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1239,8 +1253,7 @@ class LogCommand(Command):
         docopt(cls.USAGE, argv=[command] + args)
 
         try:
-            prev_log = settings.prev_logfile.read_text()
-            output(prev_log)
+            output(settings.logfile.read_text())
         except FileNotFoundError as e:
             narrate(os_error(e))
 
@@ -1315,6 +1328,7 @@ class ManifestCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "first"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1542,6 +1556,7 @@ class MountCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "first"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1603,6 +1618,7 @@ class PruneCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1685,6 +1701,7 @@ class RestoreCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "first"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1737,6 +1754,7 @@ class SettingsCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "error"
+    LOG_COMMAND = False
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1807,6 +1825,7 @@ class UmountCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = True
     COMPOSITE_CONFIGS = "first"
+    LOG_COMMAND = True
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1848,6 +1867,7 @@ class VersionCommand(Command):
     ).strip()
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "none"
+    LOG_COMMAND = False
 
     @classmethod
     def run_early(cls, command, args, settings, options):

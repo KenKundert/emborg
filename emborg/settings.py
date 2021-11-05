@@ -115,6 +115,7 @@ class ConfigQueue:
             self.requires_exclusivity = command.REQUIRES_EXCLUSIVITY
             self.composite_config_response = command.COMPOSITE_CONFIGS
             self.show_config_name = command.SHOW_CONFIG_NAME
+            self.log_command = command.LOG_COMMAND
         else:
             # This is a result of an API call.
             # This will largely constrain use to scalar configs, if a composite
@@ -124,6 +125,7 @@ class ConfigQueue:
             self.requires_exclusivity = True
             self.composite_config_response = 'restricted'
             self.show_config_name = False
+            self.log_command = True
 
     def initialize(self, name, settings):
         self.uninitialized = False
@@ -286,6 +288,7 @@ class Settings:
                 queue.initialize(name, settings)
             config = queue.get_active_config()
             self.configs = queue.configs
+            self.log_command = queue.log_command
 
             # save config name
             settings["config_name"] = config
@@ -895,7 +898,8 @@ class Settings:
         # do this after checking lock so we do not overwrite logfile
         # of emborg process that is currently running
         self.logfile = data_dir / self.resolve(LOG_FILE)
-        if "no-log" not in self.emborg_opts:
+        log_command = self.log_command and "no-log" not in self.emborg_opts
+        if log_command:
             self.prev_logfile = data_dir / self.resolve(PREV_LOG_FILE)
             rm(self.prev_logfile)
             if self.logfile.exists():

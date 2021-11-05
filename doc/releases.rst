@@ -6,6 +6,13 @@ Latest development release
 | Version: 1.27.1
 | Released: 2021-09-29
 
+- Suppress log file generation for:
+  :ref:`configs <configs>`,
+  :ref:`due <due>`,
+  :ref:`help <help>`,
+  :ref:`log <log>`,
+  :ref:`settings <settings>` and
+  :ref:`version <version>` commands.
 - Add *version* to the API.
 
 

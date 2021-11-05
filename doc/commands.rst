@@ -410,11 +410,27 @@ List available archives.
 Log
 ---
 
-Show the logfile from the previous run.
+Show the log from the previous run.
 
 .. code-block:: bash
 
     $ emborg log
+
+Most commands save a log file, but some do not.
+Specifically,
+:ref:`configs <configs>`,
+:ref:`due <due>`,
+:ref:`help <help>`,
+:ref:`log <log>`,
+:ref:`settings <settings>` and
+:ref:`version <version>` do not.
+Additionally, no command will save a log file if the ``--no-log`` command line 
+option is specified.  If you need to debug a command that does not normally 
+generate a log file and would like the extra detail that is normally included in 
+the log, specify the ``--narrate`` command line option.
+
+If you wish to access the log files directly, they reside in 
+``~/.local/share/emborg``.
 
 
 .. _manifest:
