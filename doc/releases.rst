@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.27.2
-| Released: 2021-11-04
+| Version: 1.27.3
+| Released: 2021-11-06
 
 - Suppress log file generation for:
   :ref:`configs <configs>`,
