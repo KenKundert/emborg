@@ -121,7 +121,6 @@ class ConfigQueue:
             # This will largely constrain use to scalar configs, if a composite
             # config is given, the only thing the user will be able to do is to
             # ask for the child configs.
-            self.composite_config_response = None
             self.requires_exclusivity = True
             self.composite_config_response = 'restricted'
             self.show_config_name = False
@@ -171,7 +170,7 @@ class ConfigQueue:
             raise Error("empty composite config.", culprit=name)
 
         if self.composite_config_response == "first":
-            self.remaining_configs = configs[0:]
+            self.remaining_configs = configs[0:1]
         elif self.composite_config_response == "none":
             self.remaining_configs = [None]
         else:
