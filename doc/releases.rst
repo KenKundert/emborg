@@ -6,7 +6,10 @@ Latest development release
 | Version: 1.27.3
 | Released: 2021-11-06
 
-- Suppress log file generation for:
+
+1.28 (2021-11-06)
+-----------------
+- Suppress log file generation for
   :ref:`configs <configs>`,
   :ref:`due <due>`,
   :ref:`help <help>`,
