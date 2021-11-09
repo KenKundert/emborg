@@ -541,12 +541,13 @@ class Settings:
                 if encryption.startswith("keyfile"):
                     warn(
                         dedent(
-                            """
+                            f"""
                             you should use 'borg key export' to export the
                             encryption key, and then keep that key in a safe
                             place.  You can do this with emborg using 'emborg
-                            borg key export @repo <outfile>'.  If you lose the
-                            key you will lose access to, your backups.
+                            --config {self.config_name} borg key export @repo
+                            </.../outfile>'.  If you lose the key you will lose
+                            access to, your backups.
                             """
                         ).strip(),
                         wrap=True,
@@ -744,7 +745,7 @@ class Settings:
             try:
                 borg = Run(command, modes="soeW", env=os.environ, log=False)
             except Error as e:
-                self.report_borg_error(e, ' '.join(command))
+                self.report_borg_error(e, executable)
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))
@@ -781,7 +782,7 @@ class Settings:
 
             if 'Mountpoint must be a writable directory' in e.stderr:
                 codicil = 'Perhaps an archive is already mounted there?'
-        e.reraise(culprit=f"borg {cmd}", codicil=codicil)
+        e.reraise(culprit=cmd, codicil=codicil)
 
     # destination() {{{2
     def destination(self, archive=None):
