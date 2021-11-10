@@ -510,7 +510,7 @@ emborg with configs:
     -
         args: --quiet --config test0 create
         expected:
-            > emborg error: borg create:
+            > emborg error: create:
             >     Failed to create/acquire the lock /«TESTS»/repositories/lock (timeout).
             >         If another Emborg or Borg process is using this repository,
             >         please wait for it to finish.
@@ -655,7 +655,7 @@ emborg with configs:
         args: --quiet --config test5 extract configs
         expected:
             > Include pattern 'configs' never matched.
-            > emborg error: borg extract: unexpected exit status (1).
+            > emborg error: extract: unexpected exit status (1).
         expected_type: error
 
     -
@@ -821,7 +821,7 @@ emborg with configs:
     -
         args: --quiet --config test7 extract configs
         expected:
-            > emborg error: borg extract: Include pattern 'configs' never matched.
+            > emborg error: extract: Include pattern 'configs' never matched.
         expected_type: error
 
     -
@@ -853,7 +853,7 @@ emborg with configs:
     -
         args: --config test7 list
         expected:
-            > emborg error: borg list:
+            > emborg error: list:
             >     Repository /«TESTS»/repositories does not exist.
         expected_type: error
 
