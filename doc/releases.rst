@@ -6,6 +6,8 @@ Latest development release
 | Version: 1.28.0
 | Released: 2021-11-06
 
+- Do not signal failure to hooks if Borg only emits a warning.
+
 
 1.28 (2021-11-06)
 -----------------

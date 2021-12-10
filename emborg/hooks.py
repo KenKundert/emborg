@@ -56,8 +56,9 @@ class Hooks:
             raise Error(f'{self.NAME} connection error.', codicil=full_stop(e))
 
     def signal_end(self, borg):
-        status = borg.status
-        if status:
+        # Borg returns 0 on clear success, 1 if there was a warning, and 2 or
+        # greater if there was an error that prevented normal termination.
+        if borg.status > 1:
             url = self.FAIL_URL.format(url=self.url, uuid=self.uuid)
             result = 'failure'
         else:
@@ -95,7 +96,9 @@ class HealthChecks(Hooks):
 
     def signal_end(self, borg):
         status = borg.status
-        result = 'failure' if status else 'success'
+        # Borg returns 0 on clear success, 1 if there was a warning, and 2 or
+        # greater if there was an error that prevented normal termination.
+        result = 'failure' if status > 1 else 'success'
         payload = borg.stderr
         url = f'{self.url}/{self.uuid}/{status}'
         log(f'signaling {result} of backups to {self.NAME}: {url}.')
