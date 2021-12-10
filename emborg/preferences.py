@@ -63,6 +63,7 @@ EMBORG_SETTINGS = dict(
     excludes="list of glob strings of files or directories to skip",
     exclude_from="file that contains exclude patterns",
     home_dir="users home directory (read only)",
+    include="include the contents of another file",
     log_dir="emborg log directory (read only)",
     manage_diffs_cmd="command to use to manage differences in files and directories",
     manifest_formats="format strings used by manifest",

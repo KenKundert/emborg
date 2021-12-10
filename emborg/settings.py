@@ -256,12 +256,12 @@ class Settings:
                 # config dir does not exist, create and populate it
                 narrate("creating config directory:", str(parent))
                 parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-                for name, contents in [
+                for fname, contents in [
                     (SETTINGS_FILE, INITIAL_SETTINGS_FILE_CONTENTS),
                     ("root", INITIAL_ROOT_CONFIG_FILE_CONTENTS),
                     ("home", INITIAL_HOME_CONFIG_FILE_CONTENTS),
                 ]:
-                    path = parent / name
+                    path = parent / fname
                     path.write_text(contents)
                     path.chmod(0o600)
                 output(
@@ -691,7 +691,7 @@ class Settings:
                 modes = "soeW"
                 display("\nRunning Borg {} command ...".format(cmd))
             else:
-                modes = "sOEW"
+                modes = "sOEW1"
             starts_at = arrow.now()
             log("starts at: {!s}".format(starts_at))
             try:
@@ -706,14 +706,17 @@ class Settings:
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))
+        if borg.status:
+            narrate("Borg exit status:", borg.status)
+        if borg.status == 1:
+            warnings = borg.stderr.partition(72*'-')[0]
+            warn('Warning emitted by Borg:', codicil=warnings)
         if borg.stdout:
             narrate("Borg stdout:")
             narrate(indent(borg.stdout))
         if borg.stderr:
             narrate("Borg stderr:")
             narrate(indent(borg.stderr))
-        if borg.status:
-            narrate("Borg exit status:", borg.status)
         return borg
 
     # run_borg_raw() {{{2
@@ -743,12 +746,14 @@ class Settings:
             starts_at = arrow.now()
             log("starts at: {!s}".format(starts_at))
             try:
-                borg = Run(command, modes="soeW", env=os.environ, log=False)
+                borg = Run(command, modes="soeW1", env=os.environ, log=False)
             except Error as e:
                 self.report_borg_error(e, executable)
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))
+        if borg.status == 1:
+            warn('Warning emitted by Borg, see logfile for details.')
         if borg.stdout:
             narrate("Borg stdout:")
             narrate(indent(borg.stdout))

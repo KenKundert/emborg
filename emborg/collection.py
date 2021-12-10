@@ -27,6 +27,10 @@ from inform import is_collection, is_str
 __version__ = "0.5.0"
 __released__ = "2021-01-27"
 
+class NothingGiven:
+    def __bool__(self):
+        return False
+
 
 # Utilities {{{1
 def split_lines(text, comment=None, strip=False, cull=False, sep=None):
@@ -110,6 +114,15 @@ class Collection(object):
             return [(k, self.collection[k]) for k in self.collection.keys()]
         except AttributeError:
             return list(enumerate(self.collection))
+
+    def get(self, key, default=NothingGiven):
+        try:
+            return self.collection[key]
+        except (KeyError, IndexError):
+            if default == NothingGiven:
+                raise
+            return default
+
 
     def render(self, fmt=None, sep=None):
         """Convert the collection into a string

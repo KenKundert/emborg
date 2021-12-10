@@ -93,6 +93,7 @@ emborg without configs:
             >           healthchecks_url: the healthchecks.io URL for back-ups monitor
             >          healthchecks_uuid: the healthchecks.io UUID for back-ups monitor
             >                   home_dir: users home directory (read only)
+            >                    include: include the contents of another file
             >                    log_dir: emborg log directory (read only)
             >           manage_diffs_cmd: command to use to manage differences in files
             >                             and directories
@@ -214,6 +215,7 @@ emborg with configs:
             >           healthchecks_url: the healthchecks.io URL for back-ups monitor
             >          healthchecks_uuid: the healthchecks.io UUID for back-ups monitor
             >                   home_dir: users home directory (read only)
+            >                    include: include the contents of another file
             >                    log_dir: emborg log directory (read only)
             >           manage_diffs_cmd: command to use to manage differences in files
             >                             and directories
@@ -819,10 +821,12 @@ emborg with configs:
         expected_type: regex
 
     -
-        args: --quiet --config test7 extract configs
+        args: --config test7 extract configs
         expected:
-            > emborg error: extract: Include pattern 'configs' never matched.
-        expected_type: error
+            > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > emborg warning: Warning emitted by Borg:
+            >     Include pattern 'configs' never matched.
+        expected_type: regex
 
     -
         args: --quiet --config test7 extract /«TESTS»/configs
