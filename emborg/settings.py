@@ -546,7 +546,7 @@ class Settings:
                             encryption key, and then keep that key in a safe
                             place.  You can do this with emborg using 'emborg
                             --config {self.config_name} borg key export @repo
-                            </.../outfile>'.  If you lose the key you will lose
+                            ⟪/.../outfile⟫'.  If you lose the key you will lose
                             access to, your backups.
                             """
                         ).strip(),
@@ -567,7 +567,8 @@ class Settings:
             # opts contains --list, then the stats will be displayed to user
             # rather than going to logfile, in this case, do not request stats
             # automatically, require user to do it manually.
-            borg_opts.append("--stats")
+            if '--stats' not in borg_opts:
+                borg_opts.append("--stats")
 
         # add the borg command line options appropriate to this command {{{3
         for name, attrs in BORG_SETTINGS.items():
@@ -688,7 +689,7 @@ class Settings:
                     or "narrate" in emborg_opts
                 )
             if narrating:
-                modes = "soeW"
+                modes = "soeW1"
                 display("\nRunning Borg {} command ...".format(cmd))
             else:
                 modes = "sOEW1"
@@ -708,7 +709,7 @@ class Settings:
             log("elapsed = {!s}".format(ends_at - starts_at))
         if borg.status:
             narrate("Borg exit status:", borg.status)
-        if borg.status == 1:
+        if borg.status == 1 and borg.stderr:
             warnings = borg.stderr.partition(72*'-')[0]
             warn('Warning emitted by Borg:', codicil=warnings)
         if borg.stdout:

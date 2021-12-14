@@ -206,7 +206,6 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent(
 
     # filter settings
     exclude_if_present = '.nobackup'
-    one_file_system = True
     exclude_caches = True
 
     # prune settings

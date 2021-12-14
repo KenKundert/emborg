@@ -36,7 +36,6 @@ compression = 'lz4'
 
 # filter settings
 exclude_if_present = '.nobackup'
-one_file_system = True
 exclude_caches = True
 
 # prune settings

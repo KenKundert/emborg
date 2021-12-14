@@ -657,8 +657,6 @@ emborg with configs:
         args: --quiet --config test5 extract configs
         expected:
             > Include pattern 'configs' never matched.
-            > emborg error: extract: unexpected exit status (1).
-        expected_type: error
 
     -
         args: --quiet --config test5 extract /«TESTS»/configs
