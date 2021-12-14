@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.28.1
-| Released: 2021-12-10
+| Version: 1.28.2
+| Released: 2021-12-14
 
 - Do not signal failure to hooks if Borg only emits a warning.
 
