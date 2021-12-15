@@ -172,6 +172,13 @@ following setting in your configuration file:
 
     cronhub_uuid = '51cb35d8-2975-110b-67a7-11b65d432027'
 
+If given, this setting should be specified on an individual configuration.  It 
+causes a report to be sent to *CronHub* each time an archive is created.  
+A successful report is given if *Borg* returns with an exit status of 0 or 1, 
+which implies that the command completed as expected, though there might have 
+been issues with individual files or directories.  If *Borg* returns with an 
+exit status of 2 or greater, a failure is reported.
+
 
 .. _healthchecks:
 
@@ -187,4 +194,9 @@ following setting in your configuration file:
 
     healthchecks_uuid = '51cb35d8-2975-110b-67a7-11b65d432027'
 
-
+If given, this setting should be specified on an individual configuration.  It 
+causes a report to be sent to *HealthChecks* each time an archive is created.  
+A successful report is given if *Borg* returns with an exit status of 0 or 1, 
+which implies that the command completed as expected, though there might have 
+been issues with individual files or directories.  If *Borg* returns with an 
+exit status of 2 or greater, a failure is reported.

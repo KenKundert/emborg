@@ -40,7 +40,7 @@ import os
 import sys
 from docopt import docopt
 from inform import (
-    Error, Inform, LoggingCache, cull, display, fatal, os_error, terminate
+    Error, Inform, LoggingCache, cull, display, error, os_error, terminate
 )
 from . import __released__, __version__
 from .command import Command
@@ -112,6 +112,7 @@ def main():
                             cmd_name, args, settings, emborg_opts
                         )
                     except Error as e:
+                        exit_status = 2
                         settings.fail(e, cmd=' '.join(sys.argv))
                         e.terminate()
 
@@ -126,7 +127,10 @@ def main():
         except KeyboardInterrupt:
             display("Terminated by user.")
         except Error as e:
-            e.terminate()
+            exit_status = 2
         except OSError as e:
-            fatal(os_error(e))
+            exit_status = 2
+            error(os_error(e))
+        if exit_status and exit_status > worst_exit_status:
+            worst_exit_status = exit_status
         terminate(worst_exit_status)

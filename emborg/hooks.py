@@ -36,13 +36,13 @@ class Hooks:
             if c.is_active():
                 self.active_hooks.append(c)
 
-    def backups_begin(self):
+    def __enter__(self):
         for hook in self.active_hooks:
             hook.signal_start()
 
-    def backups_finish(self, borg):
+    def __exit__(self, exc_type, exc_value, exc_traceback):
         for hook in self.active_hooks:
-            hook.signal_end(borg)
+            hook.signal_end(exc_value)
 
     def is_active(self):
         return bool(self.uuid)
@@ -55,10 +55,8 @@ class Hooks:
         except requests.exceptions.RequestException as e:
             raise Error(f'{self.NAME} connection error.', codicil=full_stop(e))
 
-    def signal_end(self, borg):
-        # Borg returns 0 on clear success, 1 if there was a warning, and 2 or
-        # greater if there was an error that prevented normal termination.
-        if borg.status > 1:
+    def signal_end(self, exception):
+        if exception:
             url = self.FAIL_URL.format(url=self.url, uuid=self.uuid)
             result = 'failure'
         else:
@@ -94,20 +92,23 @@ class HealthChecks(Hooks):
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 
-    def signal_end(self, borg):
-        status = borg.status
-        # Borg returns 0 on clear success, 1 if there was a warning, and 2 or
-        # greater if there was an error that prevented normal termination.
-        result = 'failure' if status > 1 else 'success'
-        payload = borg.stderr
+    def signal_end(self, exception):
+        if exception:
+            result = 'failure'
+            status = exception.status
+            payload = exception.stderr
+        else:
+            result = 'success'
+            status = 0
+            payload = ''
+
         url = f'{self.url}/{self.uuid}/{status}'
         log(f'signaling {result} of backups to {self.NAME}: {url}.')
         try:
-            if payload is None:
-                log('log unavailable to upload to healthchecks.io.')
-                response = requests.post(url)
-            else:
+            if payload:
                 response = requests.post(url, data=payload.encode('utf-8'))
+            else:
+                response = requests.post(url)
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 

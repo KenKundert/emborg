@@ -657,6 +657,7 @@ emborg with configs:
         args: --quiet --config test5 extract configs
         expected:
             > Include pattern 'configs' never matched.
+        expected_type: diff
 
     -
         args: --quiet --config test5 extract /«TESTS»/configs
@@ -824,7 +825,7 @@ emborg with configs:
             > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > emborg warning: Warning emitted by Borg:
             >     Include pattern 'configs' never matched.
-        expected_type: regex
+        expected_type: regex diff
 
     -
         args: --quiet --config test7 extract /«TESTS»/configs

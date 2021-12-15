@@ -346,6 +346,8 @@ class BreakLockCommand(Command):
             output(out.rstrip())
         rm(settings.lockfile)
 
+        return borg.status
+
 
 # CheckCommand command {{{1
 class CheckCommand(Command):
@@ -399,6 +401,8 @@ class CheckCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+
+        return borg.status
 
 
 # CompareCommand command {{{1
@@ -633,22 +637,22 @@ class CreateCommand(Command):
 
         # run borg
         src_dirs = settings.src_dirs
-        settings.hooks.backups_begin()
-        try:
-            borg = settings.run_borg(
-                cmd = "create",
-                borg_opts = borg_opts,
-                args = [settings.destination(True)] + src_dirs,
-                emborg_opts = options,
-                show_borg_output = bool(borg_opts),
-                use_working_dir = True,
-            )
-        except Error as e:
-            if e.stderr and "is not a valid repository" in e.stderr:
-                e.reraise(codicil="Run 'emborg init' to initialize the repository.")
-            else:
-                raise
-        settings.hooks.backups_finish(borg)
+        with settings.hooks:
+            try:
+                borg = settings.run_borg(
+                    cmd = "create",
+                    borg_opts = borg_opts,
+                    args = [settings.destination(True)] + src_dirs,
+                    emborg_opts = options,
+                    show_borg_output = bool(borg_opts),
+                    use_working_dir = True,
+                )
+                create_status = borg.status
+            except Error as e:
+                if e.stderr and "is not a valid repository" in e.stderr:
+                    e.reraise(codicil="Run 'emborg init' to initialize the repository.")
+                else:
+                    raise
 
         # update the date files
         narrate("update date file")
@@ -669,7 +673,7 @@ class CreateCommand(Command):
                     e.reraise(culprit=(setting, cmd.split()[0]))
 
         if cmdline["--fast"]:
-            return
+            return create_status
 
         # check and prune the archives if requested
         try:
@@ -692,14 +696,19 @@ class CreateCommand(Command):
                     )
                     args = []
                 check = CheckCommand()
-                check.run("check", args, settings, options)
+                check_status = check.run("check", args, settings, options)
+            else:
+                check_status = 0
 
             activity = "pruning"
             if settings.prune_after_create:
                 announce("Pruning archives ...")
                 prune = PruneCommand()
                 args = ["--stats"] if cmdline["--stats"] else []
-                prune.run("prune", args, settings, options)
+                prune_status = prune.run("prune", args, settings, options)
+            else:
+                prune_status = 0
+
         except Error as e:
             e.reraise(
                 codicil = (
@@ -707,7 +716,7 @@ class CreateCommand(Command):
                     "No error was reported while creating the archive.",
                 )
             )
-
+        return max([create_status, check_status, prune_status])
 
 # DeleteCommand command {{{1
 class DeleteCommand(Command):
@@ -756,6 +765,8 @@ class DeleteCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+
+        return borg.status
 
 
 # DiffCommand command {{{1
@@ -1082,6 +1093,8 @@ class ExtractCommand(Command):
         if out:
             output(out.rstrip())
 
+        return borg.status
+
 
 # HelpCommand {{{1
 class HelpCommand(Command):
@@ -1105,6 +1118,7 @@ class HelpCommand(Command):
         from .help import HelpMessage
 
         HelpMessage.show(cmdline["<topic>"])
+
         return 0
 
 
@@ -1166,6 +1180,8 @@ class InfoCommand(Command):
             output()
             output(out.rstrip())
 
+        return borg.status
+
 
 # InitializeCommand command {{{1
 class InitializeCommand(Command):
@@ -1193,6 +1209,8 @@ class InitializeCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+
+        return borg.status
 
 
 # ListCommand command {{{1
@@ -1231,6 +1249,8 @@ class ListCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+
+        return borg.status
 
 
 # LogCommand command {{{1
@@ -1500,6 +1520,8 @@ class ManifestCommand(Command):
             except KeyError as e:
                 raise Error('Unknown key in:', culprit=e, codicil=template)
 
+        return borg.status
+
 
 # MountCommand command {{{1
 class MountCommand(Command):
@@ -1599,6 +1621,8 @@ class MountCommand(Command):
         if out:
             output(out.rstrip())
 
+        return borg.status
+
 
 # PruneCommand command {{{1
 class PruneCommand(Command):
@@ -1654,6 +1678,8 @@ class PruneCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+
+        return borg.status
 
 
 # RestoreCommand command {{{1
@@ -1736,6 +1762,8 @@ class RestoreCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+
+        return borg.status
 
 
 # SettingsCommand command {{{1
@@ -1841,7 +1869,7 @@ class UmountCommand(Command):
 
         # run borg
         try:
-            settings.run_borg(
+            borg = settings.run_borg(
                 cmd="umount", args=[mount_point], emborg_opts=options,
             )
             try:
@@ -1853,6 +1881,7 @@ class UmountCommand(Command):
                 e.reraise(
                     codicil = f"Try running 'lsof +D {mount_point!s}' to find culprit."
                 )
+        return borg.status
 
 
 # VersionCommand {{{1
