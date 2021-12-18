@@ -23,13 +23,6 @@ repository.  The philosophy of *Emborg* is to provide commands that you would
 use often and in an interactive manner with the expectation that you would use 
 *Borg* directly for more unusual or esoteric situations.
 
-An alternative to *Emborg* is
-`borgmatic <https://github.com/witten/borgmatic>`_.  It seems largely focused on 
-the archive creation process and offers little for the other management tasks 
-such as monitoring (*due*, *list*, *manifest*), restoration (*mount*), and 
-maintenance (*check*, *prune*).  *borgmatic* recently added support for the 
-*Borg* extract command.
-
 
 Why Borg?
 ---------

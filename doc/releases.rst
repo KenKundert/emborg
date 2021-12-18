@@ -11,7 +11,7 @@ Latest development release
 -----------------
 - Do not signal failure to hooks if Borg completes normally, even if there were 
   warnings.
-- Return an exit status of 1 if *Emborg runs to completion but with exceptions, 
+- Return an exit status of 1 if *Emborg* runs to completion but with exceptions, 
   and 2 if it cannot complete normally due to a error or errors.
 
 

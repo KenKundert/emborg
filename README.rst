@@ -27,21 +27,11 @@ Emborg — Front-End to Borg Backup
 a front-end to Borg, a powerful and fast deduplicating backup program.  With 
 *Emborg*, you specify all the details about your backups once in advance, and 
 then use a very simple command line interface for your day-to-day activities.  
-The details are contained in ~/.config/emborg.  That directory contains a file 
-(settings) that contains shared settings, and then another file for each backup 
-configuration you have.
 
 Use of *Emborg* does not preclude the use of Borg directly on the same 
 repository.  The philosophy of *Emborg* is to provide commands that you would 
 use often and in an interactive manner with the expectation that you would use 
 Borg directly for the remaining commands.
-
-An alternative to *Emborg* is
-`Borgmatic <https://github.com/witten/borgmatic>`_.  It seems largely focused on 
-the archive creation process and offers little for the other management tasks 
-such as monitoring (*due*, *list*, *manifest*), restoration (*extract*, *restore*,
-*mount*), and maintenance (*check*, *prune*). *borgmatic* recently added support 
-for the Borg *extract* command.
 
 
 Getting Help
