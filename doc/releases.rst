@@ -6,8 +6,12 @@ Latest development release
 | Version: 1.28.3
 | Released: 2021-12-15
 
-- Do not signal failure to hooks if Borg only emits a warning.
-- Return an exit status of 1 if *Emborg run to completion but with exceptions, 
+
+1.29 (2021-12-18)
+-----------------
+- Do not signal failure to hooks if Borg completes normally, even if there were 
+  warnings.
+- Return an exit status of 1 if *Emborg runs to completion but with exceptions, 
   and 2 if it cannot complete normally due to a error or errors.
 
 
