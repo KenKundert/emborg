@@ -267,7 +267,7 @@ class Settings:
                 output(
                     f"Configuration directory created: {parent!s}.",
                     "Includes example settings files. Edit them to suit your needs.",
-                    "Search for and replace any fields delimited with << and >>.",
+                    "Search for and replace any fields delimited with ⟪ and ⟫.",
                     "Delete any configurations you do not need.",
                     "Generally you will use either home or root, but not both.",
                     sep="\n",

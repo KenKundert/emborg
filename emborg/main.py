@@ -127,6 +127,7 @@ def main():
         except KeyboardInterrupt:
             display("Terminated by user.")
         except Error as e:
+            e.report()
             exit_status = 2
         except OSError as e:
             exit_status = 2
