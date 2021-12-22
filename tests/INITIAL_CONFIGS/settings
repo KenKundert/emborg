@@ -1,11 +1,11 @@
 # These settings are common to all configurations
 
 # configurations
-configurations = '<<list your configurations here>>'
-default_configuration = '<<default-config>>'
+configurations = '⟪list your configurations here⟫'
+default_configuration = '⟪default-config⟫'
 
 # encryption
-encryption = '<<encryption>>'            # borg encryption method
+encryption = '⟪encryption⟫'              # borg encryption method
     # Common choices are 'repokey' and 'keyfile'.
     # With 'repokey' the encryption key is copied into repository, use this
     # only if the remote repository is owned by you and is secure.
@@ -13,12 +13,12 @@ encryption = '<<encryption>>'            # borg encryption method
     # export it and save a copy in a safe place, otherwise you may not be
     # able to access your backups if you lose your disk.
 # specify either passphrase or avendesora_account
-passphrase = '<<passcode>>'              # passphrase for encryption key
-avendesora_account = '<<account-name>>'  # avendesora account holding passphrase
+passphrase = '⟪passcode⟫'                # passphrase for encryption key
+avendesora_account = '⟪account-name⟫'    # avendesora account holding passphrase
 
 # basic settings
 # specify notify if batch and notifier if interactive
-notify = '<<your-email-address>>'        # who to notify when things go wrong
+notify = '⟪your-email-address⟫'          # who to notify when things go wrong
 notifier = 'notify-send -u normal {prog_name} "{msg}"'
                                          # interactive notifier program
 remote_ratelimit = 2000                  # bandwidth limit in kbps
@@ -26,7 +26,7 @@ prune_after_create = True                # automatically run prune after a backu
 check_after_create = 'latest'            # automatically run check after a backup
 
 # repository settings
-repository = '<<host>>:<<path>>/{host_name}-{user_name}-{config_name}'
+repository = '⟪host⟫:⟪path⟫/{host_name}-{user_name}-{config_name}'
 prefix = '{host_name}-'
     # These may contain {<name>} where <name> is any of host_name, user_name,
     # prog_name config_name, or any of the user specified settings.
