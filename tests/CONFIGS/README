@@ -1,4 +1,4 @@
-There are 7 base configurations and one composite configurations.
+There are 9 base configurations and one composite configurations.
 Before the start of testing, 'CONFIGS' is copied to 'configs'
 
 The tests back up only this directory or the 'configs' subdirectory
@@ -29,25 +29,31 @@ test3:
 test4:
     - backs up the ./configs directory
     - uses patterns with root and excludes to select which files to backup
-    - sets working_dir to . (relative paths)
+    - sets working_dir to .. (relative paths)
     - uses default mount point
 
-test5
+test5:
     - backs up the . directory
     - uses patterns with root, includes and excludes to select which files to 
       backup
     - uses default mount point
 
-test6
+test6:
     - backs up the . directory
     - uses patterns_from with root and excludes to select which files to backup
-    - sets working_dir to . (relative paths)
+    - sets working_dir to .. (relative paths)
     - uses default mount point
 
-test7
+test7:
     - backs up the . directory
     - uses patterns_from with root, includes and excludes to select which files 
       to backup
+    - uses default mount point
+
+test8:
+    - backs up the ./configs.symlink/subdir directory
+    - uses patterns with root and excludes to select which files to backup
+    - sets working_dir to . (relative paths)
     - uses default mount point
 
 tests contains test{0,1,2,3}

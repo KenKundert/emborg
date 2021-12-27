@@ -149,19 +149,19 @@ def get_available_files(settings, archive):
 
 # get_archive_paths() {{{2
 def get_archive_paths(paths, settings):
-    # need to construct a path to the file that is compatible with those
+    # Need to construct a path to the file that is compatible with those
     # paths stored in borg, thus it must begin with a src_dir (cannot just
     # use the absolute path because the corresponding src_dir path may
     # contain a symbolic link, in which the absolute path would not be found
-    # in the borg repository
-    # convert to paths relative to the working directory
+    # in the borg repository.
+    # Convert to paths relative to the working directory.
     #
     paths_not_found = set(paths)
     resolved_paths = []
-    roots = settings.resolve_patterns([], skip_checks=True)
+    settings.resolve_patterns([], skip_checks=True)
     try:
         for root_dir in settings.roots:
-            resolved_root_dir = root_dir.resolve()
+            resolved_root_dir = (settings.working_dir / root_dir).resolve()
             for name in paths:
                 path = to_path(name)
                 resolved_path = path.resolve()

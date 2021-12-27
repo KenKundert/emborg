@@ -1,6 +1,6 @@
-R «TESTS»
-+ «TESTS»/configs
-- «TESTS»
+R ⟪EMBORG⟫/tests
++ ⟪EMBORG⟫/tests/configs
+- ⟪EMBORG⟫/tests
 - fm:*/.viminfo
 - **/.*.swp
 - **/.*.swo

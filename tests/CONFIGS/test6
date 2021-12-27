@@ -1,4 +1,4 @@
 from shlib import cwd
-working_dir = str(cwd())
+working_dir = str(cwd().parent)
 patterns_from = '{config_dir}/test6patterns'
 default_mount_point = '~/EMBORG'

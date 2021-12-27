@@ -164,12 +164,12 @@ emborg without configs:
     -
         args:
         expected:
-            > Configuration directory created: /«TESTS»/.config/emborg.
+            > Configuration directory created: /⟪EMBORG⟫/tests/.config/emborg.
             > Includes example settings files. Edit them to suit your needs.
             > Search for and replace any fields delimited with ⟪ and ⟫.
             > Delete any configurations you do not need.
             > Generally you will use either home or root, but not both.
-        cmp_dirs: /«TESTS»/INITIAL_CONFIGS .config/emborg
+        cmp_dirs: /⟪EMBORG⟫/tests/INITIAL_CONFIGS .config/emborg
 
     -
         remove: .config
@@ -312,7 +312,7 @@ emborg with configs:
             >               archive: '{prefix}{{now}}'
             >                        'test0-{now}'
             >    check_after_create: True
-            >            config_dir: '/«TESTS»/.config/emborg'
+            >            config_dir: '/⟪EMBORG⟫/tests/.config/emborg'
             >           config_name: 'test0'
             >        configurations: """
             >                            test0 test1 test2 test3 test4 test5 test6 test7 test8
@@ -327,9 +327,9 @@ emborg with configs:
             >                            'sh:**/.*.swp',
             >                            'sh:**/.*.swo',
             >                        ]
-            >              home_dir: '/«TESTS»'
+            >              home_dir: '/⟪EMBORG⟫/tests'
             >           keep_within: '1d'
-            >               log_dir: '/«TESTS»/.local/share/emborg'
+            >               log_dir: '/⟪EMBORG⟫/tests/.local/share/emborg'
             >                prefix: '{config_name}-'
             >                        'test0-'
             >    prune_after_create: True
@@ -379,44 +379,44 @@ emborg with configs:
         args: --quiet --config test0 manifest --name --sort-by-name
         expected:
             > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > «TESTS»/configs
-            > «TESTS»/configs/README
-            > «TESTS»/configs/overdue.conf
-            > «TESTS»/configs/settings
-            > «TESTS»/configs/subdir
-            > «TESTS»/configs/subdir/file
-            > «TESTS»/configs/test0
-            > «TESTS»/configs/test1
-            > «TESTS»/configs/test2
-            > «TESTS»/configs/test2excludes
-            > «TESTS»/configs/test2passphrase
-            > «TESTS»/configs/test3
-            > «TESTS»/configs/test4
-            > «TESTS»/configs/test5
-            > «TESTS»/configs/test6
-            > «TESTS»/configs/test6patterns
-            > «TESTS»/configs/test7
-            > «TESTS»/configs/test7patterns
-            > «TESTS»/configs/test8
+            > ⟪EMBORG⟫/tests/configs
+            > ⟪EMBORG⟫/tests/configs/README
+            > ⟪EMBORG⟫/tests/configs/overdue.conf
+            > ⟪EMBORG⟫/tests/configs/settings
+            > ⟪EMBORG⟫/tests/configs/subdir
+            > ⟪EMBORG⟫/tests/configs/subdir/file
+            > ⟪EMBORG⟫/tests/configs/test0
+            > ⟪EMBORG⟫/tests/configs/test1
+            > ⟪EMBORG⟫/tests/configs/test2
+            > ⟪EMBORG⟫/tests/configs/test2excludes
+            > ⟪EMBORG⟫/tests/configs/test2passphrase
+            > ⟪EMBORG⟫/tests/configs/test3
+            > ⟪EMBORG⟫/tests/configs/test4
+            > ⟪EMBORG⟫/tests/configs/test5
+            > ⟪EMBORG⟫/tests/configs/test6
+            > ⟪EMBORG⟫/tests/configs/test6patterns
+            > ⟪EMBORG⟫/tests/configs/test7
+            > ⟪EMBORG⟫/tests/configs/test7patterns
+            > ⟪EMBORG⟫/tests/configs/test8
         expected_type: regex
 
     -
-        args: --quiet --config test0 manifest --name --sort-by-name /«TESTS»/configs/test
+        args: --quiet --config test0 manifest --name --sort-by-name /⟪EMBORG⟫/tests/configs/test
         expected:
             > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > «TESTS»/configs/test0
-            > «TESTS»/configs/test1
-            > «TESTS»/configs/test2
-            > «TESTS»/configs/test2excludes
-            > «TESTS»/configs/test2passphrase
-            > «TESTS»/configs/test3
-            > «TESTS»/configs/test4
-            > «TESTS»/configs/test5
-            > «TESTS»/configs/test6
-            > «TESTS»/configs/test6patterns
-            > «TESTS»/configs/test7
-            > «TESTS»/configs/test7patterns
-            > «TESTS»/configs/test8
+            > ⟪EMBORG⟫/tests/configs/test0
+            > ⟪EMBORG⟫/tests/configs/test1
+            > ⟪EMBORG⟫/tests/configs/test2
+            > ⟪EMBORG⟫/tests/configs/test2excludes
+            > ⟪EMBORG⟫/tests/configs/test2passphrase
+            > ⟪EMBORG⟫/tests/configs/test3
+            > ⟪EMBORG⟫/tests/configs/test4
+            > ⟪EMBORG⟫/tests/configs/test5
+            > ⟪EMBORG⟫/tests/configs/test6
+            > ⟪EMBORG⟫/tests/configs/test6patterns
+            > ⟪EMBORG⟫/tests/configs/test7
+            > ⟪EMBORG⟫/tests/configs/test7patterns
+            > ⟪EMBORG⟫/tests/configs/test8
         expected_type: regex
 
     -
@@ -474,17 +474,17 @@ emborg with configs:
         args: --quiet --config test0 info
         expected:
             >               config: test0
-            >                roots: /«TESTS»/configs
-            >          destination: /«TESTS»/repositories
-            >   settings directory: /«TESTS»/.config/emborg
-            >              logfile: /«TESTS»/.local/share/emborg/test0.log
+            >                roots: /⟪EMBORG⟫/tests/configs
+            >          destination: /⟪EMBORG⟫/tests/repositories
+            >   settings directory: /⟪EMBORG⟫/tests/.config/emborg
+            >              logfile: /⟪EMBORG⟫/tests/.local/share/emborg/test0.log
             >       last backed up: .*
             >
             > Repository ID: \w*
-            > Location: /«TESTS»/repositories
+            > Location: /⟪EMBORG⟫/tests/repositories
             > Encrypted: No
-            > Cache: /«TESTS»/.cache/borg/\w+
-            > Security dir: /«TESTS»/.config/borg/security/\w+
+            > Cache: /⟪EMBORG⟫/tests/.cache/borg/\w+
+            > Security dir: /⟪EMBORG⟫/tests/.config/borg/security/\w+
             > ------------------------------------------------------------------------------
             >                        Original size      Compressed size    Deduplicated size
             > All archives:          .............      ...............    .................
@@ -494,8 +494,8 @@ emborg with configs:
         expected_type: regex
 
     -
-        args: --quiet --config test0 extract /«TESTS»/configs
-        cmp_dirs: /«TESTS»/CONFIGS configs
+        args: --quiet --config test0 extract /⟪EMBORG⟫/tests/configs
+        cmp_dirs: /⟪EMBORG⟫/tests/CONFIGS configs
 
     -
         remove: configs
@@ -504,7 +504,7 @@ emborg with configs:
 
     -
         args: --quiet --config test0 mount EMBORG
-        cmp_dirs: EMBORG/«TESTS»/configs configs
+        cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs configs
         dependencies: fuse
             # if this test fails with 'EMBORG: Mountpoint must be a writable', 
             # it is because EMBORG is still mounted from a previous run.
@@ -513,7 +513,7 @@ emborg with configs:
         args: --quiet --config test0 create
         expected:
             > emborg error: create:
-            >     Failed to create/acquire the lock /«TESTS»/repositories/lock (timeout).
+            >     Failed to create/acquire the lock /⟪EMBORG⟫/tests/repositories/lock (timeout).
             >         If another Emborg or Borg process is using this repository,
             >         please wait for it to finish.
             >         Perhaps you still have an archive mounted?
@@ -539,32 +539,32 @@ emborg with configs:
         args: --quiet --config test4 files -S
         expected:
             > Archive: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            >        0 configs/
-            >        0 configs/subdir/
-            >        0 configs/subdir/file
-            >       13 configs/test2passphrase
-            >       52 configs/test6patterns
-            >       66 configs/test2excludes
-            >       84 configs/test7patterns
-            >       87 configs/test7
-            >      108 configs/test0
-            >      125 configs/test6
-            >      141 configs/test2
-            >      182 configs/test8
-            >      191 configs/test5
-            >      195 configs/test1
-            >      196 configs/test4
-            >      253 configs/test3
-            >      556 configs/overdue.conf
-            >      594 configs/settings
-            >     1620 configs/README
+            >        0 tests/configs/
+            >        0 tests/configs/subdir/
+            >        0 tests/configs/subdir/file
+            >       13 tests/configs/test2passphrase
+            >       66 tests/configs/test2excludes
+            >       82 tests/configs/test6patterns
+            >       87 tests/configs/test7
+            >      108 tests/configs/test0
+            >      111 tests/configs/test7patterns
+            >      132 tests/configs/test6
+            >      141 tests/configs/test2
+            >      182 tests/configs/test8
+            >      191 tests/configs/test5
+            >      195 tests/configs/test1
+            >      253 tests/configs/test3
+            >      324 tests/configs/test4
+            >      556 tests/configs/overdue.conf
+            >      594 tests/configs/settings
+            >     1838 tests/configs/README
         expected_type: regex
 
     -
         remove: configs/test4
         args: --quiet --config test4 compare configs
         expected:
-            > Only in /«TESTS»/EMBORG/configs: test4
+            > Only in /⟪EMBORG⟫/tests/EMBORG/tests/configs: test4
         expected_type: diff
         dependencies: fuse
 
@@ -572,28 +572,28 @@ emborg with configs:
         remove: configs/subdir/file
         args: --quiet --config test4 compare configs/subdir
         expected:
-            > Only in /«TESTS»/EMBORG/configs/subdir: file
+            > Only in /⟪EMBORG⟫/tests/EMBORG/tests/configs/subdir: file
         expected_type: diff
         dependencies: fuse
 
     -
-        remove: configs
-        args: --quiet --config test4 extract -f configs
-        cmp_dirs: CONFIGS configs
+        remove: configs tests
+        args: --quiet --config test4 extract -f tests/configs
+        cmp_dirs: CONFIGS tests/configs
 
     -
-        remove: configs
-        args: --quiet --config test4 extract -f /«TESTS»/configs
-        cmp_dirs: CONFIGS configs
+        remove: configs tests
+        args: --quiet --config test4 extract -f /⟪EMBORG⟫/tests/configs
+        cmp_dirs: CONFIGS tests/configs
 
     -
-        remove: configs
+        remove: configs tests
         args: --quiet --config test4 restore configs
         cmp_dirs: CONFIGS configs
 
     -
         args: --quiet --config test4 mount
-        cmp_dirs: EMBORG/configs configs
+        cmp_dirs: EMBORG/tests/configs configs
         dependencies: fuse
 
     -
@@ -632,25 +632,25 @@ emborg with configs:
         args: --quiet --config test5 files -N
         expected:
             > Archive: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > «TESTS»/configs/
-            > «TESTS»/configs/README
-            > «TESTS»/configs/overdue.conf
-            > «TESTS»/configs/settings
-            > «TESTS»/configs/subdir/
-            > «TESTS»/configs/subdir/file
-            > «TESTS»/configs/test0
-            > «TESTS»/configs/test1
-            > «TESTS»/configs/test2
-            > «TESTS»/configs/test2excludes
-            > «TESTS»/configs/test2passphrase
-            > «TESTS»/configs/test3
-            > «TESTS»/configs/test4
-            > «TESTS»/configs/test5
-            > «TESTS»/configs/test6
-            > «TESTS»/configs/test6patterns
-            > «TESTS»/configs/test7
-            > «TESTS»/configs/test7patterns
-            > «TESTS»/configs/test8
+            > ⟪EMBORG⟫/tests/configs/
+            > ⟪EMBORG⟫/tests/configs/README
+            > ⟪EMBORG⟫/tests/configs/overdue.conf
+            > ⟪EMBORG⟫/tests/configs/settings
+            > ⟪EMBORG⟫/tests/configs/subdir/
+            > ⟪EMBORG⟫/tests/configs/subdir/file
+            > ⟪EMBORG⟫/tests/configs/test0
+            > ⟪EMBORG⟫/tests/configs/test1
+            > ⟪EMBORG⟫/tests/configs/test2
+            > ⟪EMBORG⟫/tests/configs/test2excludes
+            > ⟪EMBORG⟫/tests/configs/test2passphrase
+            > ⟪EMBORG⟫/tests/configs/test3
+            > ⟪EMBORG⟫/tests/configs/test4
+            > ⟪EMBORG⟫/tests/configs/test5
+            > ⟪EMBORG⟫/tests/configs/test6
+            > ⟪EMBORG⟫/tests/configs/test6patterns
+            > ⟪EMBORG⟫/tests/configs/test7
+            > ⟪EMBORG⟫/tests/configs/test7patterns
+            > ⟪EMBORG⟫/tests/configs/test8
         expected_type: regex
 
     -
@@ -660,60 +660,60 @@ emborg with configs:
         expected_type: diff
 
     -
-        args: --quiet --config test5 extract /«TESTS»/configs
+        args: --quiet --config test5 extract /⟪EMBORG⟫/tests/configs
         expected:
-            > «TESTS»/configs
-            > «TESTS»/configs/test6patterns
-            > «TESTS»/configs/test2excludes
-            > «TESTS»/configs/test2
-            > «TESTS»/configs/test2passphrase
-            > «TESTS»/configs/test7patterns
-            > «TESTS»/configs/overdue.conf
-            > «TESTS»/configs/test3
-            > «TESTS»/configs/README
-            > «TESTS»/configs/settings
-            > «TESTS»/configs/test6
-            > «TESTS»/configs/test7
-            > «TESTS»/configs/test8
-            > «TESTS»/configs/test0
-            > «TESTS»/configs/test5
-            > «TESTS»/configs/test1
-            > «TESTS»/configs/test4
-            > «TESTS»/configs/subdir
-            > «TESTS»/configs/subdir/file
+            > ⟪EMBORG⟫/tests/configs
+            > ⟪EMBORG⟫/tests/configs/test6patterns
+            > ⟪EMBORG⟫/tests/configs/test2excludes
+            > ⟪EMBORG⟫/tests/configs/test2
+            > ⟪EMBORG⟫/tests/configs/test2passphrase
+            > ⟪EMBORG⟫/tests/configs/test7patterns
+            > ⟪EMBORG⟫/tests/configs/overdue.conf
+            > ⟪EMBORG⟫/tests/configs/test3
+            > ⟪EMBORG⟫/tests/configs/README
+            > ⟪EMBORG⟫/tests/configs/settings
+            > ⟪EMBORG⟫/tests/configs/test6
+            > ⟪EMBORG⟫/tests/configs/test7
+            > ⟪EMBORG⟫/tests/configs/test8
+            > ⟪EMBORG⟫/tests/configs/test0
+            > ⟪EMBORG⟫/tests/configs/test5
+            > ⟪EMBORG⟫/tests/configs/test1
+            > ⟪EMBORG⟫/tests/configs/test4
+            > ⟪EMBORG⟫/tests/configs/subdir
+            > ⟪EMBORG⟫/tests/configs/subdir/file
         expected_type: sort-lines
-        cmp_dirs: «TESTS»/configs configs
+        cmp_dirs: ⟪EMBORG⟫/tests/configs configs
 
     -
         remove: configs
         args: --quiet --config test5 restore configs
         expected:
-            > «TESTS»/configs
-            > «TESTS»/configs/test6patterns
-            > «TESTS»/configs/test2excludes
-            > «TESTS»/configs/test2
-            > «TESTS»/configs/test2passphrase
-            > «TESTS»/configs/test7patterns
-            > «TESTS»/configs/overdue.conf
-            > «TESTS»/configs/test3
-            > «TESTS»/configs/README
-            > «TESTS»/configs/settings
-            > «TESTS»/configs/test6
-            > «TESTS»/configs/test7
-            > «TESTS»/configs/test8
-            > «TESTS»/configs/test0
-            > «TESTS»/configs/test5
-            > «TESTS»/configs/test1
-            > «TESTS»/configs/test4
-            > «TESTS»/configs/subdir
-            > «TESTS»/configs/subdir/file
+            > ⟪EMBORG⟫/tests/configs
+            > ⟪EMBORG⟫/tests/configs/test6patterns
+            > ⟪EMBORG⟫/tests/configs/test2excludes
+            > ⟪EMBORG⟫/tests/configs/test2
+            > ⟪EMBORG⟫/tests/configs/test2passphrase
+            > ⟪EMBORG⟫/tests/configs/test7patterns
+            > ⟪EMBORG⟫/tests/configs/overdue.conf
+            > ⟪EMBORG⟫/tests/configs/test3
+            > ⟪EMBORG⟫/tests/configs/README
+            > ⟪EMBORG⟫/tests/configs/settings
+            > ⟪EMBORG⟫/tests/configs/test6
+            > ⟪EMBORG⟫/tests/configs/test7
+            > ⟪EMBORG⟫/tests/configs/test8
+            > ⟪EMBORG⟫/tests/configs/test0
+            > ⟪EMBORG⟫/tests/configs/test5
+            > ⟪EMBORG⟫/tests/configs/test1
+            > ⟪EMBORG⟫/tests/configs/test4
+            > ⟪EMBORG⟫/tests/configs/subdir
+            > ⟪EMBORG⟫/tests/configs/subdir/file
         expected_type: sort-lines
         cmp_dirs: CONFIGS configs
 
     -
         args: --quiet --config test5 mount
         expected: Mounting filesystem
-        cmp_dirs: EMBORG/«TESTS»/configs CONFIGS
+        cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs CONFIGS
         dependencies: fuse
 
     -
@@ -747,45 +747,45 @@ emborg with configs:
         args: --quiet --config test6 files -S
         expected:
             > Archive: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            >        0 configs/
-            >        0 configs/subdir/
-            >        0 configs/subdir/file
-            >       13 configs/test2passphrase
-            >       52 configs/test6patterns
-            >       66 configs/test2excludes
-            >       84 configs/test7patterns
-            >       87 configs/test7
-            >      108 configs/test0
-            >      125 configs/test6
-            >      141 configs/test2
-            >      182 configs/test8
-            >      191 configs/test5
-            >      195 configs/test1
-            >      196 configs/test4
-            >      253 configs/test3
-            >      556 configs/overdue.conf
-            >      594 configs/settings
-            >     1620 configs/README
+            >        0 tests/configs/
+            >        0 tests/configs/subdir/
+            >        0 tests/configs/subdir/file
+            >       13 tests/configs/test2passphrase
+            >       66 tests/configs/test2excludes
+            >       82 tests/configs/test6patterns
+            >       87 tests/configs/test7
+            >      108 tests/configs/test0
+            >      111 tests/configs/test7patterns
+            >      132 tests/configs/test6
+            >      141 tests/configs/test2
+            >      182 tests/configs/test8
+            >      191 tests/configs/test5
+            >      195 tests/configs/test1
+            >      253 tests/configs/test3
+            >      324 tests/configs/test4
+            >      556 tests/configs/overdue.conf
+            >      594 tests/configs/settings
+            >     1838 tests/configs/README
         expected_type: regex
 
     -
-        remove: configs
-        args: --quiet --config test6 extract -f configs
-        cmp_dirs: CONFIGS configs
+        remove: configs tests
+        args: --quiet --config test6 extract -f tests/configs
+        cmp_dirs: CONFIGS tests/configs
 
     -
-        remove: configs
-        args: --quiet --config test6 extract -f /«TESTS»/configs
-        cmp_dirs: CONFIGS configs
+        remove: configs tests
+        args: --quiet --config test6 extract -f /⟪EMBORG⟫/tests/configs
+        cmp_dirs: CONFIGS tests/configs
 
     -
-        remove: configs
+        remove: configs tests
         args: --quiet --config test6 restore configs
         cmp_dirs: CONFIGS configs
 
     -
         args: --quiet --config test6 mount
-        cmp_dirs: EMBORG/configs configs
+        cmp_dirs: EMBORG/tests/configs configs
         dependencies: fuse
 
     -
@@ -815,8 +815,8 @@ emborg with configs:
         args: --quiet --config test7 files -N configs/subdir
         expected:
             > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > «TESTS»/configs/subdir/
-            > «TESTS»/configs/subdir/file
+            > ⟪EMBORG⟫/tests/configs/subdir/
+            > ⟪EMBORG⟫/tests/configs/subdir/file
         expected_type: regex
 
     -
@@ -828,8 +828,8 @@ emborg with configs:
         expected_type: regex diff
 
     -
-        args: --quiet --config test7 extract /«TESTS»/configs
-        cmp_dirs: «TESTS»/configs configs
+        args: --quiet --config test7 extract /⟪EMBORG⟫/tests/configs
+        cmp_dirs: ⟪EMBORG⟫/tests/configs configs
 
     -
         remove: configs
@@ -838,7 +838,7 @@ emborg with configs:
 
     -
         args: --quiet --config test7 mount
-        cmp_dirs: EMBORG/«TESTS»/configs CONFIGS
+        cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs CONFIGS
         dependencies: fuse
 
     -
@@ -857,7 +857,7 @@ emborg with configs:
         args: --config test7 list
         expected:
             > emborg error: list:
-            >     Repository /«TESTS»/repositories does not exist.
+            >     Repository /⟪EMBORG⟫/tests/repositories does not exist.
         expected_type: error
 
     -
@@ -890,7 +890,7 @@ emborg with configs:
         expected_type: regex
 
     -
-        args: --quiet --config test8 files --date «DATE» --sort-by-name
+        args: --quiet --config test8 files --date ⟪DATE⟫ --sort-by-name
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > configs.symlink/subdir/
@@ -976,12 +976,12 @@ emborg with configs:
     -
         remove: configs/subdir/file
         args: --quiet --config test8 extract -f configs.symlink/subdir/file
-        cmp_dirs: CONFIGS/subdir ./«TESTS»/configs/subdir
+        cmp_dirs: CONFIGS/subdir ./⟪EMBORG⟫/tests/configs/subdir
 
     -
         remove: configs/subdir/file
-        args: --quiet --config test8 extract -f /«TESTS»/configs.symlink/subdir/file
-        cmp_dirs: CONFIGS/subdir ./«TESTS»/configs/subdir
+        args: --quiet --config test8 extract -f /⟪EMBORG⟫/tests/configs.symlink/subdir/file
+        cmp_dirs: CONFIGS/subdir ./⟪EMBORG⟫/tests/configs/subdir
 
     -
         remove: configs/subdir

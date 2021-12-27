@@ -93,6 +93,7 @@ def main():
             inform.narrate = True
 
         Hooks.provision_hooks()
+        worst_exit_status = 0
 
         try:
             # find the command
@@ -103,7 +104,6 @@ def main():
             if exit_status is not None:
                 terminate(exit_status)
 
-            worst_exit_status = 0
             queue = ConfigQueue(cmd)
             while queue:
                 with Settings(config, emborg_opts, queue) as settings:

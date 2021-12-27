@@ -1,4 +1,4 @@
-R ./configs
-- fm:*/.viminfo
-- **/.*.swp
-- **/.*.swo
+R ./tests/configs
+- fm:./tests/*/.viminfo
+- ./tests/**/.*.swp
+- ./tests/**/.*.swo

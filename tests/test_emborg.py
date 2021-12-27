@@ -12,7 +12,7 @@ import parametrize_from_file
 import pytest
 import re
 from inform import is_str, Color, Error, indent
-from shlib import Run, cd, cp, cwd, ln, lsf, mkdir, rm, set_prefs, touch
+from shlib import Run, cd, cp, cwd, ln, lsf, mkdir, rm, set_prefs, to_path, touch
 from textwrap import dedent
 from voluptuous import Schema, Optional, Required, Any
 parametrize = parametrize_from_file
@@ -26,10 +26,10 @@ emborg_overdue_exe = "../od".split()
 #emborg_exe = "emborg".split()
 #emborg_overdue_exe = "emborg-overdue".split()
 set_prefs(use_inform=True)
-tests_dir = __file__.rpartition('/')[0]
-tests_dir_wo_slash = tests_dir.strip('/')
-    # remove the leading and trailing slashes
-    # they will be added back in tests if needed
+tests_dir = to_path(__file__).parent
+emborg_dir = str(tests_dir.parent)
+emborg_dir_wo_slash = emborg_dir.strip('/')
+    # remove the leading slashes, it will be added back in tests if needed
 
 # schema for test cases {{{2
 emborg_schema = Schema({
@@ -72,22 +72,20 @@ class EmborgTester(object):
         # cmp_dirs is a pair of directories that, if given, should match exactly
         # remove contains files or directories to be deleted before the test runs
         #
-        # args, expected, and cmp_dirs may contain the literal text fragment: «TESTS»
-        # that is replaced by the path to the tests directory: .../emborg/tests
+        # args, expected, and cmp_dirs may contain the literal text fragment: ⟪EMBORG⟫
+        # that is replaced by the absolute path to the emborg directory: .../emborg
 
-        # expand «TESTS» and «DATE»
+        # replace ⟪EMBORG⟫ and ⟪DATE⟫ macros
         date = arrow.now().format("YYYY-MM-DD")
-
-        # replace «TESTS» and «DATE» macros
         args = args.split() if is_str(args) else args
-        args = [a.replace("«TESTS»", tests_dir_wo_slash) for a in args]
-        args = [a.replace("«DATE»", date) for a in args]
+        args = [a.replace("⟪EMBORG⟫", emborg_dir_wo_slash) for a in args]
+        args = [a.replace("⟪DATE⟫", date) for a in args]
         if expected is not None:
-            expected = expected.replace("«TESTS»", tests_dir_wo_slash)
-            expected = expected.replace("«DATE»", date)
+            expected = expected.replace("⟪EMBORG⟫", emborg_dir_wo_slash)
+            expected = expected.replace("⟪DATE⟫", date)
         if cmp_dirs:
-            cmp_dirs = cmp_dirs.replace("«TESTS»", tests_dir_wo_slash)
-            cmp_dirs = cmp_dirs.replace("«DATE»", date)
+            cmp_dirs = cmp_dirs.replace("⟪EMBORG⟫", emborg_dir_wo_slash)
+            cmp_dirs = cmp_dirs.replace("⟪DATE⟫", date)
 
         self.args = args
         self.expected = expected
@@ -184,7 +182,7 @@ def initialize_configs(initialize):
         rm(".config/emborg/subdir")
         for p in lsf(".config/emborg"):
             contents = p.read_text()
-            contents = contents.replace('«TESTS»', tests_dir)
+            contents = contents.replace('⟪EMBORG⟫', emborg_dir)
             p.write_text(contents)
         touch(".config/.nobackup")
 
@@ -288,26 +286,26 @@ def test_emborg_api(initialize):
                 response = json.loads(json_data)
                 paths = sorted([entry['path'] for entry in response])
                 for each in [
-                    '«TESTS»/configs',
-                    '«TESTS»/configs/README',
-                    '«TESTS»/configs/overdue.conf',
-                    '«TESTS»/configs/settings',
-                    '«TESTS»/configs/subdir',
-                    '«TESTS»/configs/subdir/file',
-                    '«TESTS»/configs/test0',
-                    '«TESTS»/configs/test1',
-                    '«TESTS»/configs/test2',
-                    '«TESTS»/configs/test2excludes',
-                    '«TESTS»/configs/test2passphrase',
-                    '«TESTS»/configs/test3',
-                    '«TESTS»/configs/test4',
-                    '«TESTS»/configs/test5',
-                    '«TESTS»/configs/test6',
-                    '«TESTS»/configs/test6patterns',
-                    '«TESTS»/configs/test7',
-                    '«TESTS»/configs/test7patterns',
-                    '«TESTS»/configs/test8',
+                    '⟪EMBORG⟫/tests/configs',
+                    '⟪EMBORG⟫/tests/configs/README',
+                    '⟪EMBORG⟫/tests/configs/overdue.conf',
+                    '⟪EMBORG⟫/tests/configs/settings',
+                    '⟪EMBORG⟫/tests/configs/subdir',
+                    '⟪EMBORG⟫/tests/configs/subdir/file',
+                    '⟪EMBORG⟫/tests/configs/test0',
+                    '⟪EMBORG⟫/tests/configs/test1',
+                    '⟪EMBORG⟫/tests/configs/test2',
+                    '⟪EMBORG⟫/tests/configs/test2excludes',
+                    '⟪EMBORG⟫/tests/configs/test2passphrase',
+                    '⟪EMBORG⟫/tests/configs/test3',
+                    '⟪EMBORG⟫/tests/configs/test4',
+                    '⟪EMBORG⟫/tests/configs/test5',
+                    '⟪EMBORG⟫/tests/configs/test6',
+                    '⟪EMBORG⟫/tests/configs/test6patterns',
+                    '⟪EMBORG⟫/tests/configs/test7',
+                    '⟪EMBORG⟫/tests/configs/test7patterns',
+                    '⟪EMBORG⟫/tests/configs/test8',
                 ]:
-                    each = each.replace("«TESTS»", tests_dir_wo_slash)
+                    each = each.replace("⟪EMBORG⟫", emborg_dir_wo_slash)
                     assert each in paths
 

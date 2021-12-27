@@ -156,7 +156,7 @@ done using :ref:`excludes` and :ref:`exclude_from` and using the path keys
 (``+``, ``-``, ``!``) in :ref:`patterns` and :ref:`patterns_from`.  When you use 
 a relative path to specify a recursion root then you should also use relative 
 paths for its include and exclude paths. Similarly, if you use an absolute path 
-for the a recursion root then you should also use absolute paths for its include 
+for the recursion root then you should also use absolute paths for its include 
 and exclude paths. *Borg* is okay with you having some recursion roots specified 
 with relative paths and some with absolute paths, but this confuses *Emborg* 
 when it comes time to extract or restore files from your repository. With 

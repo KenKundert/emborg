@@ -343,7 +343,7 @@ class Settings:
 
         self.working_dir = to_path(self.settings.get("working_dir", "/"))
         if not self.working_dir.exists():
-            raise Error("{self.working_dir!s} not found.", culprit="working_dir")
+            raise Error(f"{self.working_dir!s} not found.", culprit="working_dir")
         if not self.working_dir.is_absolute():
             raise Error("must be an absolute path.", culprit="working_dir")
 

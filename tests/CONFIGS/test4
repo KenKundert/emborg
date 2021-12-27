@@ -1,10 +1,13 @@
 from shlib import cwd
-working_dir = str(cwd())
-patterns = '''
-    R ./configs
-    - fm:*/.viminfo
-    - **/.*.swp
-    - **/.*.swo
-'''
+current_dir = cwd()
+parent_dir = str(current_dir.parent)
+this_dir = current_dir.name
+working_dir = parent_dir
+patterns = f"""
+    R {this_dir}/configs
+    - fm:{this_dir}/*/.viminfo
+    - {this_dir}/**/.*.swp
+    - {this_dir}/**/.*.swo
+"""
 default_mount_point = '~/EMBORG'
 report_diffs_cmd = "diff -r"

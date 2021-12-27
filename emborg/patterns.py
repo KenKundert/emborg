@@ -18,9 +18,7 @@
 
 # Imports {{{1
 from os.path import expanduser as expand_user
-
-from inform import Error, error
-
+from inform import Error, error, log
 from shlib import to_path
 
 
@@ -31,14 +29,22 @@ known_styles = "fm sh re pp pf".split()
 
 # check_root() {{{1
 def check_root(root, working_dir):
-    root = to_path(root)
-    if not root.exists():
+    if str(root) == '.':
+        log(
+            "Unable to determine whether paths are contained in a root,",
+            "because '.' is a root."
+        )
+    abs_root = working_dir / root
+    if not abs_root.exists():
         raise Error("not found.", culprit=root)
+    # the following is a bit cleaner, but no available until python 3.9
+    #if not abs_root.is_relative_to(working_dir):
+    #    raise Error("not in working directory:", working_dir, culprit=root)
     try:
-        root.resolve().relative_to(working_dir.resolve())
+        abs_root.relative_to(working_dir)
     except ValueError:
         raise Error("not in working directory:", working_dir, culprit=root)
-    return root.is_absolute()
+    return to_path(root).is_absolute()
 
 
 # check_roots() {{{1
@@ -80,15 +86,21 @@ def check_pattern(pattern, default_style, roots, expand_tilde):
             path = expand_user(path)
             pattern = prefix + path
         else:
-            raise Error("borg does not interpret leading tilde as user.")
+            raise Error(
+                "do not use leading ~,",
+                "borg does not treat it as a user home directory.",
+            )
 
     # check to see that path corresponds to a root
+    path = str(to_path(path))
     if any(path.startswith(str(root)) for root in roots):
         return pattern
     if style in ["fm", "sh"]:
         if any(str(root).startswith(path.partition("*")[0]) for root in roots):
             return pattern
-
+    if any(str(root) == '.' for root in roots):
+        # cannot check paths if root is '.'
+        return pattern
     raise Error("path is not in a known root.")
 
 
@@ -100,7 +112,8 @@ def check_patterns(
     default_style = "sh"
     for pattern in patterns:
         pattern = pattern.strip()
-        culprit = (str(src), repr(pattern))
+        culprit = src
+        codicil = repr(pattern)
         kind = pattern[0:1]
         arg = pattern[1:].lstrip()
         if kind in ["", "#"]:
@@ -109,27 +122,24 @@ def check_patterns(
             error("unknown type", culprit=culprit)
             continue
         if kind == "R":
-            try:
-                if arg[0] == "~" and not expand_tilde:
-                    error(
-                        "borg does not interpret leading tilde as user.",
-                        culprit=culprit,
-                    )
-                root = expand_user(arg)
-                if not skip_checks:
-                    check_root(root, working_dir)
-                roots.append(to_path(root))
-            except AttributeError:
-                error("can no longer add roots.", culprit=culprit)
+            if arg[0] == "~" and not expand_tilde:
+                error(
+                    "borg does not interpret leading tilde as user.",
+                    culprit=culprit, codicil=codicil
+                )
+            root = expand_user(arg)
+            if not skip_checks:
+                check_root(root, working_dir)
+            roots.append(to_path(root))
             paths.append(kind + " " + root)
         elif kind == "P":
             if arg in known_styles:
                 default_style = arg
             else:
-                error("unknown pattern style.", culprit=culprit)
+                error("unknown pattern style.", culprit=culprit, codicil=codicil)
             paths.append(kind + " " + arg)
         elif not roots:
-            error("no roots available.", culprit=culprit)
+            error("no roots available.", culprit=culprit, codicil=codicil)
             return []
         else:
             try:
@@ -137,7 +147,7 @@ def check_patterns(
                     kind + " " + check_pattern(arg, default_style, roots, expand_tilde)
                 )
             except Error as e:
-                e.report(culprit=culprit)
+                e.report(culprit=culprit, codicil=codicil)
     return paths
 
 
@@ -155,7 +165,7 @@ def check_excludes(patterns, roots, src, expand_tilde=True):
         try:
             paths.append(check_pattern(pattern, "fm", roots, expand_tilde))
         except Error as e:
-            e.report(culprit=(str(src), repr(pattern)))
+            e.report(culprit=src, codicil=repr(pattern))
     return paths
 
 
