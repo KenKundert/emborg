@@ -47,7 +47,7 @@ from shlib import (
 from time import sleep
 from .collection import Collection
 from .preferences import BORG_SETTINGS, DEFAULT_COMMAND, EMBORG_SETTINGS, PROGRAM_NAME
-from .utilities import gethostname, two_columns
+from .utilities import gethostname, pager, two_columns
 
 
 # Utilities {{{1
@@ -1273,7 +1273,7 @@ class LogCommand(Command):
         docopt(cls.USAGE, argv=[command] + args)
 
         try:
-            output(settings.logfile.read_text())
+            pager(settings.logfile.read_text())
         except FileNotFoundError as e:
             narrate(os_error(e))
 

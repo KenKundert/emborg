@@ -1,7 +1,7 @@
 # Settings
 
 # License {{{1
-# Copyright (C) 2018-2021 Kenneth S. Kundert
+# Copyright (C) 2018-2022 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -330,8 +330,8 @@ explicitly specify a particular archive. For example:
     $ emborg extract --archive continuum-2020-12-05T12:54:26 home/shaunte/bin
 
 Alternatively you can specify a date or date and time.  If only the date is 
-given the time is taken to be midnight.  The oldest archive that is                 
-younger than specified date and time is used. For example:
+given the time is taken to be midnight.  The oldest archive that is younger than 
+specified date and time is used. For example:
 
 .. code-block:: bash
 
@@ -480,7 +480,7 @@ You can explicitly specify an archive:
 
     $ emborg manifest --archive continuum-2021-04-01T12:19:58
 
-Or you choose an archive based on a date and time.  The oldest archive that is                 
+Or you choose an archive based on a date and time.  The oldest archive that is 
 younger than specified date and time is used.
 
 .. code-block:: bash
