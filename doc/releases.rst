@@ -7,6 +7,11 @@ Latest development release
 | Released: 2021-12-26
 
 
+1.30 (2022-01-04)
+-----------------
+- Fix some issues with relative paths.
+
+
 1.29 (2021-12-18)
 -----------------
 - Do not signal failure to hooks if Borg completes normally, even if there were 

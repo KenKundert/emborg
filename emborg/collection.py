@@ -28,7 +28,6 @@ __version__ = "0.5.0"
 __released__ = "2021-01-27"
 
 
-
 # Utilities {{{1
 # split_lines() {{{2
 def split_lines(text, comment=None, strip=False, cull=False, sep=None):
@@ -57,9 +56,9 @@ def split_lines(text, comment=None, strip=False, cull=False, sep=None):
     return lines
 
 
-# Null {{{2
+# Unspecified {{{2
 # class that is used as a default in functions to signal nothing was given
-class Null:
+class Unspecified:
     def __bool__(self):
         return False
 
@@ -120,14 +119,13 @@ class Collection(object):
         except AttributeError:
             return list(enumerate(self.collection))
 
-    def get(self, key, default=Null):
+    def get(self, key, default=Unspecified):
         try:
             return self.collection[key]
         except (KeyError, IndexError):
-            if default == Null:
+            if default == Unspecified:
                 raise
             return default
-
 
     def render(self, fmt=None, sep=None):
         """Convert the collection into a string
