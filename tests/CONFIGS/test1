@@ -12,3 +12,17 @@ excludes = '''
     sh:**/.*.swo
 '''
 
+run_before_backup = """
+    # this line is ignored
+    echo run_before_backup on test1
+"""
+run_before_first_backup = "echo run_before_first_backup on test1"
+run_before_borg = ["echo run_before_borg on test1"]
+run_after_backup = """
+    # this line is ignored
+    echo run_after_backup on test1
+"""
+run_after_last_backup = [
+    "echo run_after_last_backup on test1",
+]
+run_after_borg = "echo run_after_borg on test1"

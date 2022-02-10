@@ -8,14 +8,21 @@ import arrow
 import json
 import nestedtext as nt
 import os
-import parametrize_from_file
+from parametrize_from_file import parametrize
+from functools import partial
 import pytest
 import re
 from inform import is_str, Color, Error, indent
 from shlib import Run, cd, cp, cwd, ln, lsf, mkdir, rm, set_prefs, to_path, touch
 from textwrap import dedent
 from voluptuous import Schema, Optional, Required, Any
-parametrize = parametrize_from_file
+
+
+# Adapt parametrize_for_file to read dictionary rather than list
+def name_from_dict_keys(cases):
+    return [{**v, 'name': k} for k,v in cases.items()]
+
+parametrize = partial(parametrize, preprocess=name_from_dict_keys)
 
 
 # Globals {{{1
@@ -33,6 +40,7 @@ emborg_dir_wo_slash = emborg_dir.strip('/')
 
 # schema for test cases {{{2
 emborg_schema = Schema({
+    Required('name'): str,
     Optional('args', default='<PASS>'): Any(str, list),
     Optional('expected', default=""): str,
     Optional('expected_type', default=""): str,
@@ -41,6 +49,7 @@ emborg_schema = Schema({
     Optional('dependencies', default=""): str,
 }, required=True)
 emborg_overdue_schema = Schema({
+    Required('name'): str,
     Optional('conf', default=""): str,
     Optional('args', default=[]): Any(str, list),
     Required('expected', default=""): str,
@@ -65,7 +74,7 @@ class EmborgTester(object):
         # expected_type may contain keywords, 'regex', 'diff', 'error', and/or
         # 'ignore'
         # - if regex is given then expected is taken to be a regular expression
-        #   otherwise the result much match expected precisely
+        #   otherwise the result much match expected verbatim
         # - if diff is given then emborg is expected to exit with an exit status of 1
         # - if error is given then emborg is expected to exit with an exit status of 2
         # - if ignore is given, stdout/stderr is not checked
@@ -196,7 +205,7 @@ def initialize_configs(initialize):
 )
 def test_emborg_without_configs(
     initialize,
-    args, expected, expected_type, cmp_dirs, remove, dependencies
+    name, args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
     if skip_test(dependencies):
         return
@@ -206,7 +215,7 @@ def test_emborg_without_configs(
         if not passes:
             result = tester.get_result()
             expected = tester.get_expected()
-            assert result == expected
+            assert result == expected, name
             raise AssertionError('test code failure')
 
 # test_emborg_with_configs{{{2
@@ -217,7 +226,7 @@ def test_emborg_without_configs(
 )
 def test_emborg_with_configs(
     initialize_configs,
-    args, expected, expected_type, cmp_dirs, remove, dependencies
+    name, args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
     if skip_test(dependencies):
         return
@@ -227,7 +236,7 @@ def test_emborg_with_configs(
         if not passes:
             result = tester.get_result()
             expected = tester.get_expected()
-            assert result == expected
+            assert result == expected, name
             raise AssertionError('test code failure')
 
 # test_emborg_overdue {{{2
@@ -238,7 +247,7 @@ def test_emborg_with_configs(
 )
 def test_emborg_overdue(
     initialize,
-    conf, args, expected, expected_type, dependencies
+    name, conf, args, expected, expected_type, dependencies
 ):
     if skip_test(dependencies):
         return
@@ -250,11 +259,11 @@ def test_emborg_overdue(
             args = args.split() if is_str(args) else args
             overdue = Run(emborg_overdue_exe + args, "sOEW")
             if 'regex' in expected_type.split():
-                matches = bool(re.fullmatch(expected, overdue.stdout))
+                assert bool(re.fullmatch(expected, overdue.stdout)), name
             else:
-                matches = expected == overdue.stdout
+                assert expected == overdue.stdout, name
         except Error as e:
-            return str(e) == expected
+            assert str(e) == expected, name
 
 
 # test_emborg_api {{{2

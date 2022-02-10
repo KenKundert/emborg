@@ -53,13 +53,13 @@ here. Run ``emborg help <cmd>`` for the details.
 .. _exit status:
 
 Exit Status
-----------
+-----------
 
 *Emborg* returns with an exit status of 0 if it completes without issue.  It 
 returns with an exit status of 1 if was able to terminate normally but some 
 exceptional condition was encountered along the way.  For example, if the 
 :ref:`compare <compare>` or :ref:`diff <diff>` detects a difference or if 
-:due:`due <due>` command detects the backups are overdue, a 1 is returned.  In 
+:ref:`due <due>` command detects the backups are overdue, a 1 is returned.  In 
 addition, 1 is returned if *Borg* detects an error but is able to complete 
 anyway. However, if *Emborg* or *Borg* suffers errors and cannot complete, 2 is 
 returned.

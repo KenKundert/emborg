@@ -4,3 +4,18 @@ passcommand = 'cat {config_dir}/test2passphrase'
 src_dirs = '~'.split()
 
 exclude_from = '{config_dir}/test2excludes'
+
+run_before_backup = """
+    # this line is ignored
+    echo run_before_backup on test2
+"""
+run_before_first_backup = "echo run_before_first_backup on test2"
+run_before_borg = ["echo run_before_borg on test2"]
+run_after_backup = """
+    # this line is ignored
+    echo run_after_backup on test2
+"""
+run_after_last_backup = [
+    "echo run_after_last_backup on test2",
+]
+run_after_borg = "echo run_after_borg on test2"

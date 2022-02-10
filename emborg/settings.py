@@ -107,6 +107,7 @@ for name, attrs in BORG_SETTINGS.items():
     if "arg" in attrs and attrs["arg"]:
         borg_options_arg_count[convert_name_to_option(name)] = 1
 
+
 # ConfigQueue {{{2
 class ConfigQueue:
     def __init__(self, command=None):
@@ -213,6 +214,7 @@ class Settings:
         self.check()
         set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)
         self.hooks = Hooks(self)
+        self.borg_ran = False
 
         # set colorscheme
         if self.colorscheme:
@@ -637,6 +639,19 @@ class Settings:
             return
         raise Error("Cannot determine the encryption passphrase.")
 
+    # run_user_commands() {{[2
+    def run_user_commands(self, setting):
+        for i, cmd in enumerate(self.values(setting)):
+            narrate(f"staging {setting}[{i}] command.")
+            try:
+                Run(cmd, "SoEW")
+            except Error as e:
+                e.reraise(culprit=(setting, i, cmd.split()[0]))
+
+        # the following two statements are only useful from run_before_borg
+        self.settings[setting] = []  # erase the setting so it is not run again
+        self.borg_ran = True  # indicate that before has run so after should run
+
     # run_borg() {{{2
     def run_borg(
         self,
@@ -648,6 +663,10 @@ class Settings:
         show_borg_output=False,
         use_working_dir=False,
     ):
+
+        # run the run_before_borg commands
+        self.run_user_commands('run_before_borg')
+
         # prepare the command
         self.publish_passcode()
         if "BORG_PASSPHRASE" in os.environ:
@@ -718,10 +737,14 @@ class Settings:
         if borg.stderr:
             narrate("Borg stderr:")
             narrate(indent(borg.stderr))
+
         return borg
 
     # run_borg_raw() {{{2
     def run_borg_raw(self, args):
+
+        # run the run_before_borg commands
+        self.run_user_commands('run_before_borg')
 
         # prepare the command
         self.publish_passcode()
@@ -917,6 +940,10 @@ class Settings:
 
     # exit {{{2
     def __exit__(self, exc_type, exc_val, exc_tb):
+
+        # run the run_after_borg commands
+        if self.borg_ran:
+            self.run_user_commands('run_after_borg')
 
         # delete lockfile
         if self.requires_exclusivity:

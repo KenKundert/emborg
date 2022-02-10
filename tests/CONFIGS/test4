@@ -11,3 +11,32 @@ patterns = f"""
 """
 default_mount_point = '~/EMBORG'
 report_diffs_cmd = "diff -r"
+
+run_before_backup = """
+    # this line is ignored
+    echo run_before_backup 0
+    echo run_before_backup 1
+"""
+run_before_first_backup = [
+    "echo run_before_first_backup 0",
+    "echo run_before_first_backup 1",
+]
+run_before_borg = """
+    # this line is ignored
+    echo run_before_borg 0
+    echo run_before_borg 1
+"""
+run_after_backup = """
+    # this line is ignored
+    echo run_after_backup 0
+    echo run_after_backup 1
+"""
+run_after_last_backup = [
+    "echo run_after_last_backup 0",
+    "echo run_after_last_backup 1",
+]
+run_after_borg = """
+    # this line is ignored
+    echo run_after_borg 0
+    echo run_after_borg 1
+"""

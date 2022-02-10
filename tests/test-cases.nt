@@ -1,12 +1,12 @@
 emborg without configs:
 
-    -
+    better:
         args: version
         expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
         expected_type: regex
         remove: .config
 
-    -
+    suburb:
         args: help
         expected:
             > Emborg Backups
@@ -60,7 +60,7 @@ emborg without configs:
             >     overview          overview of emborg
             >     precautions       what everybody should know before using emborg
 
-    -
+    watch:
         args: settings --available
         expected:
             > Emborg settings:
@@ -118,9 +118,13 @@ emborg without configs:
             >                 repository: path to remote directory that contains
             >                             repository
             >           run_after_backup: commands to run after archive has been created
+            >             run_after_borg: commands to run after last Borg command has
+            >                             run
             >      run_after_last_backup: commands to run after last archive has been
             >                             created
             >          run_before_backup: commands to run before archive is created
+            >            run_before_borg: commands to run before first Borg command is
+            >                             run
             >    run_before_first_backup: commands to run before first archive is
             >                             created
             >              show_progress: show borg progress when running create command
@@ -161,7 +165,7 @@ emborg without configs:
             >                      umask: set umask to M (local and remote, default:
             >                             0077)
 
-    -
+    labor:
         args:
         expected:
             > Configuration directory created: /⟪EMBORG⟫/tests/.config/emborg.
@@ -171,18 +175,18 @@ emborg without configs:
             > Generally you will use either home or root, but not both.
         cmp_dirs: /⟪EMBORG⟫/tests/INITIAL_CONFIGS .config/emborg
 
-    -
+    jerkin:
         remove: .config
 
 
 emborg with configs:
 
-    -
+    idiocy:
         args: version
         expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
         expected_type: regex
 
-    -
+    heathen:
         args: settings --available
         expected:
             > Emborg settings:
@@ -240,9 +244,13 @@ emborg with configs:
             >                 repository: path to remote directory that contains
             >                             repository
             >           run_after_backup: commands to run after archive has been created
+            >             run_after_borg: commands to run after last Borg command has
+            >                             run
             >      run_after_last_backup: commands to run after last archive has been
             >                             created
             >          run_before_backup: commands to run before archive is created
+            >            run_before_borg: commands to run before first Borg command is
+            >                             run
             >    run_before_first_backup: commands to run before first archive is
             >                             created
             >              show_progress: show borg progress when running create command
@@ -283,12 +291,12 @@ emborg with configs:
             >                      umask: set umask to M (local and remote, default:
             >                             0077)
 
-    -
+    weave:
         args: version
         expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
         expected_type: regex
 
-    -
+    plateful:
         args: --quiet configs
         expected:
             > Available Configurations:
@@ -306,79 +314,131 @@ emborg with configs:
             > Default Configuration:
             >     tests
 
-    -
+    periphery:
         args: --quiet --config test0 settings
         expected:
-            >               archive: '{prefix}{{now}}'
-            >                        'test0-{now}'
-            >    check_after_create: True
-            >            config_dir: '/⟪EMBORG⟫/tests/.config/emborg'
-            >           config_name: 'test0'
-            >        configurations: """
-            >                            test0 test1 test2 test3 test4 test5 test6 test7 test8
-            >                            tests=test0,test1,test2,test3
-            >                        """
-            > default_configuration: 'tests'
-            >            encryption: 'none'
-            >        exclude_caches: True
-            >    exclude_if_present: '.nobackup'
-            >              excludes: [
-            >                            'fm:*/.viminfo',
-            >                            'sh:**/.*.swp',
-            >                            'sh:**/.*.swo',
-            >                        ]
-            >              home_dir: '/⟪EMBORG⟫/tests'
-            >           keep_within: '1d'
-            >               log_dir: '/⟪EMBORG⟫/tests/.local/share/emborg'
-            >                prefix: '{config_name}-'
-            >                        'test0-'
-            >    prune_after_create: True
-            >            repository: '~/repositories'
-            >              src_dirs: ['~/configs']
+            >                 archive: '{prefix}{{now}}'
+            >                          'test0-{now}'
+            >      check_after_create: True
+            >              config_dir: '/⟪EMBORG⟫/tests/.config/emborg'
+            >             config_name: 'test0'
+            >          configurations: """
+            >                              test0 test1 test2 test3 test4 test5 test6 test7 test8
+            >                              tests=test0,test1,test2,test3
+            >                          """
+            >   default_configuration: 'tests'
+            >              encryption: 'none'
+            >          exclude_caches: True
+            >      exclude_if_present: '.nobackup'
+            >                excludes: [
+            >                              'fm:*/.viminfo',
+            >                              'sh:**/.*.swp',
+            >                              'sh:**/.*.swo',
+            >                          ]
+            >                home_dir: '/⟪EMBORG⟫/tests'
+            >             keep_within: '1d'
+            >                 log_dir: '/⟪EMBORG⟫/tests/.local/share/emborg'
+            >                  prefix: '{config_name}-'
+            >                          'test0-'
+            >      prune_after_create: True
+            >              repository: '~/repositories'
+            >        run_after_backup: """
+            >                              # this line is ignored
+            >                              echo run_after_backup on test0
+            >                          """
+            >          run_after_borg: 'echo run_after_borg on test0'
+            >   run_after_last_backup: ['echo run_after_last_backup on test0']
+            >       run_before_backup: """
+            >                              # this line is ignored
+            >                              echo run_before_backup on test0
+            >                          """
+            >         run_before_borg: ['echo run_before_borg on test0']
+            > run_before_first_backup: 'echo run_before_first_backup on test0'
+            >                src_dirs: ['~/configs']
 
-    -
+    mushroom:
         args: --quiet --config test0 init
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
 
-    -
+    fetus:
         args: --config test0 list
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
 
-    -
+    hovel:
         args: --config test0 files
-        expected: emborg error: no archives are available.
+        expected:
+            > run_before_borg on test0
+            > emborg error: no archives are available.
+            > run_after_borg on test0
         expected_type: error
 
-    -
+    gravy:
         args: --quiet create
+        expected:
+            > run_before_first_backup on test0
+            > run_before_backup on test0
+            > run_before_borg on test0
+            > run_after_backup on test0
+            > run_after_borg on test0
+            > run_before_backup on test1
+            > run_before_borg on test1
+            > run_after_backup on test1
+            > run_after_borg on test1
+            > run_before_backup on test2
+            > run_before_borg on test2
+            > run_after_backup on test2
+            > run_after_borg on test2
+            > run_before_backup on test3
+            > run_before_borg on test3
+            > run_after_backup on test3
+            > run_after_last_backup on test3
+            > run_after_borg on test3
 
-    -
+    motif:
         args: --quiet --config test0 list
-        expected: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
         expected_type: regex
 
-    -
+    historian:
         args: --quiet --config test0 list --include-external
         expected:
+            > run_before_borg on test0
             > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
         expected_type: regex
 
-    -
+    pipeline:
         args: --quiet --config test2 delete
+        expected:
+            > run_before_borg on test2
+            > run_after_borg on test2
 
-    -
+    facial:
         args: --quiet --config test0 list --include-external
         expected:
+            > run_before_borg on test0
             > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
         expected_type: regex
 
-    -
+    gouge:
         args: --quiet --config test0 manifest --name --sort-by-name
         expected:
+            > run_before_borg on test0
             > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
             > ⟪EMBORG⟫/tests/configs
             > ⟪EMBORG⟫/tests/configs/README
             > ⟪EMBORG⟫/tests/configs/overdue.conf
@@ -400,10 +460,12 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test8
         expected_type: regex
 
-    -
+    shiver:
         args: --quiet --config test0 manifest --name --sort-by-name /⟪EMBORG⟫/tests/configs/test
         expected:
+            > run_before_borg on test0
             > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
             > ⟪EMBORG⟫/tests/configs/test0
             > ⟪EMBORG⟫/tests/configs/test1
             > ⟪EMBORG⟫/tests/configs/test2
@@ -419,12 +481,32 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test8
         expected_type: regex
 
-    -
+    whiplash:
         args: --quiet create
+        expected:
+            > run_before_first_backup on test0
+            > run_before_backup on test0
+            > run_before_borg on test0
+            > run_after_backup on test0
+            > run_after_borg on test0
+            > run_before_backup on test1
+            > run_before_borg on test1
+            > run_after_backup on test1
+            > run_after_borg on test1
+            > run_before_backup on test2
+            > run_before_borg on test2
+            > run_after_backup on test2
+            > run_after_borg on test2
+            > run_before_backup on test3
+            > run_before_borg on test3
+            > run_after_backup on test3
+            > run_after_last_backup on test3
+            > run_after_borg on test3
 
-    -
+    kindness:
         args: --quiet --config test0 list --include-external
         expected:
+            > run_before_borg on test0
             > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -432,26 +514,43 @@ emborg with configs:
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
         expected_type: regex
 
-    -
+    spoof:
         args: --quiet --config test0 prune
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
 
-    -
+    librarian:
         args: --quiet --config test0 prune --include-external
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
 
-    -
+    feminist:
         args: --quiet --config test0 check
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
 
-    -
+    creosote:
         args: --quiet --config test0 check --all
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
 
-    -
+    covering:
         args: --quiet --config test0 check --include-external
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
 
-    -
+    scroll:
         args: --quiet --config test0 list --include-external
         expected:
+            > run_before_borg on test0
             > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -459,9 +558,10 @@ emborg with configs:
             > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
         expected_type: regex
 
-    -
+    magnate:
         args: --quiet due
         expected:
             > The latest test0 archive was created (just now|(\d+ )?seconds ago)\.
@@ -470,7 +570,7 @@ emborg with configs:
             > The latest test3 archive was created (just now|(\d+ )?seconds ago)\.
         expected_type: regex
 
-    -
+    build:
         args: --quiet --config test0 info
         expected:
             >               config: test0
@@ -479,6 +579,7 @@ emborg with configs:
             >   settings directory: /⟪EMBORG⟫/tests/.config/emborg
             >              logfile: /⟪EMBORG⟫/tests/.local/share/emborg/test0.log
             >       last backed up: .*
+            > run_before_borg on test0
             >
             > Repository ID: \w*
             > Location: /⟪EMBORG⟫/tests/repositories
@@ -491,27 +592,42 @@ emborg with configs:
             >
             >                        Unique chunks         Total chunks
             > Chunk index:           .............         ............
+            > run_after_borg on test0
         expected_type: regex
 
-    -
+    thresh:
         args: --quiet --config test0 extract /⟪EMBORG⟫/tests/configs
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
         cmp_dirs: /⟪EMBORG⟫/tests/CONFIGS configs
 
-    -
+    oddment:
         remove: configs
         args: --quiet --config test0 restore configs
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
         cmp_dirs: CONFIGS configs
 
-    -
+    freelance:
         args: --quiet --config test0 mount EMBORG
         cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs configs
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
         dependencies: fuse
             # if this test fails with 'EMBORG: Mountpoint must be a writable', 
             # it is because EMBORG is still mounted from a previous run.
 
-    -
+    whitewash:
         args: --quiet --config test0 create
         expected:
+            > run_before_first_backup on test0
+            > run_before_backup on test0
+            > run_before_borg on test0
+            > run_after_backup on test0
+            > run_after_last_backup on test0
             > emborg error: create:
             >     Failed to create/acquire the lock /⟪EMBORG⟫/tests/repositories/lock (timeout).
             >         If another Emborg or Borg process is using this repository,
@@ -520,25 +636,51 @@ emborg with configs:
             >         If so, use ‘emborg umount’ to unmount it.
             >         Perhaps a previous run was killed or terminated with an error?
             >         If so, use ‘emborg breaklock’ to clear the lock.
+            > run_after_borg on test0
         expected_type: error
         dependencies: fuse
 
-    -
+    toehold:
         args: --quiet --config test0 umount EMBORG
+        expected:
+            > run_before_borg on test0
+            > run_after_borg on test0
         dependencies: fuse
 
-    -
+    faculty:
         args: --quiet --config test4 create
+        expected:
+            > run_before_first_backup 0
+            > run_before_first_backup 1
+            > run_before_backup 0
+            > run_before_backup 1
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_backup 0
+            > run_after_backup 1
+            > run_after_last_backup 0
+            > run_after_last_backup 1
+            > run_after_borg 0
+            > run_after_borg 1
 
-    -
+    terminate:
         args: --quiet --config test4 list
-        expected: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg 0
+            > run_after_borg 1
         expected_type: regex
 
-    -
+    editorial:
         args: --quiet --config test4 files -S
         expected:
+            > run_before_borg 0
+            > run_before_borg 1
             > Archive: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg 0
+            > run_after_borg 1
             >        0 tests/configs/
             >        0 tests/configs/subdir/
             >        0 tests/configs/subdir/file
@@ -546,89 +688,142 @@ emborg with configs:
             >       66 tests/configs/test2excludes
             >       82 tests/configs/test6patterns
             >       87 tests/configs/test7
-            >      108 tests/configs/test0
             >      111 tests/configs/test7patterns
             >      132 tests/configs/test6
-            >      141 tests/configs/test2
             >      182 tests/configs/test8
             >      191 tests/configs/test5
-            >      195 tests/configs/test1
-            >      253 tests/configs/test3
-            >      324 tests/configs/test4
+            >      526 tests/configs/test0
             >      556 tests/configs/overdue.conf
+            >      559 tests/configs/test2
             >      594 tests/configs/settings
+            >      612 tests/configs/test1
+            >      671 tests/configs/test3
+            >      965 tests/configs/test4
             >     1838 tests/configs/README
         expected_type: regex
 
-    -
+    sparkler:
         remove: configs/test4
         args: --quiet --config test4 compare configs
         expected:
+            > run_before_borg 0
+            > run_before_borg 1
             > Only in /⟪EMBORG⟫/tests/EMBORG/tests/configs: test4
+            > run_after_borg 0
+            > run_after_borg 1
         expected_type: diff
         dependencies: fuse
 
-    -
+    needy:
         remove: configs/subdir/file
         args: --quiet --config test4 compare configs/subdir
         expected:
+            > run_before_borg 0
+            > run_before_borg 1
             > Only in /⟪EMBORG⟫/tests/EMBORG/tests/configs/subdir: file
+            > run_after_borg 0
+            > run_after_borg 1
         expected_type: diff
         dependencies: fuse
 
-    -
+    pathway:
         remove: configs tests
         args: --quiet --config test4 extract -f tests/configs
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_borg 0
+            > run_after_borg 1
         cmp_dirs: CONFIGS tests/configs
 
-    -
+    rewrite:
         remove: configs tests
         args: --quiet --config test4 extract -f /⟪EMBORG⟫/tests/configs
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_borg 0
+            > run_after_borg 1
         cmp_dirs: CONFIGS tests/configs
 
-    -
+    abuse:
         remove: configs tests
         args: --quiet --config test4 restore configs
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_borg 0
+            > run_after_borg 1
         cmp_dirs: CONFIGS configs
 
-    -
+    dozen:
         args: --quiet --config test4 mount
         cmp_dirs: EMBORG/tests/configs configs
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_borg 0
+            > run_after_borg 1
         dependencies: fuse
 
-    -
+    regime:
         args: --quiet --config test4 umount
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_borg 0
+            > run_after_borg 1
         dependencies: fuse
 
-    -
+    aspect:
         args: --quiet --config test4 borg list --prefix test4- --short @repo
-        expected: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg 0
+            > run_after_borg 1
         expected_type: regex
 
-    -
+    addict:
         args: --quiet --config test4 compare configs
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_borg 0
+            > run_after_borg 1
         dependencies: fuse
 
-    -
+    thrill:
         args: --quiet --config test4 compare configs/subdir
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_borg 0
+            > run_after_borg 1
         dependencies: fuse
 
-    -
+    blanch:
         args: --quiet --config test4 compare --interactive configs
+        expected:
+            > run_before_borg 0
+            > run_before_borg 1
+            > run_after_borg 0
+            > run_after_borg 1
         dependencies: fuse
 
-    -
+    unbalance:
         args: --quiet --config test5 create
         expected:
             > Creating archive at (?s:.*)
         expected_type: regex
 
-    -
+    lobby:
         args: --quiet --config test5 list
         expected: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
-    -
+    purple:
         args: --quiet --config test5 files -N
         expected:
             > Archive: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -653,13 +848,13 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test8
         expected_type: regex
 
-    -
+    bobbin:
         args: --quiet --config test5 extract configs
         expected:
             > Include pattern 'configs' never matched.
         expected_type: diff
 
-    -
+    communion:
         args: --quiet --config test5 extract /⟪EMBORG⟫/tests/configs
         expected:
             > ⟪EMBORG⟫/tests/configs
@@ -684,7 +879,7 @@ emborg with configs:
         expected_type: sort-lines
         cmp_dirs: ⟪EMBORG⟫/tests/configs configs
 
-    -
+    spurn:
         remove: configs
         args: --quiet --config test5 restore configs
         expected:
@@ -710,40 +905,40 @@ emborg with configs:
         expected_type: sort-lines
         cmp_dirs: CONFIGS configs
 
-    -
+    execute:
         args: --quiet --config test5 mount
         expected: Mounting filesystem
         cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs CONFIGS
         dependencies: fuse
 
-    -
+    complaint:
         args: --quiet --config test5 umount
         dependencies: fuse
 
-    -
+    adjoin:
         args: --quiet --config test5 borg list --prefix test5- --short @repo
         expected: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
-    -
+    simpleton:
         args: --quiet --config test5 compare configs
         expected: Mounting filesystem
         dependencies: fuse
 
-    -
+    resound:
         args: --quiet --config test5 compare --interactive configs
         expected: Mounting filesystem
         dependencies: fuse
 
-    -
+    acquit:
         args: --quiet --config test6 create
 
-    -
+    harangue:
         args: --quiet --config test6 list
         expected: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
-    -
+    adversary:
         args: --quiet --config test6 files -S
         expected:
             > Archive: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -754,64 +949,64 @@ emborg with configs:
             >       66 tests/configs/test2excludes
             >       82 tests/configs/test6patterns
             >       87 tests/configs/test7
-            >      108 tests/configs/test0
             >      111 tests/configs/test7patterns
             >      132 tests/configs/test6
-            >      141 tests/configs/test2
             >      182 tests/configs/test8
             >      191 tests/configs/test5
-            >      195 tests/configs/test1
-            >      253 tests/configs/test3
-            >      324 tests/configs/test4
+            >      526 tests/configs/test0
             >      556 tests/configs/overdue.conf
+            >      559 tests/configs/test2
             >      594 tests/configs/settings
+            >      612 tests/configs/test1
+            >      671 tests/configs/test3
+            >      965 tests/configs/test4
             >     1838 tests/configs/README
         expected_type: regex
 
-    -
+    intercom:
         remove: configs tests
         args: --quiet --config test6 extract -f tests/configs
         cmp_dirs: CONFIGS tests/configs
 
-    -
+    embellish:
         remove: configs tests
         args: --quiet --config test6 extract -f /⟪EMBORG⟫/tests/configs
         cmp_dirs: CONFIGS tests/configs
 
-    -
+    rating:
         remove: configs tests
         args: --quiet --config test6 restore configs
         cmp_dirs: CONFIGS configs
 
-    -
+    clampdown:
         args: --quiet --config test6 mount
         cmp_dirs: EMBORG/tests/configs configs
         dependencies: fuse
 
-    -
+    gawky:
         args: --quiet --config test6 umount
         dependencies: fuse
 
-    -
+    huntsman:
         args: --quiet --config test6 borg list --prefix test6- --short @repo
         expected: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
-    -
+    globe:
         args: --quiet --config test6 compare
         expected: emborg error: no diff command available.
         expected_type: error
         dependencies: fuse
 
-    -
+    sugar:
         args: --quiet --config test7 create
 
-    -
+    mantel:
         args: --quiet --config test7 list
         expected: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
-    -
+    suture:
         args: --quiet --config test7 files -N configs/subdir
         expected:
             > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -819,7 +1014,7 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/subdir/file
         expected_type: regex
 
-    -
+    tadpole:
         args: --config test7 extract configs
         expected:
             > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -827,51 +1022,51 @@ emborg with configs:
             >     Include pattern 'configs' never matched.
         expected_type: regex diff
 
-    -
+    footfall:
         args: --quiet --config test7 extract /⟪EMBORG⟫/tests/configs
         cmp_dirs: ⟪EMBORG⟫/tests/configs configs
 
-    -
+    louse:
         remove: configs
         args: --quiet --config test7 restore configs
         cmp_dirs: CONFIGS configs
 
-    -
+    sweetener:
         args: --quiet --config test7 mount
         cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs CONFIGS
         dependencies: fuse
 
-    -
+    florist:
         args: --quiet --config test7 umount
         dependencies: fuse
 
-    -
+    machete:
         args: --quiet --config test7 borg list --prefix test7- --short @repo
         expected: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
-    -
+    cranberry:
         args: --config test7 delete --repo
 
-    -
+    cleanser:
         args: --config test7 list
         expected:
             > emborg error: list:
             >     Repository /⟪EMBORG⟫/tests/repositories does not exist.
         expected_type: error
 
-    -
+    harlequin:
         args: --quiet --config test8 init
 
-    -
+    master:
         args: --quiet --config test8 create
 
-    -
+    chance:
         args: --quiet --config test8 list
         expected: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
-    -
+    stockade:
         args: --quiet --config test8 files -D
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -881,7 +1076,7 @@ emborg with configs:
                 # at the same time
         expected_type: regex
 
-    -
+    sheikhdom:
         args: --quiet --config test8 files --date 1h --sort-by-name
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -889,7 +1084,7 @@ emborg with configs:
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    complete:
         args: --quiet --config test8 files --date ⟪DATE⟫ --sort-by-name
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -897,7 +1092,7 @@ emborg with configs:
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    diver:
         args: --quiet --config test8 files -O
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -905,7 +1100,7 @@ emborg with configs:
             > \w+\s* configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    explain:
         args: --quiet --config test8 files -G
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -913,7 +1108,7 @@ emborg with configs:
             > \w+\s* configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    savage:
         args: --quiet --config test8 files -K path
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -921,7 +1116,7 @@ emborg with configs:
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    adapt:
         args: --quiet --config test8 files --name
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -929,7 +1124,7 @@ emborg with configs:
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    novelty:
         args: --quiet --config test8 files --short
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -937,7 +1132,7 @@ emborg with configs:
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    anatomy:
         args: --quiet --config test8 files --short
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -945,19 +1140,19 @@ emborg with configs:
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    salesgirl:
         args: --quiet --config test8 files does-not-exist
         expected: emborg error: not contained in a source directory: does-not-exist
         expected_type: error
 
-    -
+    draper:
         args: --quiet --config test8 files configs.symlink/subdir/file
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    devolve:
         args: --quiet --config test8 files configs.symlink/subdir
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -965,7 +1160,7 @@ emborg with configs:
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    matrix:
         args: --quiet --config test8 files --recursive configs.symlink/subdir
         expected:
             > Archive: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
@@ -973,47 +1168,66 @@ emborg with configs:
             > configs.symlink/subdir/file
         expected_type: regex
 
-    -
+    bathmat:
         remove: configs/subdir/file
         args: --quiet --config test8 extract -f configs.symlink/subdir/file
         cmp_dirs: CONFIGS/subdir ./⟪EMBORG⟫/tests/configs/subdir
 
-    -
+    allot:
         remove: configs/subdir/file
         args: --quiet --config test8 extract -f /⟪EMBORG⟫/tests/configs.symlink/subdir/file
         cmp_dirs: CONFIGS/subdir ./⟪EMBORG⟫/tests/configs/subdir
 
-    -
+    clutter:
         remove: configs/subdir
         args: --quiet --config test8 restore configs/subdir
         cmp_dirs: CONFIGS/subdir configs/subdir
 
-    -
+    interior:
         remove: configs/subdir/file
         args: --quiet --config test8 restore configs/subdir/file
         cmp_dirs: CONFIGS/subdir configs/subdir
 
-    -
+    craftsman:
         args: --quiet --config test8 mount
         cmp_dirs: EMBORG/configs.symlink/subdir configs.symlink/subdir
         dependencies: fuse
 
-    -
+    stretcher:
         args: --quiet --config test8 umount
         dependencies: fuse
 
-    -
+    acquaint:
         args: --quiet --config test8 borg list --prefix test8- --short @repo
         expected: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
-    -
+    close:
         # this is needed for the API tests
         args: --quiet --config tests create
+        expected:
+            > run_before_first_backup on test0
+            > run_before_backup on test0
+            > run_before_borg on test0
+            > run_after_backup on test0
+            > run_after_borg on test0
+            > run_before_backup on test1
+            > run_before_borg on test1
+            > run_after_backup on test1
+            > run_after_borg on test1
+            > run_before_backup on test2
+            > run_before_borg on test2
+            > run_after_backup on test2
+            > run_after_borg on test2
+            > run_before_backup on test3
+            > run_before_borg on test3
+            > run_after_backup on test3
+            > run_after_last_backup on test3
+            > run_after_borg on test3
 
 emborg-overdue:
 
-    -
+    predator:
         expected:
             > test0: 0.[01] hours
             > test1: 0.[01] hours
@@ -1026,7 +1240,7 @@ emborg-overdue:
             >
         expected_type: regex
 
-    -
+    smelt:
         args: --no-passes
         expected:
 

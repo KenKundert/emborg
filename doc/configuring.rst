@@ -1067,6 +1067,21 @@ specifies identical commands to *run_before_first_backup* for each configuration
 in a composite configuration with the intent that the commands will be run only 
 once regardless whether the configurations are run individually or as a group.
 
+
+.. _run_before_borg:
+.. _run_after_borg:
+
+run_before_borg, run_after_borg
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Specifies commands that are to be run before the first *Borg* command is run or 
+after the last one is run.  These can be used, for example, to mount and then 
+unmount a remote repository, if such a thing is needed.
+
+May be specified as a list of strings or as a multi-line string with one command 
+per line (lines that begin with ``#`` are ignored).
+
+
 .. _show_progress:
 
 show_progress

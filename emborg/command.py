@@ -412,7 +412,7 @@ class CompareCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] compare [<path>]
+            emborg compare [options] [<path>]
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to mount
@@ -622,18 +622,18 @@ class CreateCommand(Command):
                     culprit = ("must_exist", path),
                 )
 
-        # run prerequisites
+        # run commands specified to be run before a backup
+        prerequisite_settings = []
         if settings.is_first_config():
-            pre_script_settings = ["run_before_first_backup", "run_before_backup"]
-        else:
-            pre_script_settings = ["run_before_backup"]
-        for setting in pre_script_settings:
+            prerequisite_settings.append("run_before_first_backup")
+        prerequisite_settings.append("run_before_backup")
+        for setting in prerequisite_settings:
             for i, cmd in enumerate(settings.values(setting)):
                 narrate(f"staging {setting}[{i}] pre-backup script")
                 try:
                     Run(cmd, "SoEW")
                 except Error as e:
-                    e.reraise(culprit=(setting, cmd.split()[0]))
+                    e.reraise(culprit=(setting, i, cmd.split()[0]))
 
         # run borg
         src_dirs = settings.src_dirs
@@ -653,24 +653,23 @@ class CreateCommand(Command):
                     e.reraise(codicil="Run 'emborg init' to initialize the repository.")
                 else:
                     raise
+            finally:
+                # run commands specified to be run after a backup
+                postrequisite_settings = ["run_after_backup"]
+                if settings.is_last_config():
+                    postrequisite_settings.append("run_after_last_backup")
+                for setting in postrequisite_settings:
+                    for i, cmd in enumerate(settings.values(setting)):
+                        narrate(f"staging {setting}[{i}] post-backup script")
+                        try:
+                            Run(cmd, "SoEW")
+                        except Error as e:
+                            e.reraise(culprit=(setting, i, cmd.split()[0]))
 
         # update the date files
         narrate("update date file")
         now = arrow.now()
         settings.date_file.write_text(str(now))
-
-        # run scripts specified to be run after a backup
-        if settings.is_last_config():
-            post_script_settings = ["run_after_backup", "run_after_last_backup"]
-        else:
-            post_script_settings = ["run_after_backup"]
-        for setting in post_script_settings:
-            for i, cmd in enumerate(settings.values(setting)):
-                narrate(f"staging {setting}[{i}] post-backup script")
-                try:
-                    Run(cmd, "SoEW")
-                except Error as e:
-                    e.reraise(culprit=(setting, cmd.split()[0]))
 
         if cmdline["--fast"]:
             return create_status
@@ -725,7 +724,7 @@ class DeleteCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] delete [<archive>]
+            emborg delete [options] [<archive>]
 
         Options:
             -r, --repo     delete entire repository
@@ -986,7 +985,7 @@ class ExtractCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] extract <path>...
+            emborg extract [options] <path>...
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to use
@@ -1129,7 +1128,7 @@ class InfoCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] info
+            emborg info [options]
 
         Options:
             -f, --fast               only report local information
@@ -1220,9 +1219,9 @@ class ListCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] list
-            emborg [options] archives
-            emborg [options] lr
+            emborg list [options]
+            emborg archives [options]
+            emborg lr [options]
 
         Options:
             -e, --include-external   list all archives in repository, not just
@@ -1285,11 +1284,11 @@ class ManifestCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] manifest [<path>]
-            emborg [options] m [<path>]
-            emborg [options] la [<path>]
-            emborg [options] files [<path>]
-            emborg [options] f [<path>]
+            emborg manifest [options] [<path>]
+            emborg m [options] [<path>]
+            emborg la [options] [<path>]
+            emborg files [options] [<path>]
+            emborg f [options] [<path>]
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to use
@@ -1530,7 +1529,7 @@ class MountCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] mount [<mount_point>]
+            emborg mount [options] [<mount_point>]
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to mount
@@ -1631,7 +1630,7 @@ class PruneCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] prune
+            emborg prune [options]
 
         Options:
             -e, --include-external   prune all archives in repository, not just
@@ -1689,7 +1688,7 @@ class RestoreCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] restore <path>...
+            emborg restore [options] <path>...
 
         Options:
             -a <archive>, --archive <archive>   name of the archive to use
@@ -1773,8 +1772,8 @@ class SettingsCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg [options] settings [<name>]
-            emborg [options] setting [<name>]
+            emborg settings [options] [<name>]
+            emborg setting [options] [<name>]
 
         Options:
             -a, --available   list available settings
