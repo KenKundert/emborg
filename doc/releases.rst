@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.30.1
-| Released: 2022-02-10
+| Version: 1.30.2
+| Released: 2022-02-15
 
 - Added the :ref:`run_before_borg and run_after_borg <run_before_borg>` 
   settings.
