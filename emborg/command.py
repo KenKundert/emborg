@@ -724,13 +724,17 @@ class DeleteCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg delete [options] [<archive>]
+            emborg delete [options] [<archive>...]
 
         Options:
             -r, --repo     delete entire repository
             -s, --stats    show Borg statistics
+            --cache-only   delete only the local cache for the given repository
 
         If no archive is specified, the latest is deleted.
+
+        Using --repo causes the entire repository to be deleted.  Unlike borg
+        itself, no warning is issued and no additional conformation is required.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -741,22 +745,26 @@ class DeleteCommand(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
-        archive = cmdline["<archive>"]
+        archives = cmdline["<archive>"]
+        cache_only = ['--cache-only'] if cmdline['--cache-only'] else []
         if cmdline['--repo']:
-            if archive:
+            if archives:
                 raise Error("must not specify an archive along with --repo.")
             os.environ['BORG_DELETE_I_KNOW_WHAT_I_AM_DOING'] = 'YES'
+        elif cache_only:
+            if archives:
+                raise Error("must not specify an archive along with --cache-only.")
         else:
-            if not archive:
-                archive = get_name_of_latest_archive(settings)
-                if not archive:
+            if not archives:
+                archives = [get_name_of_latest_archive(settings)]
+                if not archives:
                     raise Error("no archives available.")
         show_stats = cmdline["--stats"] or settings.show_stats
 
         # run borg
         borg = settings.run_borg(
             cmd = "delete",
-            args = [settings.destination(archive)],
+            args = cache_only + [settings.repository] + archives,
             emborg_opts = options,
             strip_prefix = True,
             show_borg_output = show_stats,

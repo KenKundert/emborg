@@ -111,7 +111,8 @@ class Overview(HelpMessage):
             repository.  The philosophy of Emborg is to provide commands that
             you would use often and in an interactive manner with the
             expectation that you would use Borg directly for the remaining
-            commands.
+            commands.  In fact, Emborg provides the borg command to make that
+            easier.
             """
         ).strip()
         return text
@@ -134,7 +135,7 @@ class Precautions(HelpMessage):
             information, such as your Borg passphrase and keys, that you would
             need to get started after a catastrophic loss of your disk.
 
-            In addition it is important to understand the your backup data is
+            In addition it is important to understand that your backup data is
             not encrypted with your passphrase, rather your passphrase encrypts
             a key, and your backup data is encrypted with the key.  Thus, your
             backup files cannot be decrypted without both the passphrase and the

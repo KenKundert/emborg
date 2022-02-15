@@ -8,6 +8,8 @@ Latest development release
 
 - Added the :ref:`run_before_borg and run_after_borg <run_before_borg>` 
   settings.
+- Added the ``--cache-only`` option and the ability to delete multiple archives 
+  at one time to the :ref:`delete command <delete>`.
 
 
 1.30 (2022-01-04)
