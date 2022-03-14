@@ -676,7 +676,7 @@ class Settings:
         environ = {k: v for k, v in os.environ.items() if k.startswith("BORG_")}
         if "BORG_PASSPHRASE" in environ:
             environ["BORG_PASSPHRASE"] = "<redacted>"
-        executable = self.value("borg_executable", BORG)
+        executable = to_path(self.value("borg_executable", BORG))
         borg_opts = self.borg_options(cmd, borg_opts, emborg_opts, strip_prefix)
         command = [executable] + cmd.split() + borg_opts + args
         narrate("Borg-related environment variables:", render(environ))

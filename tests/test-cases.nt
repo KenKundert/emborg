@@ -29,10 +29,11 @@ emborg without configs:
             >     --no-log                          Do not create log file.
             >
             > Available commands:
-            >     borg              run a raw borg command.
+            >     borg              run a raw borg command
             >     breaklock, break-lock
-            >                       breaks the repository and cache locks.
+            >                       breaks the repository and cache locks
             >     check             checks the repository and its archives
+            >     compact           compact segment files in the repository
             >     compare           compare local files or directories to those in an archive
             >     configs           list available backup configurations
             >     create, backup    create an archive of the current files
@@ -52,7 +53,7 @@ emborg without configs:
             >     prune             prune the repository of excess archives
             >     restore           Restore the given files or directories in place
             >     settings, setting
-            >                       list settings of chosen configuration
+            >                       display settings of chosen configuration
             >     umount, unmount   un-mount a previously mounted repository or archive
             >     version           display emborg version
             >
@@ -74,6 +75,8 @@ emborg without configs:
             >         check_after_create: run check as the last step of an archive
             >                             creation
             >                colorscheme: the color scheme
+            >       compact_after_delete: run compact after deleting an archive or
+            >                             pruning a repository
             >                 config_dir: absolute path to configuration directory
             >                             (read-only)
             >                config_name: name of active configuration (set by program)
@@ -138,6 +141,7 @@ emborg without configs:
             >
             > Borg settings:
             >                append_only: create an append-only mode repository
+            >             chunker_params: specify the chunker parameters
             >                compression: compression algorithm
             >             exclude_caches: exclude directories that contain a
             >                             CACHEDIR.TAG file
@@ -162,8 +166,16 @@ emborg without configs:
             >                remote_path: name of borg executable on remote platform
             >           remote_ratelimit: set remote network upload rate limit in kiB/s
             >                             (default: 0=unlimited)
+            >                     sparse: detect sparse holes in input (supported only
+            >                             by fixed chunker)
+            >                  threshold: set minimum threshold in percent for saved
+            >                             space when compacting (default: 10)
             >                      umask: set umask to M (local and remote, default:
             >                             0077)
+            >              upload_buffer: set network upload buffer size in MiB
+            >                             (default: 0=no buffer)
+            >           upload_ratelimit: set rate limit in kiB/s, used when writing to
+            >                             a remote network (default: 0=unlimited)
 
     labor:
         args:
@@ -200,6 +212,8 @@ emborg with configs:
             >         check_after_create: run check as the last step of an archive
             >                             creation
             >                colorscheme: the color scheme
+            >       compact_after_delete: run compact after deleting an archive or
+            >                             pruning a repository
             >                 config_dir: absolute path to configuration directory
             >                             (read-only)
             >                config_name: name of active configuration (set by program)
@@ -264,6 +278,7 @@ emborg with configs:
             >
             > Borg settings:
             >                append_only: create an append-only mode repository
+            >             chunker_params: specify the chunker parameters
             >                compression: compression algorithm
             >             exclude_caches: exclude directories that contain a
             >                             CACHEDIR.TAG file
@@ -288,8 +303,16 @@ emborg with configs:
             >                remote_path: name of borg executable on remote platform
             >           remote_ratelimit: set remote network upload rate limit in kiB/s
             >                             (default: 0=unlimited)
+            >                     sparse: detect sparse holes in input (supported only
+            >                             by fixed chunker)
+            >                  threshold: set minimum threshold in percent for saved
+            >                             space when compacting (default: 10)
             >                      umask: set umask to M (local and remote, default:
             >                             0077)
+            >              upload_buffer: set network upload buffer size in MiB
+            >                             (default: 0=no buffer)
+            >           upload_ratelimit: set rate limit in kiB/s, used when writing to
+            >                             a remote network (default: 0=unlimited)
 
     weave:
         args: version

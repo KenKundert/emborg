@@ -77,6 +77,7 @@ EMBORG_SETTINGS = dict(
     patterns="patterns that indicate whether a path should be included or excluded",
     patterns_from="file that contains patterns",
     prune_after_create="run prune after creating an archive",
+    compact_after_delete="run compact after deleting an archive or pruning a repository",
     report_diffs_cmd="shell command to use to report differences in files and directories",
     repository="path to remote directory that contains repository",
     run_after_backup="commands to run after archive has been created",
@@ -98,61 +99,120 @@ EMBORG_SETTINGS = dict(
 
 # Borg settings {{{2
 BORG_SETTINGS = dict(
-    append_only=dict(cmds="init", desc="create an append-only mode repository"),
-    compression=dict(cmds="create", arg="COMPRESSION", desc="compression algorithm"),
-    exclude_caches=dict(
-        cmds="create", desc="exclude directories that contain a CACHEDIR.TAG file"
+    append_only = dict(
+        cmds = "init",
+        desc = "create an append-only mode repository"
     ),
-    exclude_nodump=dict(cmds="create", desc="exclude files flagged NODUMP"),
-    exclude_if_present=dict(
-        cmds="create",
-        arg="NAME",
-        desc="exclude directories that are tagged by containing a filesystem object with the given NAME",
+    chunker_params = dict(
+        cmds = "create",
+        arg = "PARAMS",
+        desc = "specify the chunker parameters"
     ),
-    lock_wait=dict(
-        cmds="all",
-        arg="SECONDS",
-        desc="wait at most SECONDS for acquiring a repository/cache lock (default: 1)",
+    compression = dict(
+        cmds = "create",
+        arg = "COMPRESSION",
+        desc = "compression algorithm"
     ),
-    keep_within=dict(
-        cmds="prune", arg="INTERVAL", desc="keep all archives within this time interval"
+    exclude_caches = dict(
+        cmds = "create",
+        desc = "exclude directories that contain a CACHEDIR.TAG file"
     ),
-    keep_last=dict(
-        cmds="prune", arg="NUM", desc="number of the most recent archives to keep"
+    exclude_nodump = dict(
+        cmds = "create",
+        desc = "exclude files flagged NODUMP"
     ),
-    keep_minutely=dict(
-        cmds="prune", arg="NUM", desc="number of minutely archives to keep"
+    exclude_if_present = dict(
+        cmds = "create",
+        arg = "NAME",
+        desc = "exclude directories that are tagged by containing a filesystem object with the given NAME",
     ),
-    keep_hourly=dict(cmds="prune", arg="NUM", desc="number of hourly archives to keep"),
-    keep_daily=dict(cmds="prune", arg="NUM", desc="number of daily archives to keep"),
-    keep_weekly=dict(cmds="prune", arg="NUM", desc="number of weekly archives to keep"),
-    keep_monthly=dict(
-        cmds="prune", arg="NUM", desc="number of monthly archives to keep"
+    lock_wait = dict(
+        cmds = "all",
+        arg = "SECONDS",
+        desc = "wait at most SECONDS for acquiring a repository/cache lock (default: 1)",
     ),
-    keep_yearly=dict(cmds="prune", arg="NUM", desc="number of yearly archives to keep"),
-    one_file_system=dict(
-        cmds="create",
-        desc="stay in the same file system and do not store mount points of other file systems",
+    keep_within = dict(
+        cmds = "prune",
+        arg = "INTERVAL",
+        desc = "keep all archives within this time interval"
     ),
-    remote_path=dict(
-        cmds="all", arg="CMD", desc="name of borg executable on remote platform",
+    keep_last = dict(
+        cmds = "prune",
+        arg = "NUM",
+        desc = "number of the most recent archives to keep"
     ),
-    remote_ratelimit=dict(
-        cmds="all",
-        arg="RATE",
-        desc="set remote network upload rate limit in kiB/s (default: 0=unlimited)",
+    keep_minutely = dict(
+        cmds = "prune",
+        arg = "NUM",
+        desc = "number of minutely archives to keep"
     ),
-    # repair = dict(
-    #    cmds = 'check',
-    #    desc = 'attempt to repair any inconsistencies found'
-    # ),
-    umask=dict(
-        cmds="all", arg="M", desc="set umask to M (local and remote, default: 0077)"
+    keep_hourly = dict(
+        cmds = "prune",
+        arg = "NUM",
+        desc = "number of hourly archives to keep"
     ),
-    prefix=dict(
-        cmds="check delete info list mount prune",
-        arg="PREFIX",
-        desc="only consider archive names starting with this prefix",
+    keep_daily = dict(
+        cmds = "prune",
+        arg = "NUM",
+        desc = "number of daily archives to keep"
+    ),
+    keep_weekly = dict(
+        cmds = "prune",
+        arg = "NUM",
+        desc = "number of weekly archives to keep"
+    ),
+    keep_monthly = dict(
+        cmds = "prune",
+        arg = "NUM",
+        desc = "number of monthly archives to keep"
+    ),
+    keep_yearly = dict(
+        cmds = "prune",
+        arg = "NUM",
+        desc = "number of yearly archives to keep"
+    ),
+    one_file_system = dict(
+        cmds = "create",
+        desc = "stay in the same file system and do not store mount points of other file systems",
+    ),
+    remote_path = dict(
+        cmds = "all",
+        arg = "CMD",
+        desc = "name of borg executable on remote platform",
+    ),
+    remote_ratelimit = dict(
+        cmds = "all",
+        arg = "RATE",
+        desc = "set remote network upload rate limit in kiB/s (default: 0=unlimited)",
+    ),
+    sparse = dict(
+        cmds = "create",
+        desc = "detect sparse holes in input (supported only by fixed chunker)"
+    ),
+    threshold = dict(
+        cmds = "compact",
+        arg = "PERCENT",
+        desc = "set minimum threshold in percent for saved space when compacting (default: 10)",
+    ),
+    umask = dict(
+        cmds = "all",
+        arg = "M",
+        desc = "set umask to M (local and remote, default: 0077)"
+    ),
+    upload_buffer = dict(
+        cmds = "all",
+        arg = "UPLOAD_BUFFER",
+        desc = "set network upload buffer size in MiB (default: 0=no buffer)",
+    ),
+    upload_ratelimit = dict(
+        cmds = "all",
+        arg = "RATE",
+        desc = "set rate limit in kiB/s, used when writing to a remote network (default: 0=unlimited)",
+    ),
+    prefix = dict(
+        cmds = "check delete info list mount prune",
+        arg = "PREFIX",
+        desc = "only consider archive names starting with this prefix",
     ),
 )
 
@@ -193,9 +253,9 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent(
     notify = '⟪your-email-address⟫'          # who to notify when things go wrong
     notifier = 'notify-send -u normal {prog_name} "{msg}"'
                                              # interactive notifier program
-    remote_ratelimit = 2000                  # bandwidth limit in kbps
     prune_after_create = True                # automatically run prune after a backup
     check_after_create = 'latest'            # automatically run check after a backup
+    compact_after_delete = True              # automatically run compact after a delete or prune
 
     # repository settings
     repository = '⟪host⟫:⟪path⟫/{host_name}-{user_name}-{config_name}'

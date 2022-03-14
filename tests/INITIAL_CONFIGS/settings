@@ -21,9 +21,9 @@ avendesora_account = '⟪account-name⟫'    # avendesora account holding passph
 notify = '⟪your-email-address⟫'          # who to notify when things go wrong
 notifier = 'notify-send -u normal {prog_name} "{msg}"'
                                          # interactive notifier program
-remote_ratelimit = 2000                  # bandwidth limit in kbps
 prune_after_create = True                # automatically run prune after a backup
 check_after_create = 'latest'            # automatically run check after a backup
+compact_after_delete = True              # automatically run compact after a delete or prune
 
 # repository settings
 repository = '⟪host⟫:⟪path⟫/{host_name}-{user_name}-{config_name}'

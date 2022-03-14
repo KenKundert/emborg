@@ -1155,6 +1155,14 @@ append_only
 Create an append-only mode repository.
 
 
+.. _chunker_params:
+
+chunker_params
+~~~~~~~~~~~~~~
+
+Parameters used by the chunker command.
+
+
 .. _compression:
 
 compression
@@ -1345,12 +1353,37 @@ remote_path
 Name of *Borg* executable on remote platform.
 
 
+.. _sparse:
+
+sparse
+~~~~~~~~~
+
+Detect sparse holes in input (supported only by fixed chunker).
+
+Requires *Borg* version 1.2 or newer.
+
+
+.. _threshold:
+
+threshold
+~~~~~~~~~
+
+Sets minimum threshold for saved space when compacting a repository with the 
+:ref:`compact command <compact>`.  Value is given in percent.
+
+Requires *Borg* version 1.2 or newer.
+
+
 .. _remote_ratelimit:
 
 remote_ratelimit
 ~~~~~~~~~~~~~~~~
 
 Set remote network upload rate limit in KiB/s (default: 0=unlimited).
+
+*Borg* has deprecated *remote_ratelimit* in version 1.2.  If you are seeing this 
+warning, you should rename *remote_ratelimit* to *upload_ratelimit* in your 
+*Emborg* settings file.
 
 
 .. _umask:
@@ -1360,6 +1393,27 @@ umask
 
 Set umask. This is passed to *Borg*. It uses it when creating files, either 
 local or remote. The default is 0o077.
+
+
+.. _upload_buffer:
+
+upload_buffer
+~~~~~~~~~~~~~
+
+Set network upload buffer size in MiB.  By default no buffer is used.  Requires 
+*Borg* version 1.2 or newer.
+
+
+.. _upload_ratelimit:
+
+upload_ratelimit
+~~~~~~~~~~~~~~~~
+
+Set upload rate limit in KiB/s when writing to a remote network (default: 
+0=unlimited).
+
+Use *upload_ratelimit* when using *Borg* version 1.2 or higher, otherwise use 
+*remote_ratelimit*.
 
 
 .. _working_dir:

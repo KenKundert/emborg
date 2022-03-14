@@ -287,7 +287,7 @@ class Command:
 # BorgCommand command {{{1
 class BorgCommand(Command):
     NAMES = "borg".split()
-    DESCRIPTION = "run a raw borg command."
+    DESCRIPTION = "run a raw borg command"
     USAGE = dedent(
         """
         Usage:
@@ -317,7 +317,7 @@ class BorgCommand(Command):
 # BreakLockCommand command {{{1
 class BreakLockCommand(Command):
     NAMES = "breaklock break-lock".split()
-    DESCRIPTION = "breaks the repository and cache locks."
+    DESCRIPTION = "breaks the repository and cache locks"
     USAGE = dedent(
         """
         Usage:
@@ -397,6 +397,55 @@ class CheckCommand(Command):
             args = verify + repair + [settings.destination(archive)],
             emborg_opts = options,
             strip_prefix = include_external_archives,
+        )
+        out = borg.stdout
+        if out:
+            output(out.rstrip())
+
+        return borg.status
+
+
+# CompactCommand command {{{1
+class CompactCommand(Command):
+    NAMES = "compact".split()
+    DESCRIPTION = "compact segment files in the repository"
+    USAGE = dedent(
+        """
+        Usage:
+            emborg compact [options]
+
+        Options:
+            -p, --progress        shows Borg progress
+
+        This command frees repository space by compacting segments.
+
+        Use this regularly to avoid running out of space, however you do not
+        need to it after each after each Borg command. It is especially useful
+        after deleting archives, because only compaction will really free
+        repository space.
+
+        Requires Borg version 1.2 or newer.
+        """
+    ).strip()
+    REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = True
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        borg_opts = []
+        if cmdline["--progress"] or settings.show_progress:
+            borg_opts.append("--progress")
+
+        # run borg
+        borg = settings.run_borg(
+            cmd = "compact",
+            borg_opts = borg_opts,
+            args = [settings.destination()],
+            emborg_opts = options,
+            show_borg_output = bool(borg_opts),
         )
         out = borg.stdout
         if out:
@@ -699,6 +748,7 @@ class CreateCommand(Command):
             else:
                 check_status = 0
 
+            # prune the repository if requested
             activity = "pruning"
             if settings.prune_after_create:
                 announce("Pruning archives ...")
@@ -727,6 +777,7 @@ class DeleteCommand(Command):
             emborg delete [options] [<archive>...]
 
         Options:
+            -f, --fast     skip compacting
             -r, --repo     delete entire repository
             -s, --stats    show Borg statistics
             --cache-only   delete only the local cache for the given repository
@@ -772,8 +823,29 @@ class DeleteCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+        delete_status = borg.status
 
-        return borg.status
+        if cmdline["--fast"]:
+            return delete_status
+
+        try:
+            # compact the repository if requested
+            if settings.compact_after_delete:
+                narrate("Compacting repository ...")
+                compact = CompactCommand()
+                compact_status = compact.run("compact", args, settings, options)
+            else:
+                compact_status = 0
+
+        except Error as e:
+            e.reraise(
+                codicil = (
+                    f"This error occurred while compacting the repository.",
+                    "No error was reported while deleting the archive.",
+                )
+            )
+
+        return max([delete_status, compact_status])
 
 
 # DiffCommand command {{{1
@@ -1643,6 +1715,7 @@ class PruneCommand(Command):
         Options:
             -e, --include-external   prune all archives in repository, not just
                                      those associated with this configuration
+            -f, --fast               skip compacting
             -l, --list               show fate of each archive
             -s, --stats              show Borg statistics
         """
@@ -1661,6 +1734,7 @@ class PruneCommand(Command):
             borg_opts.append("--stats")
         if cmdline["--list"]:
             borg_opts.append("--list")
+        fast = cmdline["--fast"]
 
         # checking the settings
         intervals = "within last minutely hourly daily weekly monthly yearly"
@@ -1685,8 +1759,29 @@ class PruneCommand(Command):
         out = borg.stdout
         if out:
             output(out.rstrip())
+        prune_status = borg.status
 
-        return borg.status
+        if cmdline["--fast"]:
+            return prune_status
+
+        try:
+            # compact the repository if requested
+            if settings.compact_after_delete:
+                narrate("Compacting repository ...")
+                compact = CompactCommand()
+                compact_status = compact.run("compact", args, settings, options)
+            else:
+                compact_status = 0
+
+        except Error as e:
+            e.reraise(
+                codicil = (
+                    f"This error occurred while compacting the repository.",
+                    "No error was reported while pruning the repository.",
+                )
+            )
+
+        return max([prune_status, compact_status])
 
 
 # RestoreCommand command {{{1
@@ -1776,7 +1871,7 @@ class RestoreCommand(Command):
 # SettingsCommand command {{{1
 class SettingsCommand(Command):
     NAMES = "settings setting".split()
-    DESCRIPTION = "list settings of chosen configuration"
+    DESCRIPTION = "display settings of chosen configuration"
     USAGE = dedent(
         """
         Usage:
@@ -1784,7 +1879,11 @@ class SettingsCommand(Command):
             emborg setting [options] [<name>]
 
         Options:
-            -a, --available   list available settings
+            -a, --available   list available settings and give their
+                              descriptions rather than their values
+
+        If given without an argument all specified settings of a config are
+        listed and their values displayed.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = False
