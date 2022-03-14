@@ -420,9 +420,9 @@ class CompactCommand(Command):
         This command frees repository space by compacting segments.
 
         Use this regularly to avoid running out of space, however you do not
-        need to it after each after each Borg command. It is especially useful
-        after deleting archives, because only compaction will really free
-        repository space.
+        need to it after each Borg command. It is especially useful after
+        deleting archives, because only compaction will really free repository
+        space.
 
         Requires Borg version 1.2 or newer.
         """

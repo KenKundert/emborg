@@ -1163,6 +1163,15 @@ chunker_params
 Parameters used by the chunker command.
 
 
+.. _compact_after_delete:
+
+compact_after_delete
+~~~~~~~~~~~~~~~~~~~~
+
+If True, the :ref:`compact command <compact>` is run after deleting an archive 
+or pruning a repository.
+
+
 .. _compression:
 
 compression

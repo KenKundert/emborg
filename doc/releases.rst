@@ -7,14 +7,11 @@ Latest development release
 | Released: 2022-03-13
 
 - Enhanced *Emborg* to support new Borg 1.2 features.
+
   - Added :ref:`compact command <compact>`
-  - Added
-    :ref:`chunker_params`,
-    :ref:`sparse`,
-    :ref:`sparse`,
-    :ref:`threshold`,
-    :ref:`upload_ratelimit`,
-    :ref:`upload_buffer` settings.
+  - Added :ref:`chunker_params`, :ref:`sparse`, :ref:`sparse`, :ref:`threshold`,
+    :ref:`upload_ratelimit`, :ref:`upload_buffer` settings.
+
 - Added the :ref:`run_before_borg and run_after_borg <run_before_borg>` 
   settings.
 - Added the ``--cache-only`` option and the ability to delete multiple archives 

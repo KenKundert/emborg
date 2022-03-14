@@ -23,9 +23,10 @@ or:
 
 The available commands are:
 
-    :borg:       :ref:`run a raw borg command. <borg>`
-    :breaklock:  :ref:`breaks the repository and cache locks. <breaklock>`
+    :borg:       :ref:`run a raw borg command <borg>`
+    :breaklock:  :ref:`breaks the repository and cache locks <breaklock>`
     :check:      :ref:`checks the repository and its archives <check>`
+    :compact:    :ref:`compact segment files in the repository <compact>`
     :compare:    :ref:`compare local files with those in an archive <compare>`
     :configs:    :ref:`list available backup configurations <configs>`
     :create:     :ref:`create an archive of the current files <create>`
@@ -107,9 +108,28 @@ Check the integrity of the repository and its archives.  The most recently
 created archive is checked if one is not specified unless ``--all`` is given, in 
 which case all archives are checked.
 
-The ``--repair`` option will attempt to repair any damage found. Be aware that 
-this is considered an *experimental* feature in *Borg* and so carries extra risk 
-due to its immaturity.
+The ``--repair`` option attempts to repair any damage found. Be aware that this 
+is considered an *experimental* feature in *Borg* and so carries extra risk due 
+to its immaturity.
+
+
+.. _compact:
+
+Compact
+-------
+
+This command frees repository space by compacting segments.
+
+Use this regularly to avoid running out of space, however you do not need to it 
+after each *Borg* command. It is especially useful after deleting archives, 
+because only compaction really frees repository space.
+
+Requires Borg version 1.2 or newer.  Prior to version 1.2 the compact 
+functionality was part of the *Borg* *prune* command.  As of version 1.2 this 
+functionality was split into its own command.
+
+If you set :ref:`compact_after_delete` *Emborg* automatically runs this command 
+after every use of the :ref:`delete <delete>` and :ref:`prune <prune>` commands.
 
 
 .. _compare:
