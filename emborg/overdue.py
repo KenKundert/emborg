@@ -185,7 +185,7 @@ def main():
                 delta = now - mtime
                 age = 24 * delta.days + delta.seconds / 3600
                 report = age > max_age
-                overdue = ' -- overdue' if report else ''
+                overdue = ' — overdue' if report else ''
                 color = fails if report else passes
                 if report or not cmdline["--no-passes"]:
                     display(color(fmt(overdue_message)))
