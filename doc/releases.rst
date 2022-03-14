@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.30.2
-| Released: 2022-02-15
+| Version: 1.30.3
+| Released: 2022-03-13
 
 - Enhanced *Emborg* to support new Borg 1.2 features.
   - Added :ref:`compact command <compact>`
