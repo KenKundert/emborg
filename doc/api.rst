@@ -111,7 +111,7 @@ to use the *Emborg* API.
 
 
 Example
-=======
+-------
 
 A command that queries one or more configs and prints the total size of its 
 archives.  This example is a simplified version of the *Emborg* accessory 

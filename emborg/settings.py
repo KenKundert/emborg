@@ -544,12 +544,12 @@ class Settings:
                     warn(
                         dedent(
                             f"""
-                            you should use 'borg key export' to export the
+                            you should use “borg key export” to export the
                             encryption key, and then keep that key in a safe
-                            place.  You can do this with emborg using 'emborg
+                            place.  You can do this with emborg using “emborg
                             --config {self.config_name} borg key export @repo
-                            ⟪/.../outfile⟫'.  If you lose the key you will lose
-                            access to, your backups.
+                            ❬/.../out-file❭”.  If you lose this key you lose
+                            access to your backups.
                             """
                         ).strip(),
                         wrap=True,
