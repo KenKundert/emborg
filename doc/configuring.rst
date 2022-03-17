@@ -1081,12 +1081,6 @@ unmount a remote repository, if such a thing is needed.
 May be specified as a list of strings or as a multi-line string with one command 
 per line (lines that begin with ``#`` are ignored).
 
-Of all the *run_before_* and *run_after_* settings, only *run_after_borg* may 
-contain *Emborg* commands.  The reason being is that *Emborg* sets a lock file 
-while running and that lock file is not removed until just before the 
-*run_after_borg* commands are run.  Thus, if you wish to automatically run 
-`borg-space <https://github.com/KenKundert/borg-space>`_ to record the size of 
-your backups over time, you should include the command in *run_after_borg*.
 
 .. _show_progress:
 

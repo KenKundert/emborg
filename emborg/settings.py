@@ -94,7 +94,7 @@ fullhostname = getfullhostname()
 username = getusername()
 
 
-# borg_options_arg_count {{{1
+# borg_options_arg_count {{{2
 borg_options_arg_count = {
     "borg": 1,
     "--exclude": 1,
@@ -108,7 +108,7 @@ for name, attrs in BORG_SETTINGS.items():
         borg_options_arg_count[convert_name_to_option(name)] = 1
 
 
-# ConfigQueue {{{2
+# ConfigQueue {{{1
 class ConfigQueue:
     def __init__(self, command=None):
         self.uninitialized = True
@@ -200,7 +200,7 @@ class ConfigQueue:
 # Settings class {{{1
 class Settings:
     # Constructor {{{2
-    def __init__(self, config=None, emborg_opts=(), _queue=None):
+    def __init__(self, config=None, emborg_opts=(), **kwargs):
         self.settings = dict()
         self.do_not_expand = ()
         self.emborg_opts = emborg_opts
@@ -210,7 +210,7 @@ class Settings:
         # logfile for this config
         get_informer().set_logfile(LoggingCache())
         self.config_dir = to_path(CONFIG_DIR)
-        self.read_config(name=config, queue=_queue)
+        self.read_config(name=config, **kwargs)
         self.check()
         set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)
         self.hooks = Hooks(self)
@@ -227,7 +227,7 @@ class Settings:
                 warn(f'unknown colorscheme: {self.colorscheme}.')
 
     # read_config() {{{2
-    def read_config(self, name=None, path=None, queue=None):
+    def read_config(self, name=None, path=None, **kwargs):
         """Recursively read configuration files.
 
         name (str):
@@ -282,6 +282,7 @@ class Settings:
             settings = path.run()
 
             # initialize the config queue
+            queue = kwargs.get('queue')
             if not queue:
                 # this is a request through the API
                 queue = ConfigQueue()
@@ -291,6 +292,8 @@ class Settings:
             self.configs = queue.configs
             self.log_command = queue.log_command
             self.requires_exclusivity = queue.requires_exclusivity
+            if 'exclusive' in kwargs:
+                self.requires_exclusivity = kwargs['exclusive']
 
             # save config name
             settings["config_name"] = config

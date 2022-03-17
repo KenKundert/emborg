@@ -106,7 +106,7 @@ def main():
 
             queue = ConfigQueue(cmd)
             while queue:
-                with Settings(config, emborg_opts, queue) as settings:
+                with Settings(config, emborg_opts, queue=queue) as settings:
                     try:
                         exit_status = cmd.execute(
                             cmd_name, args, settings, emborg_opts
