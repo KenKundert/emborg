@@ -290,6 +290,7 @@ class Settings:
             config = queue.get_active_config()
             self.configs = queue.configs
             self.log_command = queue.log_command
+            self.requires_exclusivity = queue.requires_exclusivity
 
             # save config name
             settings["config_name"] = config
@@ -888,12 +889,14 @@ class Settings:
         self.data_dir = data_dir
 
         # perform locking
-        lockfile = self.lockfile = data_dir / self.resolve(LOCK_FILE)
         if self.requires_exclusivity:
+            lockfile = self.lockfile = data_dir / self.resolve(LOCK_FILE)
+
             # check for existence of lockfile
             if lockfile.exists():
                 report = True
                 try:
+                    # check to see if the process is still running
                     lock_contents = lockfile.read_text()
                     pid = None
                     for l in lock_contents.splitlines():
@@ -901,7 +904,7 @@ class Settings:
                         if name.strip().lower() == "pid":
                             pid = int(value.strip())
                     assert pid > 0
-                    os.kill(pid, 0)
+                    os.kill(pid, 0)     # does not actually kill the process
                 except ProcessLookupError as e:
                     if e.errno == errno.ESRCH:
                         report = False  # process no longer exists
