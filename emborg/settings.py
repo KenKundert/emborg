@@ -944,10 +944,10 @@ class Settings:
     # exit {{{2
     def __exit__(self, exc_type, exc_val, exc_tb):
 
-        # run the run_after_borg commands
-        if self.borg_ran:
-            self.run_user_commands('run_after_borg')
-
         # delete lockfile
         if self.requires_exclusivity:
             self.lockfile.unlink()
+
+        # run the run_after_borg commands
+        if self.borg_ran:
+            self.run_user_commands('run_after_borg')

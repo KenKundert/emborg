@@ -86,7 +86,7 @@ mail_overdue_message = dedent(
     f"""
     Backup of {{host}} is overdue:
        from: {username}@{hostname} at {now}
-       message: the backup sentinel file has not changed in {{age:0.0f}} hours.
+       message: the backup sentinel file has not changed in {{age:0.1f}} hours.
        sentinel file: {{path!s}}
     """
 ).strip()
