@@ -892,9 +892,11 @@ class Settings:
         self.data_dir = data_dir
 
         # perform locking
-        if self.requires_exclusivity:
-            lockfile = self.lockfile = data_dir / self.resolve(LOCK_FILE)
+        lockfile = self.lockfile = data_dir / self.resolve(LOCK_FILE)
+            # This must be outside if statement because of breaklock command.
+            # It want to remove lock file even though it does not require exclusivity.
 
+        if self.requires_exclusivity:
             # check for existence of lockfile
             if lockfile.exists():
                 report = True
