@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.30.5
-| Released: 2022-03-17
+| Version: 1.30.6
+| Released: 2022-03-21
 
 - Enhanced *Emborg* to support new Borg 1.2 features.
 
