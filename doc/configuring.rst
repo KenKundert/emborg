@@ -1161,6 +1161,8 @@ chunker_params
 ~~~~~~~~~~~~~~
 
 Parameters used by the chunker command.
+More information is available from `chunker_params 
+<https://borgbackup.readthedocs.io/en/stable/usage/notes.html#chunker-params>`.
 
 
 .. _compact_after_delete:
