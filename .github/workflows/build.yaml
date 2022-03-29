@@ -32,7 +32,7 @@ jobs:
           pip install tox
           pip install coveralls
       - name: Run tests
-        run:
+        run: |
           echo $MISSING_DEPENDENCIES
           tox
       - name: Report test coverage
