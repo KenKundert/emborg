@@ -714,9 +714,9 @@ emborg with configs:
             >       66 tests/configs/test2excludes
             >       82 tests/configs/test6patterns
             >       87 tests/configs/test7
-            >      105 tests/configs/test9
             >      111 tests/configs/test7patterns
             >      132 tests/configs/test6
+            >      133 tests/configs/test9
             >      182 tests/configs/test8
             >      191 tests/configs/test5
             >      526 tests/configs/test0
@@ -979,9 +979,9 @@ emborg with configs:
             >       66 tests/configs/test2excludes
             >       82 tests/configs/test6patterns
             >       87 tests/configs/test7
-            >      105 tests/configs/test9
             >      111 tests/configs/test7patterns
             >      132 tests/configs/test6
+            >      133 tests/configs/test9
             >      182 tests/configs/test8
             >      191 tests/configs/test5
             >      526 tests/configs/test0

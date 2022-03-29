@@ -6,3 +6,4 @@ patterns = '''
     - ~/**/.*.swp
     - **/.*.swo
 '''
+compact_after_delete = True
