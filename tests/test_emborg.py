@@ -213,7 +213,7 @@ def test_emborg_without_configs(
     name, args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
     print(f"MISSING_DEPENDENCIES = {', '.join(missing_dependencies)}")
-    print(f"Test dependencies = {', '.join(pendencies)}")
+    print(f"Test dependencies = {', '.join(dependencies)}")
     if skip_test(dependencies):
         print(f"Skipping test {name}")
         return
