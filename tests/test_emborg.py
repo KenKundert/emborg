@@ -212,8 +212,12 @@ def test_emborg_without_configs(
     initialize,
     name, args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
+    print(f"MISSING_DEPENDENCIES = {', '.join(missing_dependencies)}"
+    print(f"Test dependencies = {', '.join(pendencies)}"
     if skip_test(dependencies):
+        print(f"Skipping test {name}")
         return
+    print(f"Running test {name}")
     with cd(tests_dir):
         tester = EmborgTester(args, expected, expected_type, cmp_dirs, remove)
         passes = tester.run()
