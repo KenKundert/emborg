@@ -25,7 +25,11 @@ jobs:
       - name: Install Borg
         run:
           sudo apt install borgbackup
+      - name: Dependencies
+        run:
           echo $MISSING_DEPENDENCIES
+      - name: Borg Version
+        run:
           borg --version
       - name: Install packages
         run:
