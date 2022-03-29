@@ -1,7 +1,12 @@
-# Tesr Emborg
+# Test Emborg
 #
-# These tests require BorgBackup to be available.  As such, they are not really
-# suitable for public continuous integration services such as GitHub Actions.
+# These tests require BorgBackup to be available.
+# You can set MISSING_DEPENDENCIES environment turn off tests that depend on
+# features you do not have.  Currently there are two such features, “fuse” and
+# “borg1.2”.  Simply list each dependency you do not have in this variable
+# separated by spaces.  For example:
+#
+#     export MISSING_DEPENDENCIES="fuse borg1.2"
 
 # Imports {{{1
 import arrow

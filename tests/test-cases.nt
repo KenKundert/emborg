@@ -332,6 +332,7 @@ emborg with configs:
             >     test6
             >     test7
             >     test8
+            >     test9
             >     tests=test0,test1,test2,test3
             >
             > Default Configuration:
@@ -346,7 +347,7 @@ emborg with configs:
             >              config_dir: '/⟪EMBORG⟫/tests/.config/emborg'
             >             config_name: 'test0'
             >          configurations: """
-            >                              test0 test1 test2 test3 test4 test5 test6 test7 test8
+            >                              test0 test1 test2 test3 test4 test5 test6 test7 test8 test9
             >                              tests=test0,test1,test2,test3
             >                          """
             >   default_configuration: 'tests'
@@ -481,6 +482,7 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test7
             > ⟪EMBORG⟫/tests/configs/test7patterns
             > ⟪EMBORG⟫/tests/configs/test8
+            > ⟪EMBORG⟫/tests/configs/test9
         expected_type: regex
 
     shiver:
@@ -502,6 +504,7 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test7
             > ⟪EMBORG⟫/tests/configs/test7patterns
             > ⟪EMBORG⟫/tests/configs/test8
+            > ⟪EMBORG⟫/tests/configs/test9
         expected_type: regex
 
     whiplash:
@@ -640,7 +643,7 @@ emborg with configs:
             > run_before_borg on test0
             > run_after_borg on test0
         dependencies: fuse
-            # if this test fails with 'EMBORG: Mountpoint must be a writable', 
+            # if this test fails with “EMBORG: Mountpoint must be a writable”,
             # it is because EMBORG is still mounted from a previous run.
 
     whitewash:
@@ -711,6 +714,7 @@ emborg with configs:
             >       66 tests/configs/test2excludes
             >       82 tests/configs/test6patterns
             >       87 tests/configs/test7
+            >      105 tests/configs/test9
             >      111 tests/configs/test7patterns
             >      132 tests/configs/test6
             >      182 tests/configs/test8
@@ -718,7 +722,7 @@ emborg with configs:
             >      526 tests/configs/test0
             >      556 tests/configs/overdue.conf
             >      559 tests/configs/test2
-            >      594 tests/configs/settings
+            >      600 tests/configs/settings
             >      612 tests/configs/test1
             >      671 tests/configs/test3
             >      965 tests/configs/test4
@@ -869,6 +873,7 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test7
             > ⟪EMBORG⟫/tests/configs/test7patterns
             > ⟪EMBORG⟫/tests/configs/test8
+            > ⟪EMBORG⟫/tests/configs/test9
         expected_type: regex
 
     bobbin:
@@ -881,24 +886,25 @@ emborg with configs:
         args: --quiet --config test5 extract /⟪EMBORG⟫/tests/configs
         expected:
             > ⟪EMBORG⟫/tests/configs
-            > ⟪EMBORG⟫/tests/configs/test6patterns
-            > ⟪EMBORG⟫/tests/configs/test2excludes
-            > ⟪EMBORG⟫/tests/configs/test2
-            > ⟪EMBORG⟫/tests/configs/test2passphrase
-            > ⟪EMBORG⟫/tests/configs/test7patterns
             > ⟪EMBORG⟫/tests/configs/overdue.conf
-            > ⟪EMBORG⟫/tests/configs/test3
             > ⟪EMBORG⟫/tests/configs/README
             > ⟪EMBORG⟫/tests/configs/settings
-            > ⟪EMBORG⟫/tests/configs/test6
-            > ⟪EMBORG⟫/tests/configs/test7
-            > ⟪EMBORG⟫/tests/configs/test8
-            > ⟪EMBORG⟫/tests/configs/test0
-            > ⟪EMBORG⟫/tests/configs/test5
-            > ⟪EMBORG⟫/tests/configs/test1
-            > ⟪EMBORG⟫/tests/configs/test4
             > ⟪EMBORG⟫/tests/configs/subdir
             > ⟪EMBORG⟫/tests/configs/subdir/file
+            > ⟪EMBORG⟫/tests/configs/test0
+            > ⟪EMBORG⟫/tests/configs/test1
+            > ⟪EMBORG⟫/tests/configs/test2
+            > ⟪EMBORG⟫/tests/configs/test2excludes
+            > ⟪EMBORG⟫/tests/configs/test2passphrase
+            > ⟪EMBORG⟫/tests/configs/test3
+            > ⟪EMBORG⟫/tests/configs/test4
+            > ⟪EMBORG⟫/tests/configs/test5
+            > ⟪EMBORG⟫/tests/configs/test6
+            > ⟪EMBORG⟫/tests/configs/test6patterns
+            > ⟪EMBORG⟫/tests/configs/test7
+            > ⟪EMBORG⟫/tests/configs/test7patterns
+            > ⟪EMBORG⟫/tests/configs/test8
+            > ⟪EMBORG⟫/tests/configs/test9
         expected_type: sort-lines
         cmp_dirs: ⟪EMBORG⟫/tests/configs configs
 
@@ -907,24 +913,25 @@ emborg with configs:
         args: --quiet --config test5 restore configs
         expected:
             > ⟪EMBORG⟫/tests/configs
-            > ⟪EMBORG⟫/tests/configs/test6patterns
-            > ⟪EMBORG⟫/tests/configs/test2excludes
-            > ⟪EMBORG⟫/tests/configs/test2
-            > ⟪EMBORG⟫/tests/configs/test2passphrase
-            > ⟪EMBORG⟫/tests/configs/test7patterns
             > ⟪EMBORG⟫/tests/configs/overdue.conf
-            > ⟪EMBORG⟫/tests/configs/test3
             > ⟪EMBORG⟫/tests/configs/README
             > ⟪EMBORG⟫/tests/configs/settings
-            > ⟪EMBORG⟫/tests/configs/test6
-            > ⟪EMBORG⟫/tests/configs/test7
-            > ⟪EMBORG⟫/tests/configs/test8
-            > ⟪EMBORG⟫/tests/configs/test0
-            > ⟪EMBORG⟫/tests/configs/test5
-            > ⟪EMBORG⟫/tests/configs/test1
-            > ⟪EMBORG⟫/tests/configs/test4
             > ⟪EMBORG⟫/tests/configs/subdir
             > ⟪EMBORG⟫/tests/configs/subdir/file
+            > ⟪EMBORG⟫/tests/configs/test0
+            > ⟪EMBORG⟫/tests/configs/test1
+            > ⟪EMBORG⟫/tests/configs/test2
+            > ⟪EMBORG⟫/tests/configs/test2excludes
+            > ⟪EMBORG⟫/tests/configs/test2passphrase
+            > ⟪EMBORG⟫/tests/configs/test3
+            > ⟪EMBORG⟫/tests/configs/test4
+            > ⟪EMBORG⟫/tests/configs/test5
+            > ⟪EMBORG⟫/tests/configs/test6
+            > ⟪EMBORG⟫/tests/configs/test6patterns
+            > ⟪EMBORG⟫/tests/configs/test7
+            > ⟪EMBORG⟫/tests/configs/test7patterns
+            > ⟪EMBORG⟫/tests/configs/test8
+            > ⟪EMBORG⟫/tests/configs/test9
         expected_type: sort-lines
         cmp_dirs: CONFIGS configs
 
@@ -972,6 +979,7 @@ emborg with configs:
             >       66 tests/configs/test2excludes
             >       82 tests/configs/test6patterns
             >       87 tests/configs/test7
+            >      105 tests/configs/test9
             >      111 tests/configs/test7patterns
             >      132 tests/configs/test6
             >      182 tests/configs/test8
@@ -979,7 +987,7 @@ emborg with configs:
             >      526 tests/configs/test0
             >      556 tests/configs/overdue.conf
             >      559 tests/configs/test2
-            >      594 tests/configs/settings
+            >      600 tests/configs/settings
             >      612 tests/configs/test1
             >      671 tests/configs/test3
             >      965 tests/configs/test4
@@ -1224,6 +1232,22 @@ emborg with configs:
         args: --quiet --config test8 borg list --prefix test8- --short @repo
         expected: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
+
+    panther:
+        args: --quiet --config test9 create
+        dependencies: borg1.2
+
+    archivist:
+        args: --quiet --config test9 compact
+        dependencies: borg1.2
+
+    planet:
+        args: --quiet --config test9 prune
+        dependencies: borg1.2
+
+    gable:
+        args: --quiet --config test9 delete
+        dependencies: borg1.2
 
     close:
         # this is needed for the API tests

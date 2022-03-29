@@ -1,0 +1,8 @@
+patterns = '''
+    R ~
+    + ~/configs
+    - ~
+    - fm:*/.viminfo
+    - ~/**/.*.swp
+    - **/.*.swo
+'''

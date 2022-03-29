@@ -833,14 +833,14 @@ class DeleteCommand(Command):
             if settings.compact_after_delete:
                 narrate("Compacting repository ...")
                 compact = CompactCommand()
-                compact_status = compact.run("compact", args, settings, options)
+                compact_status = compact.run("compact", [], settings, options)
             else:
                 compact_status = 0
 
         except Error as e:
             e.reraise(
                 codicil = (
-                    f"This error occurred while compacting the repository.",
+                    "This error occurred while compacting the repository.",
                     "No error was reported while deleting the archive.",
                 )
             )
@@ -1769,14 +1769,14 @@ class PruneCommand(Command):
             if settings.compact_after_delete:
                 narrate("Compacting repository ...")
                 compact = CompactCommand()
-                compact_status = compact.run("compact", args, settings, options)
+                compact_status = compact.run("compact", [], settings, options)
             else:
                 compact_status = 0
 
         except Error as e:
             e.reraise(
                 codicil = (
-                    f"This error occurred while compacting the repository.",
+                    "This error occurred while compacting the repository.",
                     "No error was reported while pruning the repository.",
                 )
             )
