@@ -29,6 +29,8 @@ jobs:
           pip install tox
           pip install coveralls
       - name: Run tests
+        env:
+          MISSING_DEPENDENCIES: borg1.2
         run: tox
       - name: Report test coverage
         env:
