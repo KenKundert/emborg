@@ -1161,7 +1161,7 @@ chunker_params
 ~~~~~~~~~~~~~~
 
 Parameters used by the chunker command.
-More information is available from `chunker_params 
+More information is available from `chunker_params Borg documentation
 <https://borgbackup.readthedocs.io/en/stable/usage/notes.html#chunker-params>`_.
 
 
