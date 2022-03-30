@@ -6,18 +6,20 @@ Latest development release
 | Version: 1.31.0
 | Released: 2022-03-21
 
+- Fixed issues associated with :ref:`compact_after_delete` setting.
+
 
 1.31 (2022-03-21)
 -----------------
 - Enhanced *Emborg* to support new Borg 1.2 features.
 
   - Added :ref:`compact command <compact>`
-  - Added :ref:`chunker_params`, :ref:`sparse`, :ref:`threshold`,
-    :ref:`upload_ratelimit`, :ref:`upload_buffer` settings.
+  - Added :ref:`compact_after_delete`, :ref:`chunker_params`, :ref:`sparse`,
+    :ref:`threshold`, :ref:`upload_ratelimit`, :ref:`upload_buffer` settings.
 
-- Added the :ref:`run_before_borg and run_after_borg <run_before_borg>` 
+- Added the :ref:`run_before_borg and run_after_borg <run_before_borg>`
   settings.
-- Added the ``--cache-only`` option and the ability to delete multiple archives 
+- Added the ``--cache-only`` option and the ability to delete multiple archives
   at one time to the :ref:`delete command <delete>`.
 
 
@@ -28,9 +30,9 @@ Latest development release
 
 1.29 (2021-12-18)
 -----------------
-- Do not signal failure to hooks if Borg completes normally, even if there were 
+- Do not signal failure to hooks if Borg completes normally, even if there were
   warnings.
-- Return an exit status of 1 if *Emborg* runs to completion but with exceptions, 
+- Return an exit status of 1 if *Emborg* runs to completion but with exceptions,
   and 2 if it cannot complete normally due to a error or errors.
 
 
@@ -49,8 +51,8 @@ Latest development release
 1.27 (2021-09-21)
 -----------------
 - Improve the logging for composite configurations.
-- Add support for `Borg-Space <https://github.com/KenKundert/borg-space>`_, 
-  a utility that allows you to track and plot disk space usage for your *Borg* 
+- Add support for `Borg-Space <https://github.com/KenKundert/borg-space>`_,
+  a utility that allows you to track and plot disk space usage for your *Borg*
   repositories over time.
 
 
@@ -65,14 +67,14 @@ Latest development release
 - Added the :ref:`compare command <compare>`.
 - Added the :ref:`manage_diffs_cmd` and :ref:`report_diffs_cmd` settings.
 - Added the
-  :ref:`run_before_first_backup <run_before_first_backup>` and 
+  :ref:`run_before_first_backup <run_before_first_backup>` and
   :ref:`run_after_last_backup <run_after_last_backup>` settings.
-- Allow files listed by :ref:`manifest <manifest>` command to be constrained to 
+- Allow files listed by :ref:`manifest <manifest>` command to be constrained to
   those contained within a path.
 - Allow relative dates to be specified on the :ref:`extract <extract>`,
-  :ref:`manifest <manifest>`, :ref:`mount <mount>` and :ref:`restore <restore>` 
+  :ref:`manifest <manifest>`, :ref:`mount <mount>` and :ref:`restore <restore>`
   commands.
-- Allow *BORG_PASSPHRASE*, *BORG_PASSPHRASE_FD*, or *BORG_PASSCOMMAND* to 
+- Allow *BORG_PASSPHRASE*, *BORG_PASSPHRASE_FD*, or *BORG_PASSCOMMAND* to
   dominate over *Emborg* passphrase settings.
 
 
@@ -88,23 +90,23 @@ Latest development release
 
 1.22 (2021-06-21)
 -----------------
-- Added support for `healthchecks.io <https://healthchecks.io>`_ monitoring 
+- Added support for `healthchecks.io <https://healthchecks.io>`_ monitoring
   service.
 - Added support for `cronhub.io <https://cronhub.io>`_ monitoring service.
 
 
 1.21 (2021-03-11)
 -----------------
-- Made extensive changes to :ref:`manifest <manifest>` command to make it more 
+- Made extensive changes to :ref:`manifest <manifest>` command to make it more
   flexible
 
-    - colorized the output based on file health (green implies healthy, red 
+    - colorized the output based on file health (green implies healthy, red
       implies unhealthy)
-    - added ``--no-color`` option to :ref:`manifest <manifest>` to suppress 
+    - added ``--no-color`` option to :ref:`manifest <manifest>` to suppress
       colorization
     - added :ref:`colorscheme` setting.
     - added :ref:`manifest_default_format` setting.
-    - added support for *Borg* *list* command field names for both reporting 
+    - added support for *Borg* *list* command field names for both reporting
       and sorting.
     - added *Emborg* variants to some of the *Borg* field names.
     - added ``--show-formats`` command line option.
@@ -113,19 +115,19 @@ Latest development release
     - change predefined formats to use fields that render faster
 
     .. warning::
-        These changes are not backward compatible. If you have 
-        a :ref:`manifest_formats` setting from a previous version, it may 
+        These changes are not backward compatible. If you have
+        a :ref:`manifest_formats` setting from a previous version, it may
         need to be updated.
 
 - It is now an error for :ref:`prefix` setting to contain ``{{now}}``.
-- :ref:`Settings <settings>` command will now print a single setting value 
+- :ref:`Settings <settings>` command will now print a single setting value
   if its name is given.
 
 
 1.20 (2021-02-13)
 -----------------
 
-- Add ``--progress`` command-line option and :ref:`show_progress` option to 
+- Add ``--progress`` command-line option and :ref:`show_progress` option to
   the :ref:`create <create>` command.
 
 
@@ -138,7 +140,7 @@ Latest development release
 -----------------
 - Added ``--repo`` option to :ref:`delete <delete>` command.
 - Added ``--relocated`` global command-line option.
-- *Emborg* now automatically confirms to *Borg* that you know what you are doing 
+- *Emborg* now automatically confirms to *Borg* that you know what you are doing
   when you delete a repository or repair an archive.
 
 
@@ -157,23 +159,23 @@ Latest development release
 -----------------
 - Improve messaging from *emborg-overdue*
 - :ref:`Configs <configs>` command now outputs default configuration too.
-- Some commands now use first subconfig when run with a composite configuration 
+- Some commands now use first subconfig when run with a composite configuration
   rather than terminating with an error.
 - Added :ref:`show_stats` setting.
-- Added ``--stats`` option to :ref:`create <create>`, :ref:`delete <delete>` and 
+- Added ``--stats`` option to :ref:`create <create>`, :ref:`delete <delete>` and
   :ref:`prune <prune>` commands.
-- Added ``--list`` option to :ref:`create <create>`, :ref:`extract <extract>` 
+- Added ``--list`` option to :ref:`create <create>`, :ref:`extract <extract>`
   and :ref:`restore <restore>` commands.
 - Added sorting and formatting options to :ref:`manifest <manifest>` command.
 - Added :ref:`manifest_formats` setting.
-- Renamed ``--trial-run`` option to ``--dry-run`` to be more consistent with 
+- Renamed ``--trial-run`` option to ``--dry-run`` to be more consistent with
   *Borg*.
 - Add *files* and *f* aliases to :ref:`manifest <manifest>` command.
 - Added :ref:`working_dir` setting.
 - Added :ref:`do_not_expand` setting.
 - Added :ref:`exclude_nodump` setting
 - Added :ref:`patterns` and :ref:`patterns_from` settings.
-- *Emborg* lock file is now ignored if the process it references is no longer 
+- *Emborg* lock file is now ignored if the process it references is no longer
   running
 - Support ``--repair`` option on :ref:`check command <check>`.
 
@@ -207,7 +209,7 @@ Latest development release
 
 1.9 (2019-11-08)
 ----------------
-- Added ability to check individual archives to the :ref:`check <check>` 
+- Added ability to check individual archives to the :ref:`check <check>`
   command.
 - Made latest archive the default for :ref:`check <check>` command.
 - Allow :ref:`exclude_from <exclude_from>` setting to be a list of file names.
@@ -221,7 +223,7 @@ Latest development release
 1.7 (2019-10-07)
 ----------------
 - Fixed bug that involved the Boolean Borg settings
-  (:ref:`one_file_system <one_file_system>`, :ref:`exclude_caches 
+  (:ref:`one_file_system <one_file_system>`, :ref:`exclude_caches
   <exclude_caches>`, ...)
 
 
@@ -238,14 +240,14 @@ Latest development release
 - Added :ref:`prefix <prefix>` and :ref:`exclude_from <exclude_from>` settings.
 - Provide default value for :ref:`archive <archive>` setting.
 - Add ``--all`` command line option to :ref:`mount <mount>` command.
-- Add ``--include-external`` command line option to :ref:`check <check>`, 
+- Add ``--include-external`` command line option to :ref:`check <check>`,
   :ref:`list <list>`, :ref:`mount <mount>`, and :ref:`prune <prune>` commands.
 - Add ``--sort`` command line option to :ref:`manifest <manifest>` command.
 - Add ``--latest`` command line option to :ref:`delete <delete>` command.
 - Added ``--quiet`` command line option
 - :ref:`umount <umount>` command now deletes directory used as mount point.
 - Moved log files to ~/.local/share/emborg
-  (run 'mv ~/.config/emborg/\*.{log,lastbackup}\* ~/.local/share/emborg' before 
+  (run 'mv ~/.config/emborg/\*.{log,lastbackup}\* ~/.local/share/emborg' before
   using this version).
 
 
@@ -254,7 +256,7 @@ Latest development release
 - Added *ssh_command* setting
 - Added ``--fast`` option to :ref:`info <info>` command
 - Added *emborg-overdue* executable
-- Allow :ref:`run_before_backup <run_before_backup>` and :ref:`run_after_backup 
+- Allow :ref:`run_before_backup <run_before_backup>` and :ref:`run_after_backup
   <run_after_backup>` to be simple strings
 
 
@@ -265,7 +267,7 @@ Latest development release
 
 1.2 (2019-01-16)
 ----------------
-- Added the :ref:`borg_executable <borg_executable>` and :ref:`passcommand 
+- Added the :ref:`borg_executable <borg_executable>` and :ref:`passcommand
   <passcommand>` settings.
 
 
