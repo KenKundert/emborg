@@ -1,12 +1,19 @@
 # Test Emborg
 #
-# These tests require BorgBackup to be available.
-# You can set MISSING_DEPENDENCIES environment turn off tests that depend on
-# features you do not have.  Currently there are two such features, “fuse” and
-# “borg1.2”.  Simply list each dependency you do not have in this variable
-# separated by spaces.  For example:
+# These tests require Borg Backup (borg) to be available.
 #
-#     export MISSING_DEPENDENCIES="fuse borg1.2"
+# Some tests require FUSE (Filesystem in User Space).  Pass “--no-fuse” as
+# command line option to pytest to skip those tests if FUSE is not available.
+#
+# Some tests require a specific version borg version or newer to be available.
+# Add “--borg-version=❬version❭” to indicate your version.  Typically this is
+# done using “--borg-version=$(borg --version)” (bash) or “--borg-version="`borg
+# --version`"”.  If you do not specify “--borg-version”, the latest version is
+# assumed.
+#
+# When using tox, you can pass these options through tox using:
+#     tox -- --borg-version=❬version❭ --no-fuse
+# Anything after the first -- is passed to pytest.
 
 # Imports {{{1
 import arrow
@@ -61,14 +68,6 @@ emborg_overdue_schema = Schema({
     Required('expected_type', default=""): str,
     Optional('dependencies', default=""): str,
 }, required=True)
-
-# missing dependencies {{{2
-missing_dependencies = set(
-    os.environ.get('MISSING_DEPENDENCIES', '').lower().split()
-)
-def skip_test(dependencies):
-    return set(dependencies.lower().split()) & missing_dependencies
-
 
 # EmborgTester class {{{1
 class EmborgTester(object):
@@ -174,10 +173,12 @@ class EmborgTester(object):
 
 
 # Setup {{{1
-# Test fixture {{{2
-# initialize {{{3
+# dependency_options fixture {{{3
+# This fixture is defined at the top-level in ../conftest.py.
+
+# initialize  ixture {{{3
 @pytest.fixture(scope="session")
-def initialize():
+def initialize(dependency_options):
     with cd(tests_dir):
         rm("configs .config .local repositories configs.symlink".split())
         cp("CONFIGS", "configs")
@@ -186,11 +187,11 @@ def initialize():
         ln("~/.local/lib", ".local/lib")
         ln("configs", "configs.symlink")
         os.environ["HOME"] = str(cwd())
+    return dependency_options
 
-
-# initialize_configs {{{3
+# initialize_configs fixture {{{3
 @pytest.fixture(scope="session")
-def initialize_configs(initialize):
+def initialize_configs(initialize, dependency_options):
     with cd(tests_dir):
         cp("CONFIGS", ".config/emborg")
         rm(".config/emborg/subdir")
@@ -199,10 +200,19 @@ def initialize_configs(initialize):
             contents = contents.replace('⟪EMBORG⟫', emborg_dir)
             p.write_text(contents)
         touch(".config/.nobackup")
+    return dependency_options
 
+# missing dependencies {{{2
+def skip_test_if_missing_dependencies(cmdline_options, dependencies):
+    if cmdline_options.borg_version < (1, 2, 0):
+        if 'borg1.2' in dependencies:
+            pytest.skip("test requires borg 1.2 or higher")
+    if cmdline_options.fuse_is_missing and 'fuse' in dependencies:
+        pytest.skip("test requires fuse")
 
 # Tests {{{1
 # test_emborg_without_configs{{{2
+#@pytest.fixture(scope='session')
 @parametrize(
     path = f'{tests_dir}/test-cases.nt',
     key = 'emborg without configs',
@@ -212,8 +222,7 @@ def test_emborg_without_configs(
     initialize,
     name, args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
-    if skip_test(dependencies):
-        return
+    skip_test_if_missing_dependencies(initialize, dependencies)
     with cd(tests_dir):
         tester = EmborgTester(args, expected, expected_type, cmp_dirs, remove)
         passes = tester.run()
@@ -233,8 +242,7 @@ def test_emborg_with_configs(
     initialize_configs,
     name, args, expected, expected_type, cmp_dirs, remove, dependencies
 ):
-    if skip_test(dependencies):
-        return
+    skip_test_if_missing_dependencies(initialize_configs, dependencies)
     with cd(tests_dir):
         tester = EmborgTester(args, expected, expected_type, cmp_dirs, remove)
         passes = tester.run()
@@ -254,8 +262,7 @@ def test_emborg_overdue(
     initialize,
     name, conf, args, expected, expected_type, dependencies
 ):
-    if skip_test(dependencies):
-        return
+    skip_test_if_missing_dependencies(initialize, dependencies)
     with cd(tests_dir):
         if conf:
             with open('.config/overdue.conf', 'w') as f:
@@ -288,7 +295,6 @@ def test_emborg_api(initialize):
                     args = ['--json', emborg.destination()]
                 )
                 response = json.loads(borg.stdout)
-                print(response)
                 archive = response['archives'][-1]['archive']
 
                 # list files in latest archive
