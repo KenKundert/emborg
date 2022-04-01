@@ -6,6 +6,8 @@ Latest development release
 | Version: 1.31.1
 | Released: 2022-03-29
 
+
+1.32 (2022-04-01)
 - Fixed issues associated with :ref:`compact_after_delete` setting.
 
 
