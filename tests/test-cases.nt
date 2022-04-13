@@ -590,10 +590,10 @@ emborg with configs:
     magnate:
         args: --quiet due
         expected:
-            > The latest test0 archive was created (just now|(\d+ )?seconds ago)\.
-            > The latest test1 archive was created (just now|(\d+ )?seconds ago)\.
-            > The latest test2 archive was created (just now|(\d+ )?seconds ago)\.
-            > The latest test3 archive was created (just now|(\d+ )?seconds ago)\.
+            > The latest test0 archive was created (just now|(\d+ )?(seconds|minutes) ago|a minute ago)\.
+            > The latest test1 archive was created (just now|(\d+ )?(seconds|minutes) ago|a minute ago)\.
+            > The latest test2 archive was created (just now|(\d+ )?(seconds|minutes) ago|a minute ago)\.
+            > The latest test3 archive was created (just now|(\d+ )?(seconds|minutes) ago|a minute ago)\.
         expected_type: regex
 
     build:
