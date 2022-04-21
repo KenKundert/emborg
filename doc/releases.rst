@@ -8,6 +8,7 @@ Latest development release
 
 
 1.32 (2022-04-01)
+-----------------
 - Fixed issues associated with :ref:`compact_after_delete` setting.
 
 
