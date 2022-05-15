@@ -266,6 +266,7 @@ And finally, here is the contents of the *snapshots* configuration file:
     # prune settings
     keep_hourly = 12
     prune_after_create = True
+    check_after_create = False
 
 To run this configuration every 10 minutes, add the following entry to your 
 crontab file using 'crontab -e':

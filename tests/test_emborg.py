@@ -52,8 +52,8 @@ emborg_dir_wo_slash = emborg_dir.strip('/')
 
 # schema for test cases {{{2
 emborg_schema = Schema({
-    Required('name'): str,
-    Optional('args', default='<PASS>'): Any(str, list),
+    Required('name'): str,  # this field is promoted to key by above code
+    Optional('args', default='❬PASS❭'): Any(str, list),
     Optional('expected', default=""): str,
     Optional('expected_type', default=""): str,
     Optional('cmp_dirs', default=""): str,
@@ -114,7 +114,7 @@ class EmborgTester(object):
         # remove requested files and directories
         if self.remove:
             rm(self.remove.split())
-        if '<PASS>' in self.args:
+        if '❬PASS❭' in self.args:
             return True
 
         # run command
