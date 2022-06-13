@@ -6,6 +6,7 @@ tests/.config
 tests/.local
 tests/configs
 tests/home
+.bump.cfg.nt
 
 # C extensions
 *.so
