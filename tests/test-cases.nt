@@ -727,7 +727,7 @@ emborg with configs:
             >      671 tests/configs/test3
             >      965 tests/configs/test4
             >     1838 tests/configs/README
-            > Total size = 7.324kB.
+            > Total size = 7.32kB.
         expected_type: regex
 
     sparkler:
@@ -993,7 +993,7 @@ emborg with configs:
             >      671 tests/configs/test3
             >      965 tests/configs/test4
             >     1838 tests/configs/README
-            > Total size = 7.324kB.
+            > Total size = 7.32kB.
         expected_type: regex
 
     intercom:
