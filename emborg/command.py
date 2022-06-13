@@ -1401,7 +1401,10 @@ class ManifestCommand(Command):
             emborg manifest .
 
         This command lists the files in the archive that were originally
-        contained in the current working directory.
+        contained in the current working directory.  The path given should be a
+        filesystem path, meaning it is either an absolute path or a relative
+        path from the direction from which Emborg is being run.  It is not a
+        Borg path.
 
         You can specify a particular archive if you wish:
 
@@ -1546,6 +1549,7 @@ class ManifestCommand(Command):
         else:
             healthy_color = Color("green", Color.isTTY())
             broken_color = Color("red", Color.isTTY())
+        total_size = 0
         for values in lines:
             # this loop can be quite slow. the biggest issue is arrow. parsing
             # time is slow. also output() can be slow, so use print() instead.
@@ -1580,8 +1584,10 @@ class ManifestCommand(Command):
                 values['CTime'] = arrow.get(values['ctime'])
             if 'atime' in values and 'ATime' in template:
                 values['ATime'] = arrow.get(values['atime'])
-            if 'size' in values and '{Size' in template:
-                values['Size'] = Quantity(values['size'], "B")
+            if 'size' in values:
+                total_size += values['size']
+                if '{Size' in template:
+                    values['Size'] = Quantity(values['size'], "B")
             if 'csize' in values and '{CSize' in template:
                 values['CSize'] = Quantity(values['csize'], "B")
             if 'dsize' in values and '{DSize' in template:
@@ -1598,6 +1604,10 @@ class ManifestCommand(Command):
                 )
             except KeyError as e:
                 raise Error('Unknown key in:', culprit=e, codicil=template)
+
+        if total_size:
+            total_size = Quantity(total_size, 'B')
+            print(f"Total size = {total_size:0.2s}.")
 
         return borg.status
 
