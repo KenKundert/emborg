@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.32.0
-| Released: 2022-04-01
+| Version: 1.32.1
+| Released: 2022-06-12
 
 
 1.32 (2022-04-01)
