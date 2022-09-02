@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.32.1
-| Released: 2022-06-12
+| Version: 1.32.2
+| Released: 2022-09-01
 
 - Added :ref:`compare` command.
 - Added :ref:`manage_diffs_cmd` and :ref:`report_diffs_cmd` settings.
