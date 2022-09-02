@@ -206,11 +206,13 @@ You can also specify the date and time relative to the current moment:
 The :ref:`compare command <compare>` allows you to see and manage the 
 differences between your local files and those in an archive.  You can compare 
 individual files or entire directories.  You can use the date and archive 
-options to select the particular archive to compare against.
+options to select the particular archive to compare against.  You can use the 
+interactive version of the command to graphically view changes and merge them 
+back into you local files.
 
 .. code-block:: bash
 
-    $ emborg compare doc/thesis
+    $ emborg compare -i doc/thesis
 
 The :ref:`restore command <restore>` restores files or directories in place, 
 meaning it replaces the current version with the one from the archive.
