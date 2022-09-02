@@ -734,7 +734,7 @@ class Settings:
             narrate("Borg exit status:", borg.status)
         if borg.status == 1 and borg.stderr:
             warnings = borg.stderr.partition(72*'-')[0]
-            warn('Warning emitted by Borg:', codicil=warnings)
+            warn('warning emitted by Borg:', codicil=warnings)
         if borg.stdout:
             narrate("Borg stdout:")
             narrate(indent(borg.stdout))
@@ -781,7 +781,7 @@ class Settings:
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))
         if borg.status == 1:
-            warn('Warning emitted by Borg, see logfile for details.')
+            warn('warning emitted by Borg, see logfile for details.')
         if borg.stdout:
             narrate("Borg stdout:")
             narrate(indent(borg.stdout))

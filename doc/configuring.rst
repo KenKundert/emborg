@@ -41,7 +41,7 @@ following:
                                           # use notifier for interactive backups 
                                           # and notify for scheduled backups
                                           # notification program
-    remote_ratelimit = 2000               # bandwidth limit in kbps
+    upload_ratelimit = 2000               # bandwidth limit in kbps
     umask = '077'                         # umask to use when creating the archives
     repository = 'archives:/mnt/backups/{host_name}/{user_name}/{config_name}'
                                           # remote directory for repository
@@ -729,11 +729,11 @@ manage_diffs_cmd
 
 Command to use to perform interactive file and directory comparisons using the 
 ``--interactive`` option to the :ref:`compare command <compare>`.  The command 
-is executed in a subshell, so the command string you specify may contain quotes 
-and such.  The string may contain two sets of empty braces, which are replaced 
-by the two files or directories to be compared.  If not, then the paths are 
-simply appended to the end of the command as specified.  Suitable commands for 
-use in this setting include `Vim <https://www.vim.org>`_ with the `DirDiff 
+may be specified in the form of a string or a list of strings.  If a string, it 
+may contain the literal text ``{archive_path}`` and ``{local_path}``, which are 
+replaced by the two files or directories to be compared.  If not, then the paths 
+are simply appended to the end of the command as specified.  Suitable commands 
+for use in this setting include `Vim <https://www.vim.org>`_ with the `DirDiff 
 <https://www.vim.org/scripts/script.php?script_id=102>`_  plugin, `Meld 
 <https://meldmerge.org>`_, and presumably others such as *DiffMerge*, *Kompare*, 
 *Diffuse*, *KDiff3*, etc.  If you are a *Vim* user, another alternative is 
@@ -744,13 +744,13 @@ streamlined interface to *Vim/DirDiff*.  Here are examples on how to configure
 .. code-block:: python
 
     manage_diffs_cmd = "meld"
-    manage_diffs_cmd = "gvim -f -c 'DirDiff {{}} {{}}'"
+    manage_diffs_cmd = ["meld", "-a"]
+    manage_diffs_cmd = "gvim -f -c 'DirDiff {archive_path} {local_path}'"
     manage_diffs_cmd = "vdiff -g"
 
-Pairs of braces are also used to insert *Emborg* settings into other settings, 
 which is generally not desired in this case.  To avoid that the braces are 
 doubled up to escape them.  Alternatively you could simply list 
-*report_diffs_cmd* in the :ref:`do_not_expand` setting.
+*manage_diffs_cmd* in the :ref:`do_not_expand` setting.
 
 The :ref:`compare command <compare>` mounts the remote archive, runs the 
 specified command and then immediately unmounts the archive.  As such, it is 
@@ -953,23 +953,24 @@ report_diffs_cmd
 ~~~~~~~~~~~~~~~~
 
 Command used to perform file and directory comparisons using the :ref:`compare 
-command <compare>`.  The command is executed in a subshell, so the command 
-string you specify may contain quotes and such.  The string may contain two sets 
-of empty braces, which are replaced by the two files or directories to be 
-compared.  If not, then the paths are simply appended to the end of the command 
-as specified.  Suitable commands for use in this setting include ``diff -r`` the 
-and ``colordiff -r``.  Here are examples of two different but equivalent ways of 
-configuring *diff*:
+command <compare>`.  The command may be specified in the form of a string or 
+a list of strings.  If a string, it may contain the literal text 
+``{archive_path}`` and ``{local_path}``, which are replaced by the two files or 
+directories to be compared.  If not, then the paths are simply appended to the 
+end of the command as specified.  Suitable commands for use in this setting 
+include ``diff -r`` the and ``colordiff -r``.  Here are examples of two 
+different but equivalent ways of configuring *diff*:
 
 .. code-block:: python
 
     report_diffs_cmd = "diff -r"
-    report_diffs_cmd = "diff -r {{}} {{}}"
+    report_diffs_cmd = "diff -r {archive_path} {local_path}"
 
-Pairs of braces are also used to insert *Emborg* settings into other settings, 
-which is generally not desired in this case.  To avoid that the braces are 
-doubled up to escape them.  Alternatively you could simply list 
-*report_diffs_cmd* in the :ref:`do_not_expand` setting.
+You may prefer to use *colordiff*, which is like *diff* but in color:
+
+.. code-block:: python
+
+    report_diffs_cmd = "colordiff -r"
 
 
 .. _repository:

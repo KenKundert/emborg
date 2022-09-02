@@ -42,7 +42,7 @@ from inform import (
 )
 from quantiphy import Quantity, UnitConversion, QuantiPhyError
 from shlib import (
-    Run, cwd, mkdir, rm, set_prefs as set_shlib_prefs, split_cmd, to_path
+    Cmd, Run, cwd, mkdir, rm, set_prefs as set_shlib_prefs, split_cmd, to_path
 )
 from time import sleep
 from .collection import Collection
@@ -183,8 +183,7 @@ def get_archive_paths(paths, settings):
                     pass
         if paths_not_found:
             raise Error(
-                'not contained in a source directory:',
-                conjoin(paths_not_found)
+                f"not contained in a source directory: {conjoin(paths_not_found)}."
             )
         return resolved_paths
     except ValueError as e:
@@ -293,8 +292,10 @@ class BorgCommand(Command):
         Usage:
             emborg borg <borg_args>...
 
-        An argument that is precisely '@repo' is replaced with the path to the
-        repository.  The passphrase is set before the command is run.
+        You can specify the repository to act on using ‘@repo’, which is
+        replaced with the path to the repository.  Specify the repository and
+        archive using ‘@repo::❬archive-name❭’.  The passphrase is set before
+        the command is run.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -552,8 +553,8 @@ class CompareCommand(Command):
         # resolve the path relative to working directory
         if not path:
             path = '.'
-        arch_path = to_path(path).resolve().relative_to(settings.working_dir)
-        arch_path = to_path(mount_point, arch_path)
+        archive_path = to_path(path).resolve().relative_to(settings.working_dir)
+        archive_path = to_path(mount_point, archive_path)
 
         # create mount point if it does not exist
         try:
@@ -562,18 +563,32 @@ class CompareCommand(Command):
             raise Error(os_error(e))
 
         # run borg to mount
-        borg = settings.run_borg(
-            cmd = "mount",
-            args = [settings.destination(archive), mount_point],
-            emborg_opts = options,
-        )
-
         try:
+            borg = settings.run_borg(
+                cmd = "mount",
+                args = [settings.destination(archive), mount_point],
+                emborg_opts = options,
+            )
+
             # run diff tool
-            diff_cmd = differ.format(path, arch_path)
-            if diff_cmd == differ:
-                diff_cmd = f"{differ} '{path}' '{arch_path}'"
-            diff = Run(diff_cmd, 'SoeW1')
+            if is_str(differ):
+                cmd = differ.format(
+                    archive_path = str(archive_path),
+                    local_path = str(path)
+                )
+                if cmd == differ:
+                    cmd = split_cmd(differ) + [archive_path, path]
+            else:
+                cmd = differ + [archive_path, path]
+            try:
+                diff = Cmd(cmd, modes='soEW1')
+                diff.run()
+            except Error as e:
+                codicil = e.stdout if e.stdout and not e.stderr else None
+                e.report(codicil=codicil)
+            except KeyboardInterrupt:
+                log('user killed diff command.')
+                diff.kill()
 
         finally:
             # run borg to un-mount
@@ -1403,8 +1418,8 @@ class ManifestCommand(Command):
         This command lists the files in the archive that were originally
         contained in the current working directory.  The path given should be a
         filesystem path, meaning it is either an absolute path or a relative
-        path from the direction from which Emborg is being run.  It is not a
-        Borg path.
+        path from the direction from which *Emborg* is being run.  It is not a
+        *Borg* path.
 
         You can specify a particular archive if you wish:
 
@@ -1679,7 +1694,7 @@ class MountCommand(Command):
         else:
             mount_point = settings.as_path("default_mount_point")
         if not mount_point:
-            raise Error("must specify directory to use as mount point")
+            raise Error("must specify directory to use as mount point.")
         display("mount point is:", mount_point)
         archive = cmdline["--archive"]
         date = cmdline["--date"]
@@ -1981,7 +1996,7 @@ class UmountCommand(Command):
         else:
             mount_point = settings.as_path("default_mount_point")
         if not mount_point:
-            raise Error("must specify directory to use as mount point")
+            raise Error("must specify directory to use as mount point.")
 
         # run borg
         try:

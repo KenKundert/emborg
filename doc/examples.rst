@@ -33,7 +33,7 @@ Here is the contents of the settings file: /root/.config/emborg/settings:
 
     # basic settings
     notify = "root@continuum.com"
-    remote_ratelimit = 2000     # bandwidth limit in kbps
+    upload_ratelimit = 2000     # bandwidth limit in kbps
     prune_after_create = True
     check_after_create = 'latest'
 
@@ -168,7 +168,7 @@ be run interactively, perhaps once per day.
     encryption = 'keyfile'
     avendesora_account = 'laptop-borg'
     needs_ssh_agent = True
-    remote_ratelimit = 2000
+    upload_ratelimit = 2000
     prune_after_create = True
     check_after_create = 'latest'
 

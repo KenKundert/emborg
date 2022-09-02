@@ -1051,7 +1051,7 @@ emborg with configs:
         args: --config test7 extract configs
         expected:
             > Archive: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > emborg warning: Warning emitted by Borg:
+            > emborg warning: warning emitted by Borg:
             >     Include pattern 'configs' never matched.
         expected_type: regex diff
 
@@ -1175,7 +1175,7 @@ emborg with configs:
 
     salesgirl:
         args: --quiet --config test8 files does-not-exist
-        expected: emborg error: not contained in a source directory: does-not-exist
+        expected: emborg error: not contained in a source directory: does-not-exist.
         expected_type: error
 
     draper:
