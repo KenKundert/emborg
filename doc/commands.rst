@@ -170,9 +170,16 @@ compare the files and directories of the current working directory.
     $ emborg compare tests
     $ emborg compare ~/bin
 
-This command requires that the following settings be specified in your settings 
-file: :ref:`manage_diffs_cmd`, :ref:`report_diffs_cmd`, and 
-:ref:`default_mount_point`.
+This command uses external tools to view and manage the differences.  Before it 
+can be used it must be configured to use these tools, which is done with the
+:ref:`manage_diffs_cmd` and :ref:`report_diffs_cmd` settings.  In addition, the 
+:ref:`default_mount_point` must be configured.  The :ref:`manage_diffs_cmd` is 
+used if the ``--interactive`` (or ``-i``) option is given, and 
+:ref:`report_diffs_cmd` otherwise.  However, if only one is given it is used in 
+both cases.  So, if you find that you only want to use the interactive tool to 
+view and manage your differences, you can simply not specify 
+:ref:`report_diffs_cmd`, which would eliminate the need to specify the ``-i`` 
+option.
 
 The command operates by mounting the desired archive, performing the comparison, 
 and then unmounting the directory. Problems sometimes occur that can result in 

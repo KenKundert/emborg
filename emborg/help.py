@@ -163,8 +163,10 @@ class Precautions(HelpMessage):
             It is also best, if it can be arranged, to keep your backups at a
             remote site so that your backups do not get destroyed in the same
             disaster, such as a fire or flood, that claims your original files.
-            One option is rsync.net (https://www.rsync.net/products/attic.html).
-            Another is `BorgBase (https://www.borgbase.com).
+            Some commercial options are:
+                rsync.net (https://www.rsync.net/products/attic.html)
+                BorgBase (https://www.borgbase.com)
+                Hetzner (https://www.hetzner.com/storage/storage-box)
 
             Finally, it is a good idea to practice a recovery. Pretend that you
             have lost all your files and then see if you can do a restore from

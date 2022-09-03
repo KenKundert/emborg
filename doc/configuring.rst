@@ -748,18 +748,14 @@ streamlined interface to *Vim/DirDiff*.  Here are examples on how to configure
     manage_diffs_cmd = "gvim -f -c 'DirDiff {archive_path} {local_path}'"
     manage_diffs_cmd = "vdiff -g"
 
-which is generally not desired in this case.  To avoid that the braces are 
-doubled up to escape them.  Alternatively you could simply list 
-*manage_diffs_cmd* in the :ref:`do_not_expand` setting.
-
 The :ref:`compare command <compare>` mounts the remote archive, runs the 
 specified command and then immediately unmounts the archive.  As such, it is 
 important that the command run in the foreground.  By default, *gvim* runs in 
-the foreground.  You can tell this because if run directly in a shell, the shell 
+the background.  You can tell this because if run directly in a shell, the shell 
 immediately accepts new commands even though *gvim* is still active.  To avoid 
 this, the ``-f`` option is added to the *gvim* command line to indicate it 
-should run in the background.  Without this, you will see an error from 
-fusermount indicating 'Device or resource busy'.  If you get this message, you 
+should run in the foreground.  Without this, you will see an error from 
+*fusermount* indicating ‘Device or resource busy’.  If you get this message, you 
 will have to close the editor and manually un-mount the archive.
 
 
