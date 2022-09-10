@@ -18,7 +18,6 @@
 
 # Imports {{{1
 from textwrap import dedent
-
 from appdirs import user_config_dir, user_data_dir
 
 # Preferences {{{1

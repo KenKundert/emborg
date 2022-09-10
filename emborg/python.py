@@ -22,7 +22,7 @@
 
 # Imports {{{1
 from inform import Error, display, full_stop, narrate, os_error
-from shlib import cp, to_path
+from .shlib import cp, to_path
 
 
 # PythonFile class {{{1

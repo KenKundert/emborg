@@ -44,10 +44,8 @@ import os
 import pwd
 import socket
 from textwrap import dedent
-
 import arrow
 from docopt import docopt
-
 from inform import (
     Color,
     Error,
@@ -61,11 +59,11 @@ from inform import (
     terminate,
     warn,
 )
-from shlib import Run, to_path, set_prefs as set_shlib_prefs
 
 from . import __released__, __version__
 from .preferences import CONFIG_DIR, DATA_DIR, OVERDUE_FILE, OVERDUE_LOG_FILE
 from .python import PythonFile
+from .shlib import Run, to_path, set_prefs as set_shlib_prefs
 
 # Globals {{{1
 set_shlib_prefs(use_inform=True, log_cmd=True)

@@ -19,7 +19,7 @@
 # Imports {{{1
 from os.path import expanduser as expand_user
 from inform import Error, error, log
-from shlib import to_path
+from .shlib import to_path
 
 
 # Globals {{{1

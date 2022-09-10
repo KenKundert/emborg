@@ -41,7 +41,7 @@ from inform import (
     warn,
 )
 from quantiphy import Quantity, UnitConversion, QuantiPhyError
-from shlib import (
+from .shlib import (
     Cmd, Run, cwd, mkdir, rm, set_prefs as set_shlib_prefs, split_cmd, to_path
 )
 from time import sleep

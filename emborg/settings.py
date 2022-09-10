@@ -46,7 +46,7 @@ from inform import (
     render,
     warn,
 )
-from shlib import (
+from .shlib import (
     Run, cd, cwd, getmod, mv, render_command, rm, to_path,
     set_prefs as set_shlib_prefs
 )
@@ -730,8 +730,7 @@ class Settings:
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed = {!s}".format(ends_at - starts_at))
-        if borg.status:
-            narrate("Borg exit status:", borg.status)
+        narrate("Borg exit status:", borg.status)
         if borg.status == 1 and borg.stderr:
             warnings = borg.stderr.partition(72*'-')[0]
             warn('warning emitted by Borg:', codicil=warnings)

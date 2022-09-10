@@ -19,7 +19,7 @@ import os
 import pwd
 import socket
 
-from shlib import Run, set_prefs as set_shlib_prefs
+from .shlib import Run, set_prefs as set_shlib_prefs
 set_shlib_prefs(use_inform=True, log_cmd=True)
 
 

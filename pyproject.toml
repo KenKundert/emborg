@@ -1,0 +1,43 @@
+[project]
+name = "emborg"
+version = "1.32.3"
+description = "Borg front end."
+readme = "README.rst"
+license = {file = "LICENSE"}
+keywords = ["emborg", "borg", "borgmatic", "backups"]
+authors = [
+    {name = "Ken Kundert"},
+    {email = "emborg@nurdletech.com"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.6"
+dependencies = [
+    "appdirs",
+    "arrow>=0.15",
+    "docopt",
+    "inform>=1.26",
+    "quantiphy",
+    "requests",
+]
+
+[project.scripts]
+emborg = "emborg.main:main"
+emborg-overdue = "emborg.overdue:main"
+
+[project.urls]
+homepage = "https://emborg.readthedocs.io"
+documentation = "https://emborg.readthedocs.io"
+repository = "https://github.com/kenkundert/emborg"
+changelog = "https://github.com/KenKundert/emborg/blob/master/doc/releases.rst"
+
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"

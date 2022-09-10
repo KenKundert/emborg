@@ -176,7 +176,7 @@ class EmborgTester(object):
 # dependency_options fixture {{{3
 # This fixture is defined at the top-level in ../conftest.py.
 
-# initialize  ixture {{{3
+# initialize  fixture {{{3
 @pytest.fixture(scope="session")
 def initialize(dependency_options):
     with cd(tests_dir):
