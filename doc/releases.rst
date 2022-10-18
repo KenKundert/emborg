@@ -8,6 +8,7 @@ Latest development release
 
 - Added :ref:`compare` command.
 - Added :ref:`manage_diffs_cmd` and :ref:`report_diffs_cmd` settings.
+- Allow ~/.config/emborg to always hold settings files if user prefers.
 
 
 1.32 (2022-04-01)
