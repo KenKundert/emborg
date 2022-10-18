@@ -48,10 +48,7 @@ def is_str(obj):
 # is_iterable {{{2
 def is_iterable(obj):
     """Identifies objects that can be iterated over, including strings."""
-    try:  # python3
-        from collections.abc import Iterable
-    except ImportError:  # python2
-        from collections import Iterable
+    from collections.abc import Iterable
     return isinstance(obj, Iterable)
 
 
@@ -226,13 +223,8 @@ def rm(*paths):
                 shutil.rmtree(to_str(path))
             else:
                 path.unlink()
-        # suitable for python3 only
-        # except FileNotFoundError:
-        #     pass
-        except (IOError, OSError) as err:
-            # don't complain if the file never existed
-            if err.errno != errno.ENOENT:
-                raise
+        except FileNotFoundError:
+            pass
 
 
 # ln {{{2
@@ -258,17 +250,7 @@ def mkdir(*paths):
     directory already exists.
     """
     for path in to_paths(paths):
-        try:
-            path.mkdir(parents=True)
-            # older versions of pathlib ignore exist_ok
-            # in Python3.5, just add exist_ok=True to arg list
-        # commented out version is suitable for Python3 only
-        # except FileExistsError:
-        #     if path.is_file():
-        #         raise
-        except (IOError, OSError) as err:
-            if err.errno != errno.EEXIST or path.is_file():
-                raise
+        path.mkdir(parents=True, exist_ok=True)
 
 
 # mount/umount {{{2
@@ -340,15 +322,23 @@ def ls(*paths, **kwargs):
     Paths may be files or directories. If path is a file, it is returned.
     If path is a directory, the items in the directory are returned.
 
-    Args:
-        paths: the paths to list ('.' if no paths given).
-        select: a returned path will match this glob string, use **/* to enable
-            recursion
-        reject: a returned path will not match this glob string
-        only: specifies the type of returned paths, choose from 'file' or 'dir'
-        hidden (bool): specifies whether hidden files should be returned, if
-            not given hidden files are returned if select string starts with
-            '.'
+    Positional arguments:
+        paths:
+            the paths to list ('.' if no paths given).
+
+    Keyword arguments:
+        select:
+            A returned path will match this glob string, use **/* to enable
+            recursion.
+        reject:
+            A returned path will not match this glob string.  The glob string is
+            matched from the right (see pathlib match function).  If an absolute
+            path is given the entire path must match.
+        only:
+            Specifies the type of returned paths, choose from 'file' or 'dir'.
+        hidden (bool):
+            Specifies whether hidden files should be returned, if not given
+            hidden files are returned if select string starts with '.'.
 
     KSK: it is a bit weird that I allow paths to be a list, but not select or
     reject. It would be nice to pass lists to both of those.
@@ -374,9 +364,9 @@ def ls(*paths, **kwargs):
     """
     select = kwargs.get("select", "*")
     reject = kwargs.get("reject", "\0")
-    # KSK: I have used '\0' as the default reject pattern because using ''
-    # generates an exception. I put in an enhancement request to the pathlib
-    # team to fix this, but it was rejected.
+        # KSK: I have used '\0' as the default reject pattern because using ''
+        # generates an exception. I put in an enhancement request to the pathlib
+        # team to fix this, but it was rejected.
     only = kwargs.get("only")
     hidden = kwargs.get("hidden")
 

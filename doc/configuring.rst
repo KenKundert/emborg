@@ -3,11 +3,18 @@
 Configuring
 ===========
 
-Settings files go in ~/.config/emborg. You need a shared settings file and then 
-one file for each backup configuration you need.  Except for 
-:ref:`configurations` and :ref:`default_configuration` any setting may be placed 
-in either the shared file or the configuration specific file.  If a setting is 
-found in both files, the version in the configuration specific file dominates.
+Typically the settings files go in the default location for configuration files 
+on your system.  On Linux systems, that location is ~/.config/emborg.  Other 
+systems use more awkward locations, so while *Emborg* creates initial versions 
+in the default location, you are free to move them to ~/.config/emborg if you 
+prefer.  *Emborg* always checks for the files in ~/.config/emborg if it exists 
+before looking in the default location for your system.
+
+You need a shared settings file and then one file for each backup configuration 
+you need.  Except for :ref:`configurations` and :ref:`default_configuration` any 
+setting may be placed in either the shared file or the configuration specific 
+file.  If a setting is found in both files, the version in the configuration 
+specific file dominates.
 
 You can get a complete list of available configuration settings by running:
 
