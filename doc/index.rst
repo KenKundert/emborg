@@ -5,31 +5,43 @@ Emborg — Front-End to Borg Backup
 
 | Version: 1.32.4
 | Released: 2022-10-18
-| Please report all bugs and suggestions on
-  `Github <https://github.com/KenKundert/emborg/issues>`_.
+| Please report all bugs and suggestions on GitHub_.
 
 
 What is Emborg?
 ---------------
 
 *Emborg* is a simple command line utility to orchestrate backups. It is built as 
-a front-end to `Borg Backup <https://borgbackup.readthedocs.io>`_, a powerful 
-and fast deduplicating backup program.  With *Emborg*, you specify all the 
-details about your backups once in advance, and then use a very simple command 
-line interface for your day-to-day activities.
+a front-end to Borg_, a powerful and fast de-duplicating backup program.  With 
+*Emborg*, you specify all the details about your backups once in advance, and 
+then use a very simple command line interface for your day-to-day activities.
 
-Use of *Emborg* does not preclude the use of Borg directly on the same 
+Use of *Emborg* does not preclude the use of *Borg* directly on the same 
 repository.  The philosophy of *Emborg* is to provide commands that you would 
 use often and in an interactive manner with the expectation that you would use 
 *Borg* directly for more unusual or esoteric situations.
+
+
+Why Emborg?
+-----------
+
+There are alternatives to *Emborg* such as BorgMatic_ and Vorta_, both of which 
+are also front-ends to *BorgBackup*.  *BorgMatic* has a command line interface 
+like *Emborg* while *Vorta* is GUI-based.  *Emborg* distinguishes itself by 
+providing a command line interface that is very efficient for common tasks, such 
+as creating archives (backups), restoring files or directories, or comparing 
+existing files to those in an archive.  Also, *Emborg* naturally supports 
+multiple destination repositories.  This feature can be used to simultaneously 
+backup to a local repository, which provides rapid restores, and an off-site 
+repository, which provides increased safety in case of a local disaster.
 
 
 Why Borg?
 ---------
 
 Well, everyone needs to backup their files. So perhaps the questions should be: 
-why not Duplicity?  `Duplicity <http://duplicity.nongnu.org>`_ has been the 
-standard way to do backups on Unix systems for many years.
+why not *Duplicity*?  Duplicity_ has been the standard way to do backups on Unix 
+systems for many years.
 
 *Duplicity* provides full and incremental backups. A full backup makes complete 
 copies of each file. With an incremental backup, only the difference between the 
@@ -69,9 +81,9 @@ path to find the contents.  In this way, it only retrieves the data it needs.
 There is no complicated and fragile process needed to reconstruct the file from 
 a long string of differences.
 
-After living with Duplicity for many years, I now find the Borg recovery process 
-stunningly fast and extremely reliable.  I am completely sold on Borg and will 
-never use Duplicity again.
+After living with *Duplicity* for many years, I now find the *Borg* recovery 
+process stunningly fast and extremely reliable.  I am completely sold on *Borg* 
+and will never use *Duplicity* again.
 
 
 Terminology
@@ -176,7 +188,7 @@ most recent archive.
     $ emborg manifest
     $ emborg files
 
-You can restrict the listing to those file contained in the current working 
+You can restrict the listing to those files contained in the current working 
 directory using:
 
 .. code-block:: bash
@@ -190,8 +202,8 @@ archive.
 
     $ emborg manifest -a continuum-2019-04-23T18:35:33
 
-Or, you can give a date, in which case the first archive created after that date 
-is used.
+Or, you can give a date, in which case the oldest archive created before that 
+date is used.
 
 .. code-block:: bash
 
@@ -222,7 +234,7 @@ to draw from.
 .. code-block:: bash
 
     $ cd ~/bin
-    $ emborg restore vu
+    $ emborg restore accounts.json
 
 The :ref:`mount command <mount>` creates a directory 'BACKUPS' and then mounts 
 an archive or the whole repository on this directory.  This allows you to move 
@@ -271,7 +283,7 @@ Status
 on either the client or the server machine that notifies you if your back-ups 
 have not completed successfully in a specified period of time.  In addition, 
 *Emborg* can be configured to update monitoring services such as 
-`healthchecks.io <https://healthchecks.io>`_ with the status of the backups.
+HealthChecks.io_ with the status of the backups.
 
 
 Borg
@@ -279,8 +291,7 @@ Borg
 
 *Borg* has more power than what is exposed with *Emborg*.  You may
 use it directly or through the *Emborg* :ref:`borg command <borg>` when you need 
-that power.  More information about *Borg* can be found at `borgbackup on 
-readthedocs <https://borgbackup.readthedocs.io/en/stable/index.html>`_.
+that power.  More information can be found at Borg_.
 
 
 Precautions
@@ -290,11 +301,10 @@ You should assure you have a backup copy of the encryption key and its
 passphrase in a safe place (run 'borg key export' to extract the encryption
 keys).  This is very important.  If the only copy of the encryption credentials
 are on the disk being backed up and if that disk were to fail you would not be
-able to access your backups. I recommend the use of `SpareKeys
-<https://github.com/kalekundert/sparekeys>`_ as a way of assuring that you
-always have access to the essential information, such as your Borg passphrase
-and keys, that you would need to get started after a catastrophic loss of your
-disk.
+able to access your backups. I recommend the use of SpareKeys_ as a way of 
+assuring that you always have access to the essential information, such as your 
+*Borg* passphrase and keys, that you would need to get started after 
+a catastrophic loss of your disk.
 
 If you keep the passphrase in an *Emborg* configuration file then you should set
 the permissions for that file so that it is not readable by others:
@@ -304,18 +314,16 @@ the permissions for that file so that it is not readable by others:
    chmod 600 ~/.config/emborg/*
 
 Better is to simply not store the passphrase in *Emborg* configuration files.
-You can use the *passcommand* setting for this, or you can use
-`Avendesora <https://avendesora.readthedocs.io>`_, which is a flexible password
-management system. The interface to *Avendesora* is already built in to 
-*Emborg,* but its use is optional (it need not be installed).
+You can use the *passcommand* setting for this, or you can use Avendesora_, 
+which is a flexible password management system. The interface to *Avendesora* is 
+already built in to *Emborg,* but its use is optional (it need not be 
+installed).
 
 It is also best, if it can be arranged, to keep your backups at a remote site so
 that your backups do not get destroyed in the same disaster, such as a fire or
-flood, that claims your original files. One option is `rsync.net
-<https://www.rsync.net/products/attic.html>`_. Another is `BorgBase
-<https://www.borgbase.com>`_. I have experience with both, and both seem quite 
-good.  One I have not tried is `Hetzner 
-<https://www.hetzner.com/storage/storage-box>`_.
+flood, that claims your original files. One option is RSync_.  Another is 
+BorgBase_.  I have experience with both, and both seem quite good.  One I have 
+not tried is Hetzner_.
 
 Finally, it is a good idea to practice a recovery. Pretend that you have lost
 all your files and then see if you can do a restore from backup. Doing this and
@@ -326,8 +334,7 @@ lose your files.
 Issues
 ------
 
-Please ask questions or report problems on
-`Github <https://github.com/KenKundert/emborg/issues>`_.
+Please ask questions or report problems on GitHub_.
 
 
 Contents
@@ -346,3 +353,15 @@ Contents
    releases
 
 * :ref:`genindex`
+
+.. _Borg: https://borgbackup.readthedocs.io
+.. _BorgMatic: https://torsion.org/borgmatic
+.. _Vorta: https://github.com/borgbase/vorta
+.. _Duplicity: http://duplicity.nongnu.org
+.. _HealthChecks.io: https://healthchecks.io
+.. _SpareKeys: https://github.com/kalekundert/sparekeys
+.. _Avendesora: https://avendesora.readthedocs.io
+.. _RSync: https://www.rsync.net/products/attic.html
+.. _BorgBase: https://www.borgbase.com
+.. _Hetzner: https://www.hetzner.com/storage/storage-box
+.. _GitHub: https://github.com/KenKundert/emborg/issues
