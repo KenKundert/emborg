@@ -107,6 +107,16 @@ for name, attrs in BORG_SETTINGS.items():
     if "arg" in attrs and attrs["arg"]:
         borg_options_arg_count[convert_name_to_option(name)] = 1
 
+# extract_version {{{2
+def get_version():
+    VERSION_REGEX = r"(\d+)\.(\d+)\.(\d+)(?:(a|b|rc|\.dev|\.post)(\d+))?"
+    match = re.match(VERSION_REGEX, __version__)
+    def to_int(s):
+        try:
+            return int(s)
+        except:
+            return s
+    return tuple(to_int(c) for c in match.groups())
 
 # ConfigQueue {{{1
 class ConfigQueue:
@@ -204,7 +214,7 @@ class Settings:
         self.settings = dict()
         self.do_not_expand = ()
         self.emborg_opts = emborg_opts
-        self.version = tuple(int(p) for p in __version__.split('.'))
+        self.version = get_version()
 
         # reset the logfile so anything logged after this is placed in the
         # logfile for this config

@@ -2,7 +2,7 @@ emborg without configs:
 
     better:
         args: version
-        expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected: emborg version: \d+\.\d+\.\d+(\.?\w+\d+)? \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
         expected_type: regex
         remove: .config
 
@@ -195,7 +195,7 @@ emborg with configs:
 
     idiocy:
         args: version
-        expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected: emborg version: \d+\.\d+\.\d+(\.?\w+\d+)? \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
         expected_type: regex
 
     heathen:
@@ -316,7 +316,7 @@ emborg with configs:
 
     weave:
         args: version
-        expected: emborg version: \d+\.\d+\.\d+ \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+        expected: emborg version: \d+\.\d+\.\d+(\.?\w+\d+)? \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
         expected_type: regex
 
     plateful:
