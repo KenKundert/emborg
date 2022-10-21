@@ -1,6 +1,6 @@
 [project]
 name = "emborg"
-version = "1.33.0rc0"
+version = "1.33.0rc1"
 description = "Borg front end."
 readme = "README.rst"
 license = {file = "LICENSE"}
