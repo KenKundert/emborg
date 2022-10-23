@@ -7,7 +7,7 @@ Latest development release
 | Released: 2022-10-21
 
 
-1.33 (2022-10-??)
+1.33 (2022-10-22)
 -----------------
 - Added :ref:`compare <compare>` command.
 - Added :ref:`manage_diffs_cmd` and :ref:`report_diffs_cmd` settings.
