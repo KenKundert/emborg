@@ -184,7 +184,7 @@ option.
 The command operates by mounting the desired archive, performing the comparison, 
 and then unmounting the directory. Problems sometimes occur that can result in 
 the archive remaining mounted.  In this case you will need to resolve any issues 
-that are preventing the unmounting, and then explicitly run the :ref:`unmount 
+that are preventing the unmounting, and then explicitly run the :ref:`umount 
 command <umount>` before you can use this *Borg* repository again.
 
 This command differs from the :ref:`diff command <diff>` in that it compares 

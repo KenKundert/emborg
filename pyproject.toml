@@ -36,7 +36,7 @@ emborg-overdue = "emborg.overdue:main"
 homepage = "https://emborg.readthedocs.io"
 documentation = "https://emborg.readthedocs.io"
 repository = "https://github.com/kenkundert/emborg"
-changelog = "https://github.com/KenKundert/emborg/blob/master/doc/releases.rst"
+changelog = "https://emborg.readthedocs.io/en/latest/releases.html"
 
 [build-system]
 requires = ["flit_core >=2,<4"]
