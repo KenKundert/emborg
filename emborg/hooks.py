@@ -95,8 +95,12 @@ class HealthChecks(Hooks):
     def signal_end(self, exception):
         if exception:
             result = 'failure'
-            status = exception.status
-            payload = exception.stderr
+            if isinstance(exception, OSError):
+                status = 1
+                payload = str(exception)
+            else:
+                status = exception.status
+                payload = exception.stderr
         else:
             result = 'success'
             status = 0
