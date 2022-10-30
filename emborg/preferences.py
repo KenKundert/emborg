@@ -222,6 +222,11 @@ BORG_SETTINGS = dict(
         arg = "PREFIX",
         desc = "only consider archive names starting with this prefix",
     ),
+    glob_archives = dict(
+        cmds = "check delete info list mount prune",
+        arg = "GLOB",
+        desc = "only consider archive names matching the glob",
+    ),
 )
 
 # Utilities {{{2
@@ -267,7 +272,7 @@ INITIAL_SETTINGS_FILE_CONTENTS = dedent(
 
     # repository settings
     repository = '⟪host⟫:⟪path⟫/{host_name}-{user_name}-{config_name}'
-    prefix = '{host_name}-'
+    archive = '{host_name}-{{now}}'
         # These may contain {<name>} where <name> is any of host_name, user_name,
         # prog_name config_name, or any of the user specified settings.
         # Double up the braces to specify parameters that should be interpreted

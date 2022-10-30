@@ -75,13 +75,20 @@ securely hold your key by specifying the Avendesora account name of the key to
 :ref:`avendesora_account`.
 
 This example assumes that there is one backup configuration per repository. You 
-can instead have all of your configurations share a single repository by 
-replacing :ref:`repository` and adding :ref:`prefix` like so:
+can instead have more than one configurations share a single repository by 
+adjusting :ref:`repository` and adding :ref:`glob_archives` like so:
 
 .. code-block:: python
 
     repository = 'archives:/mnt/backups/{host_name}/{user_name}'
-    prefix = '{config_name}-'
+    glob_archives = '{config_name}-*'
+
+In this case several backup configurations would deposit archives into a single 
+directory, allowing them to reduce the total space required to hold the archives 
+if there are shared files between the configurations.  The :ref:`glob_archives` 
+setting is required to allow each backup configuration to recognize its own 
+archives.  All archive names that match the glob string associate with this 
+configuration.
 
 
 .. _individual_configurations:
@@ -396,58 +403,27 @@ value might be:
 them with the value specified by the name. Names within double-brace pairs are 
 interpreted by *Borg*.
 
-This template consists of a leading part that is fixed ('{config_name}-') and 
-a trailing part that varies on each archive ('{{now}}', which is replaced by 
-a datestamp). The leading fixed part is referred to as the *prefix* and can be 
-given separately:
+More than one backup configuration can share the same repository.  This allows 
+*Borg*’s de-duplication feature to work across all configurations, resulting in 
+less total space needed for the combined set of all your archives.  In this case 
+you must also set the :ref:`glob_archives <glob_archives>` setting so that each 
+backup configuration can recognize its own archives.  It is used by the 
+:ref:`check`, :ref:`delete`, :ref:`info`, :ref:`list`, :ref:`mount`, and 
+:ref:`prune` commands to filter out archives not associated with the desired 
+backup configuration.
+
+The *archive* setting should include *{{now}}* so each archive has a unique 
+name, however you can customize how *now* is expanded.  For example, you can 
+reduce the length of the timestamp using:
 
 .. code-block:: python
 
-    archive = '{config_name}-{{now}}'
-    prefix = '{config_name}-'
+    archive = '{host_name}-{{now:%Y%m%d}}'
 
-This is helpful when multiple configurations backup to the same repository. In 
-this case *prefix* is assumed to be unique between the configurations. It allows 
-certain commands to filter out archives that belong to other configurations.  
-Specifically the :ref:`check`, :ref:`delete`, :ref:`info`, :ref:`list`, 
-:ref:`mount`, and :ref:`prune` commands all use *prefix*.
-
-When sharing a repository between multiple backup configurations, it is 
-important that all prefixes be unique. Be careful of one prefix that is a prefix 
-of another. For example, prefixes of *root* and *root2* would be bad because 
-*root* is a prefix of *root2*.  In the examples given, *prefix* ends with '-' to 
-reduce this risk.
-
-If you do not specify either *archive* or *prefix*, then you get the following 
-defaults:
-
-.. code-block:: python
-
-    prefix = '{host_name}-{user_name}-{config_name}-'
-    archive = '{prefix}{{now}}'
-
-If you specify only *prefix*, then *archive* becomes:
-
-.. code-block:: python
-
-    archive = '<prefix>{{now}}'
-
-If you specify only *archive*, then *prefix* remains unset. This is only 
-suitable when there is only one backup configuration using a repository.
-
-If you want *prefix* and want to customize *now*, you should give both *prefix* 
-and *archive*. For example, you can reduce the length of the timestamp using:
-
-.. code-block:: python
-
-    prefix = '{host_name}-'
-    archive = '{prefix}{{now:%Y%m%d}}'
-
-In this example the host name was used as the prefix rather than the 
-configuration name. When specifying both the *prefix* and the *archive*, the 
-leading part of *archive* should match *prefix*.  Be aware that by including 
-only the date in the archive name rather than the full timestamp, you are 
-limiting yourself to creating one archive per day.
+However, you should be aware that by including only the date in the archive name 
+rather than the full timestamp, you are limiting yourself to creating one 
+archive per day.  A second archive created on the same day simply writes over 
+the previous archive.
 
 
 .. _avendesora_account:
@@ -999,17 +975,18 @@ repository.  For a local repository you would use something like this:
 These examples assume that */mnt/backups* contains many independent 
 repositories, and that each repository contains the files associated with 
 a single backup configuration.  Borg allows you to make a repository the target 
-of many backup configurations, and in this way you can further benefit from its 
-ability to de-duplicate files.  In this case you might want to use a less 
-granular name for your repository.  For example, a particular user could use 
-a single repository for all their configurations on all their hosts using:
+of more than one backup configuration, and in this way you can further benefit 
+from its ability to de-duplicate files.  In this case you might want to use 
+a less granular name for your repository.  For example, a particular user could 
+use a single repository for all their configurations on all their hosts using:
 
 .. code-block:: python
 
     repository = '/mnt/backups/{user_name}'
 
-In this case you should specify the :ref:`prefix` setting to allow the archives 
-created by each backup configuration to be distinguished.
+When more than one configuration shares a repository you should specify the 
+:ref:`glob_archives` setting so that each configuration can recognize its own 
+archives.
 
 A local repository should be specified with an absolute path, and that path 
 should not contain a colon (``:``) to avoid confusing the algorithm that 
@@ -1210,6 +1187,25 @@ exclude_nodump
 Exclude files flagged NODUMP.
 
 
+.. _glob_archives:
+
+glob_archives
+~~~~~~~~~~~~~
+
+A glob string that a backup configuration uses to recognize its archives when 
+more than one configuration is sharing the same repository.  A glob string is 
+a string that is expected to match the name of the archives.  It must contain at 
+least one asterisk (``*``).  Each asterisk will match any number of contiguous 
+characters.  For example, a *glob_archives* setting of ``home-*`` will match 
+``home-2022-10-23T19:11:04``.
+
+*glob_archives* is required if you save the archives of multiple backup 
+configurations to the same repository.  Otherwise it is not needed.  It is used 
+by the :ref:`check`, :ref:`delete`, :ref:`info`, :ref:`list`, :ref:`mount`, and 
+:ref:`prune` commands to filter out archives not associated with the desired 
+backup configuration.
+
+
 .. _lock_wait:
 
 lock_wait
@@ -1357,7 +1353,10 @@ prefix
 ~~~~~~
 
 Only consider archive names starting with this prefix.
-For more, see :ref:`archive`.
+
+As of Borg 1.2 *prefix* is deprecated and should no longer be used.  Use 
+:ref:`glob_archives` instead.  It provides the same basic functionality in a way 
+that is a little more general.  For more information, see :ref:`archive`.
 
 
 .. _remote_path:

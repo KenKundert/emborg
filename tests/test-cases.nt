@@ -149,6 +149,7 @@ emborg without configs:
             >                             containing a filesystem object with the given
             >                             NAME
             >             exclude_nodump: exclude files flagged NODUMP
+            >              glob_archives: only consider archive names matching the glob
             >                 keep_daily: number of daily archives to keep
             >                keep_hourly: number of hourly archives to keep
             >                  keep_last: number of the most recent archives to keep
@@ -286,6 +287,7 @@ emborg with configs:
             >                             containing a filesystem object with the given
             >                             NAME
             >             exclude_nodump: exclude files flagged NODUMP
+            >              glob_archives: only consider archive names matching the glob
             >                 keep_daily: number of daily archives to keep
             >                keep_hourly: number of hourly archives to keep
             >                  keep_last: number of the most recent archives to keep
@@ -341,7 +343,7 @@ emborg with configs:
     periphery:
         args: --quiet --config test0 settings
         expected:
-            >                 archive: '{prefix}{{now}}'
+            >                 archive: '{config_name}-{{now}}'
             >                          'test0-{now}'
             >      check_after_create: True
             >              config_dir: '/⟪EMBORG⟫/tests/.config/emborg'
@@ -359,11 +361,11 @@ emborg with configs:
             >                              'sh:**/.*.swp',
             >                              'sh:**/.*.swo',
             >                          ]
+            >           glob_archives: '{config_name}-*'
+            >                          'test0-*'
             >                home_dir: '/⟪EMBORG⟫/tests'
             >             keep_within: '1d'
             >                 log_dir: '/⟪EMBORG⟫/tests/.local/share/emborg'
-            >                  prefix: '{config_name}-'
-            >                          'test0-'
             >      prune_after_create: True
             >              repository: '~/repositories'
             >        run_after_backup: """
@@ -722,12 +724,12 @@ emborg with configs:
             >      526 tests/configs/test0
             >      556 tests/configs/overdue.conf
             >      559 tests/configs/test2
-            >      600 tests/configs/settings
             >      612 tests/configs/test1
+            >      614 tests/configs/settings
             >      671 tests/configs/test3
             >      965 tests/configs/test4
             >     1838 tests/configs/README
-            > Total size = 7.32kB.
+            > Total size = 7.34kB.
         expected_type: regex
 
     sparkler:
@@ -804,7 +806,7 @@ emborg with configs:
         dependencies: fuse
 
     aspect:
-        args: --quiet --config test4 borg list --prefix test4- --short @repo
+        args: --quiet --config test4 borg list --glob-archives test4-* --short @repo
         expected:
             > run_before_borg 0
             > run_before_borg 1
@@ -947,7 +949,7 @@ emborg with configs:
         dependencies: fuse
 
     adjoin:
-        args: --quiet --config test5 borg list --prefix test5- --short @repo
+        args: --quiet --config test5 borg list --glob-archives test5-* --short @repo
         expected: test5-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
@@ -988,12 +990,12 @@ emborg with configs:
             >      526 tests/configs/test0
             >      556 tests/configs/overdue.conf
             >      559 tests/configs/test2
-            >      600 tests/configs/settings
             >      612 tests/configs/test1
+            >      614 tests/configs/settings
             >      671 tests/configs/test3
             >      965 tests/configs/test4
             >     1838 tests/configs/README
-            > Total size = 7.32kB.
+            > Total size = 7.34kB.
         expected_type: regex
 
     intercom:
@@ -1021,7 +1023,7 @@ emborg with configs:
         dependencies: fuse
 
     huntsman:
-        args: --quiet --config test6 borg list --prefix test6- --short @repo
+        args: --quiet --config test6 borg list --glob-archives test6-* --short @repo
         expected: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
@@ -1074,7 +1076,7 @@ emborg with configs:
         dependencies: fuse
 
     machete:
-        args: --quiet --config test7 borg list --prefix test7- --short @repo
+        args: --quiet --config test7 borg list --glob-archives test7-* --short @repo
         expected: test7-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 
@@ -1231,7 +1233,7 @@ emborg with configs:
         dependencies: fuse
 
     acquaint:
-        args: --quiet --config test8 borg list --prefix test8- --short @repo
+        args: --quiet --config test8 borg list --glob-archives test8-* --short @repo
         expected: test8-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
         expected_type: regex
 

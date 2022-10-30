@@ -588,7 +588,7 @@ class Settings:
 
         # add the borg command line options appropriate to this command {{{3
         for name, attrs in BORG_SETTINGS.items():
-            if strip_prefix and name == "prefix":
+            if strip_prefix and name in ["prefix", "glob_archives"]:
                 continue
             if cmd in attrs["cmds"] or "all" in attrs["cmds"]:
                 opt = convert_name_to_option(name)

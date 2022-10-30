@@ -9,8 +9,8 @@ default_configuration = 'tests'
 
 # repository/archive settings
 repository = '~/repositories'
-prefix = '{config_name}-'
-archive = '{prefix}{{now}}'
+archive = '{config_name}-{{now}}'
+glob_archives = '{config_name}-*'
 encryption = 'none'
 
 # shared filter settings

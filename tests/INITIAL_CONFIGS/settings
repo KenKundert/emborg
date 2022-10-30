@@ -27,7 +27,7 @@ compact_after_delete = True              # automatically run compact after a del
 
 # repository settings
 repository = '⟪host⟫:⟪path⟫/{host_name}-{user_name}-{config_name}'
-prefix = '{host_name}-'
+archive = '{host_name}-{{now}}'
     # These may contain {<name>} where <name> is any of host_name, user_name,
     # prog_name config_name, or any of the user specified settings.
     # Double up the braces to specify parameters that should be interpreted
