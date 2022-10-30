@@ -1223,7 +1223,7 @@ class InfoCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            emborg info [options]
+            emborg info [options] [<archive>]
 
         Options:
             -f, --fast               only report local information
@@ -1238,6 +1238,7 @@ class InfoCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         fast = cmdline["--fast"]
+        archive = cmdline["<archive>"]
 
         # run borg_options('create') to populate settings.roots
         try:
@@ -1247,25 +1248,26 @@ class InfoCommand(Command):
             roots = ['not set']
 
         # report local information
-        output(f"              config: {settings.config_name}")
-        output(f'               roots: {", ".join(roots)}')
-        output(f"         destination: {settings.destination()}")
-        output(f"  settings directory: {settings.config_dir}")
-        output(f"             logfile: {settings.logfile}")
-        try:
-            backup_date = arrow.get(settings.date_file.read_text())
-            output(f"      last backed up: {backup_date}, {backup_date.humanize()}")
-        except FileNotFoundError as e:
-            narrate(os_error(e))
-        except arrow.parser.ParserError as e:
-            narrate(e, culprit=settings.date_file)
-        if fast:
-            return
+        if not archive:
+            output(f"              config: {settings.config_name}")
+            output(f'               roots: {", ".join(roots)}')
+            output(f"         destination: {settings.destination()}")
+            output(f"  settings directory: {settings.config_dir}")
+            output(f"             logfile: {settings.logfile}")
+            try:
+                backup_date = arrow.get(settings.date_file.read_text())
+                output(f"      last backed up: {backup_date}, {backup_date.humanize()}")
+            except FileNotFoundError as e:
+                narrate(os_error(e))
+            except arrow.parser.ParserError as e:
+                narrate(e, culprit=settings.date_file)
+            if fast:
+                return
 
         # now output the information from borg about the repository
         borg = settings.run_borg(
             cmd = "info",
-            args = [settings.destination()],
+            args = [settings.destination(archive)],
             emborg_opts = options,
             strip_prefix = True,
         )

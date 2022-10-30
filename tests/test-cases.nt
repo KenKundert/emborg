@@ -845,7 +845,11 @@ emborg with configs:
     unbalance:
         args: --quiet --config test5 create
         expected:
-            > Creating archive at (?s:.*)
+            > (?s:.*)
+            > .* repository check, no problems found.
+            > (?s:.*)
+            > Archive consistency check complete, no problems found.
+            > (?s:.*)
         expected_type: regex
 
     lobby:

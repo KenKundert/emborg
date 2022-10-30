@@ -6,6 +6,8 @@ Latest development release
 | Version: 1.33.1
 | Released: 2022-10-30
 
+- Added ability to apply the :ref:`info <info>` command to a particular archive.
+
 
 1.33 (2022-10-22)
 -----------------

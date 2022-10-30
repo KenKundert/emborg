@@ -704,11 +704,6 @@ class Settings:
                 )
 
         # run the command
-        narrate(
-            "running:\n{}".format(
-                indent(render_command(command, borg_options_arg_count))
-            )
-        )
         with cd(self.working_dir if use_working_dir else "."):
             narrate("running in:", cwd())
             if "--json" in command or "--json-lines" in command:
@@ -726,6 +721,11 @@ class Settings:
                 display("\nRunning Borg {} command ...".format(cmd))
             else:
                 modes = "sOEW1"
+            narrate(
+                "running:\n{}".format(
+                    indent(render_command(command, borg_options_arg_count))
+                )
+            )
             starts_at = arrow.now()
             log("starts at: {!s}".format(starts_at))
             try:
