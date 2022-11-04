@@ -1284,14 +1284,14 @@ emborg-overdue:
 
     predator:
         expected:
-            > test0: 0.[01] hours
-            > test1: 0.[01] hours
-            > test2: 0.[01] hours
-            > test3: 0.[01] hours
-            > test4: 0.[01] hours
-            > test5: 0.[01] hours
-            > test6: 0.[01] hours
-            > test7: 0.[01] hours
+            > test0: 0.\d hours
+            > test1: 0.\d hours
+            > test2: 0.\d hours
+            > test3: 0.\d hours
+            > test4: 0.\d hours
+            > test5: 0.\d hours
+            > test6: 0.\d hours
+            > test7: 0.\d hours
             >
         expected_type: regex
 
