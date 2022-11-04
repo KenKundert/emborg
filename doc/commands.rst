@@ -34,7 +34,7 @@ The available commands are:
     :diff:       :ref:`show the differences between two archives <diff>`
     :due:        :ref:`days since last backup <due>`
     :extract:    :ref:`recover file or files from archive <extract>`
-    :help:       :ref:`give information about commands or other topics <help>`
+    :help:       :ref:`give information about commands or other topics <emborg_help>`
     :info:       :ref:`print information about a backup <info>`
     :init:       :ref:`initialize the repository <init>`
     :list:       :ref:`list the archives currently contained in the repository <list>`
@@ -386,7 +386,7 @@ replaces the existing files rather than simply copying them into the current
 directory.
 
 
-.. _help:
+.. _emborg_help:
 
 Help
 ----
@@ -468,7 +468,7 @@ Most commands save a log file, but some do not.
 Specifically,
 :ref:`configs <configs>`,
 :ref:`due <due>`,
-:ref:`help <help>`,
+:ref:`help <emborg_help>`,
 :ref:`log <log>`,
 :ref:`settings <settings>` and
 :ref:`version <version>` do not.

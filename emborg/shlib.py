@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = "1.5.0-beta.0"
-__released__ = "2022-08-31"
+__version__ = "1.5"
+__released__ = "2022-11-04"
 
 # Imports {{{1
 try:
