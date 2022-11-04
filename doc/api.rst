@@ -26,7 +26,10 @@ separately:
             print(borg.stdout.rstrip())
 
 *Emborg* takes the config name as an argument, if not given the default config 
-is used. It provides the following useful methods and attributes:
+is used.  You can also pass list of *Emborg* options and the path to the 
+configurations directory.
+
+*Emborg* provides the following useful methods and attributes:
 
 
 **configs**

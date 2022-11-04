@@ -46,7 +46,7 @@ try:
     from . import __released__, __version__
     from .command import Command
     from .hooks import Hooks
-    from .settings import ConfigQueue, Settings
+    from .emborg import ConfigQueue, Emborg
 
     # Globals {{{1
     version = f"{__version__} ({__released__})"
@@ -64,11 +64,11 @@ try:
     # Main {{{1
     def main():
         with Inform(
-            error_status=2,
-            flush=True,
-            logfile=LoggingCache(),
-            prog_name='emborg',
-            version=version,
+            error_status = 2,
+            flush = True,
+            logfile = LoggingCache(),
+            prog_name = 'emborg',
+            version = version,
         ) as inform:
 
             # read command line
@@ -84,10 +84,10 @@ try:
                 os.environ['BORG_RELOCATED_REPO_ACCESS_IS_OK'] = 'YES'
             emborg_opts = cull(
                 [
-                    "verbose" if cmdline["--verbose"] else "",
-                    "narrate" if cmdline["--narrate"] else "",
-                    "dry-run" if cmdline["--dry-run"] else "",
-                    "no-log" if cmdline["--no-log"] else "",
+                    "verbose" if cmdline["--verbose"] else None,
+                    "narrate" if cmdline["--narrate"] else None,
+                    "dry-run" if cmdline["--dry-run"] else None,
+                    "no-log" if cmdline["--no-log"] else None,
                 ]
             )
             if cmdline["--narrate"]:
@@ -107,7 +107,7 @@ try:
 
                 queue = ConfigQueue(cmd)
                 while queue:
-                    with Settings(config, emborg_opts, queue=queue) as settings:
+                    with Emborg(config, emborg_opts, queue=queue) as settings:
                         try:
                             exit_status = cmd.execute(
                                 cmd_name, args, settings, emborg_opts

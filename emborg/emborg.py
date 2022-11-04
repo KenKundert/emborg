@@ -1,4 +1,4 @@
-# Settings
+# Emborg Settings
 
 # License {{{1
 # Copyright (C) 2018-2022 Kenneth S. Kundert
@@ -107,17 +107,6 @@ for name, attrs in BORG_SETTINGS.items():
     if "arg" in attrs and attrs["arg"]:
         borg_options_arg_count[convert_name_to_option(name)] = 1
 
-# extract_version {{{2
-def get_version():
-    VERSION_REGEX = r"(\d+)\.(\d+)\.(\d+)(?:(a|b|rc|\.dev|\.post)(\d+))?"
-    match = re.match(VERSION_REGEX, __version__)
-    def to_int(s):
-        try:
-            return int(s)
-        except:
-            return s
-    return tuple(to_int(c) for c in match.groups())
-
 # ConfigQueue {{{1
 class ConfigQueue:
     def __init__(self, command=None):
@@ -161,7 +150,10 @@ class ConfigQueue:
                 raise Error(
                     "unknown configuration.",
                     culprit = name,
-                    codicil = "Perhaps you forgot to add it to the 'configurations' setting?.",
+                    codicil = (
+                        "Perhaps you forgot to add it to the ‘configurations’ setting?.",
+                        f"Choose from: {conjoin(all_configs)}.",
+                    )
                 )
         else:
             if len(config_groups) > 0:
@@ -207,19 +199,32 @@ class ConfigQueue:
         return bool(self.uninitialized or self.remaining_configs)
 
 
-# Settings class {{{1
-class Settings:
+# Emborg class {{{1
+class Emborg:
+    """Emborg Settings
+
+    config (str):
+        Name of desired configuration. Passed only when reading the top level
+        settings file. Default is the default configuration as specified in the
+        settings file, or if that is not specified then the first configuration
+        given is used.
+    emborg_opts ([str])
+        A list of Emborg options chosen from “verbose”, “narrate”, “dry-run”,
+        and “no-log”.
+    config_dir (str, Path)
+        Path to configurations directory.  Normally this is not specified.
+        Give it only when overriding the default configurations directory.
+    """
     # Constructor {{{2
-    def __init__(self, config=None, emborg_opts=(), **kwargs):
+    def __init__(self, config=None, emborg_opts=(), config_dir=None, **kwargs):
         self.settings = dict()
         self.do_not_expand = ()
         self.emborg_opts = emborg_opts
-        self.version = get_version()
 
         # reset the logfile so anything logged after this is placed in the
         # logfile for this config
         get_informer().set_logfile(LoggingCache())
-        self.config_dir = to_path(CONFIG_DIR)
+        self.config_dir = to_path(config_dir if config_dir else CONFIG_DIR)
         self.read_config(name=config, **kwargs)
         self.check()
         set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)
@@ -237,23 +242,12 @@ class Settings:
                 warn(f'unknown colorscheme: {self.colorscheme}.')
 
     # read_config() {{{2
-    def read_config(self, name=None, path=None, **kwargs):
-        """Recursively read configuration files.
-
-        name (str):
-            Name of desired configuration. Passed only when reading the top level
-            settings file. Default is the default configuration as specified in the
-            settings file, or if that is not specified then the first configuration
-            given is used.
-        path (str):
-            Full path to settings file. Should not be given for the top level
-            settings file (SETTINGS_FILE in CONFIG_DIR).
-        """
-
-        if path:
+    def read_config(self, name=None, **kwargs):
+        if '_include_path' in kwargs:
             # we are reading an include file
-            settings = PythonFile(path).run()
+            path = kwargs['_include_path']
             parent = path.parent
+            settings = PythonFile(path).run()
             includes = Collection(
                 settings.get(INCLUDE_SETTING),
                 split_lines,
@@ -327,8 +321,7 @@ class Settings:
 
         # read include files, if any are specified
         for include in includes:
-            path = to_path(parent, include)
-            self.read_config(path=path)
+            self.read_config(_include_path=to_path(parent, include))
 
     # check() {{{2
     def check(self):

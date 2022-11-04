@@ -120,6 +120,8 @@ class EmborgTester(object):
         # run command
         emborg = Run(self.cmd, "sOMW*")
         self.result = dedent(Color.strip_colors(emborg.stdout)).strip("\n")
+        if emborg.stdout:
+            print(emborg.stdout)
 
         # check stdout
         matches = True
@@ -229,7 +231,7 @@ def test_emborg_without_configs(
         if not passes:
             result = tester.get_result()
             expected = tester.get_expected()
-            assert result == expected, name
+            assert result == expected, f"Test ‘{name}’ fails."
             raise AssertionError('test code failure')
 
 # test_emborg_with_configs{{{2
@@ -249,7 +251,7 @@ def test_emborg_with_configs(
         if not passes:
             result = tester.get_result()
             expected = tester.get_expected()
-            assert result == expected, name
+            assert result == expected, f"Test ‘{name}’ fails."
             raise AssertionError('test code failure')
 
 # test_emborg_overdue {{{2
@@ -271,61 +273,75 @@ def test_emborg_overdue(
             args = args.split() if is_str(args) else args
             overdue = Run(emborg_overdue_exe + args, "sOEW")
             if 'regex' in expected_type.split():
-                assert bool(re.fullmatch(expected, overdue.stdout)), name
+                assert bool(re.fullmatch(expected, overdue.stdout)), f"Test ‘{name}’ fails."
             else:
-                assert expected == overdue.stdout, name
+                assert expected == overdue.stdout, f"Test ‘{name}’ fails."
         except Error as e:
-            assert str(e) == expected, name
+            assert str(e) == expected, f"Test ‘{name}’ fails."
 
 
 # test_emborg_api {{{2
 def test_emborg_api(initialize):
-    with cd(tests_dir):
-        from emborg import Emborg
+    from emborg import Emborg
 
-        with Emborg('tests') as emborg:
+    # get available configs
+    # do this before changing the working directory so as to test the ability
+    # to explicitly set the config_dir
+    config_dir = tests_dir / '.config/emborg'
+    try:
+        with Emborg('tests', config_dir=config_dir) as emborg:
             configs = emborg.configs
-        assert configs == 'test0 test1 test2 test3'.split()
+    except Error as e:
+        e.report()
+        assert not e, str(e)
+    assert configs == 'test0 test1 test2 test3'.split()
 
+    with cd(tests_dir):
+
+        # list each config and assure than it contains expected paths
         for config in configs:
-            # get the name of latest archive
-            with Emborg(config) as emborg:
-                borg = emborg.run_borg(
-                    cmd = 'list',
-                    args = ['--json', emborg.destination()]
-                )
-                response = json.loads(borg.stdout)
-                archive = response['archives'][-1]['archive']
+            try:
+                # get the name of latest archive
+                with Emborg(config) as emborg:
+                    borg = emborg.run_borg(
+                        cmd = 'list',
+                        args = ['--json', emborg.destination()]
+                    )
+                    response = json.loads(borg.stdout)
+                    archive = response['archives'][-1]['archive']
 
-                # list files in latest archive
-                borg = emborg.run_borg(
-                    cmd = 'list',
-                    args = ['--json-lines', emborg.destination(archive)]
-                )
-                json_data = '[' + ','.join(borg.stdout.splitlines()) + ']'
-                response = json.loads(json_data)
-                paths = sorted([entry['path'] for entry in response])
-                for each in [
-                    '⟪EMBORG⟫/tests/configs',
-                    '⟪EMBORG⟫/tests/configs/README',
-                    '⟪EMBORG⟫/tests/configs/overdue.conf',
-                    '⟪EMBORG⟫/tests/configs/settings',
-                    '⟪EMBORG⟫/tests/configs/subdir',
-                    '⟪EMBORG⟫/tests/configs/subdir/file',
-                    '⟪EMBORG⟫/tests/configs/test0',
-                    '⟪EMBORG⟫/tests/configs/test1',
-                    '⟪EMBORG⟫/tests/configs/test2',
-                    '⟪EMBORG⟫/tests/configs/test2excludes',
-                    '⟪EMBORG⟫/tests/configs/test2passphrase',
-                    '⟪EMBORG⟫/tests/configs/test3',
-                    '⟪EMBORG⟫/tests/configs/test4',
-                    '⟪EMBORG⟫/tests/configs/test5',
-                    '⟪EMBORG⟫/tests/configs/test6',
-                    '⟪EMBORG⟫/tests/configs/test6patterns',
-                    '⟪EMBORG⟫/tests/configs/test7',
-                    '⟪EMBORG⟫/tests/configs/test7patterns',
-                    '⟪EMBORG⟫/tests/configs/test8',
-                ]:
-                    each = each.replace("⟪EMBORG⟫", emborg_dir_wo_slash)
-                    assert each in paths
+                    # list files in latest archive
+                    borg = emborg.run_borg(
+                        cmd = 'list',
+                        args = ['--json-lines', emborg.destination(archive)]
+                    )
+                    json_data = '[' + ','.join(borg.stdout.splitlines()) + ']'
+                    response = json.loads(json_data)
+                    paths = sorted([entry['path'] for entry in response])
+                    for each in [
+                        '⟪EMBORG⟫/tests/configs',
+                        '⟪EMBORG⟫/tests/configs/README',
+                        '⟪EMBORG⟫/tests/configs/overdue.conf',
+                        '⟪EMBORG⟫/tests/configs/settings',
+                        '⟪EMBORG⟫/tests/configs/subdir',
+                        '⟪EMBORG⟫/tests/configs/subdir/file',
+                        '⟪EMBORG⟫/tests/configs/test0',
+                        '⟪EMBORG⟫/tests/configs/test1',
+                        '⟪EMBORG⟫/tests/configs/test2',
+                        '⟪EMBORG⟫/tests/configs/test2excludes',
+                        '⟪EMBORG⟫/tests/configs/test2passphrase',
+                        '⟪EMBORG⟫/tests/configs/test3',
+                        '⟪EMBORG⟫/tests/configs/test4',
+                        '⟪EMBORG⟫/tests/configs/test5',
+                        '⟪EMBORG⟫/tests/configs/test6',
+                        '⟪EMBORG⟫/tests/configs/test6patterns',
+                        '⟪EMBORG⟫/tests/configs/test7',
+                        '⟪EMBORG⟫/tests/configs/test7patterns',
+                        '⟪EMBORG⟫/tests/configs/test8',
+                    ]:
+                        each = each.replace("⟪EMBORG⟫", emborg_dir_wo_slash)
+                        assert each in paths
+            except Error as e:
+                e.report()
+                assert not e, str(e)
 

@@ -1,4 +1,4 @@
-# Emborg Settings
+# Emborg Preferences
 #
 # Copyright (C) 2018-2022 Kenneth S. Kundert
 
