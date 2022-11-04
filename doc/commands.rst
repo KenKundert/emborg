@@ -421,6 +421,12 @@ This command prints out the locations of important files and directories.
 
     $ emborg info
 
+You can also get information about a particular archive.
+
+.. code-block:: bash
+
+    $ emborg info home-2022-11-03T23:07:25
+
 
 .. _init:
 
