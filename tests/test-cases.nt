@@ -709,26 +709,26 @@ emborg with configs:
             > Archive: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > run_after_borg 0
             > run_after_borg 1
-            >        0 tests/configs/
-            >        0 tests/configs/subdir/
-            >        0 tests/configs/subdir/file
-            >       13 tests/configs/test2passphrase
-            >       66 tests/configs/test2excludes
-            >       82 tests/configs/test6patterns
-            >       87 tests/configs/test7
-            >      111 tests/configs/test7patterns
-            >      132 tests/configs/test6
-            >      133 tests/configs/test9
-            >      182 tests/configs/test8
-            >      191 tests/configs/test5
-            >      526 tests/configs/test0
-            >      556 tests/configs/overdue.conf
-            >      559 tests/configs/test2
-            >      612 tests/configs/test1
-            >      614 tests/configs/settings
-            >      671 tests/configs/test3
-            >      965 tests/configs/test4
-            >     1838 tests/configs/README
+            >     0B tests/configs/
+            >     0B tests/configs/subdir/
+            >     0B tests/configs/subdir/file
+            >    13B tests/configs/test2passphrase
+            >    66B tests/configs/test2excludes
+            >    82B tests/configs/test6patterns
+            >    87B tests/configs/test7
+            >   111B tests/configs/test7patterns
+            >   132B tests/configs/test6
+            >   133B tests/configs/test9
+            >   182B tests/configs/test8
+            >   191B tests/configs/test5
+            >   526B tests/configs/test0
+            >   556B tests/configs/overdue.conf
+            >   559B tests/configs/test2
+            >   612B tests/configs/test1
+            >   614B tests/configs/settings
+            >   671B tests/configs/test3
+            >   965B tests/configs/test4
+            > 1.84kB tests/configs/README
             > Total size = 7.34kB.
         expected_type: regex
 
@@ -979,26 +979,26 @@ emborg with configs:
         args: --quiet --config test6 files -S
         expected:
             > Archive: test6-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            >        0 tests/configs/
-            >        0 tests/configs/subdir/
-            >        0 tests/configs/subdir/file
-            >       13 tests/configs/test2passphrase
-            >       66 tests/configs/test2excludes
-            >       82 tests/configs/test6patterns
-            >       87 tests/configs/test7
-            >      111 tests/configs/test7patterns
-            >      132 tests/configs/test6
-            >      133 tests/configs/test9
-            >      182 tests/configs/test8
-            >      191 tests/configs/test5
-            >      526 tests/configs/test0
-            >      556 tests/configs/overdue.conf
-            >      559 tests/configs/test2
-            >      612 tests/configs/test1
-            >      614 tests/configs/settings
-            >      671 tests/configs/test3
-            >      965 tests/configs/test4
-            >     1838 tests/configs/README
+            >     0B tests/configs/
+            >     0B tests/configs/subdir/
+            >     0B tests/configs/subdir/file
+            >    13B tests/configs/test2passphrase
+            >    66B tests/configs/test2excludes
+            >    82B tests/configs/test6patterns
+            >    87B tests/configs/test7
+            >   111B tests/configs/test7patterns
+            >   132B tests/configs/test6
+            >   133B tests/configs/test9
+            >   182B tests/configs/test8
+            >   191B tests/configs/test5
+            >   526B tests/configs/test0
+            >   556B tests/configs/overdue.conf
+            >   559B tests/configs/test2
+            >   612B tests/configs/test1
+            >   614B tests/configs/settings
+            >   671B tests/configs/test3
+            >   965B tests/configs/test4
+            > 1.84kB tests/configs/README
             > Total size = 7.34kB.
         expected_type: regex
 
