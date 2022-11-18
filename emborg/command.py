@@ -1470,16 +1470,19 @@ class ManifestCommand(Command):
         if not archive:
             archive = get_name_of_latest_archive(settings)
 
-        # define available formats
+        # predefined formats
         formats = dict(
             name = "{path}",
             short = "{path}{Type}",
             date = "{mtime} {path}{Type}",
             size = "{size:8} {path}{Type}",
+            si = "{Size:6.2} {path}{Type}",
             owner = "{user:8} {path}{Type}",
             group = "{group:8} {path}{Type}",
             long = '{mode:10} {user:6} {group:6} {size:8} {mtime} {path}{extra}',
         )
+
+        # choose format
         default_format = settings.manifest_default_format
         if not default_format:
             default_format = 'short'
@@ -1506,7 +1509,7 @@ class ManifestCommand(Command):
             fmt = "date"
             sort_key = 'mtime'
         elif cmdline["--sort-by-size"]:
-            fmt = "size"
+            fmt = "si"
             sort_key = 'size'
         elif cmdline["--sort-by-owner"]:
             fmt = "owner"
@@ -1527,11 +1530,15 @@ class ManifestCommand(Command):
         if cmdline['--format']:
             fmt = cmdline['--format']
             if fmt not in formats:
-                raise Error('unknown format.', culprit=fmt)
+                raise Error(
+                    'unknown format.',
+                    culprit = fmt,
+                    codicil = f"Choose from: {conjoin(formats)}."
+                )
 
         # run borg
         output("Archive:", archive)
-        template = formats.get(fmt)
+        template = formats[fmt]
         keys = template.lower()
             # lower case it so we get size when user requests Size
         if sort_key and '{' + sort_key not in keys:
@@ -1588,7 +1595,7 @@ class ManifestCommand(Command):
                 values['Type'] = '/'  # directory
             elif type == 'l':
                 values['Type'] = '@'  # directory
-                values['extra'] = ' -> ' + values['source']
+                values['extra'] = ' —> ' + values['source']
             elif type == 'h':
                 values['extra'] = ' links to ' + values['source']
             elif type == 'p':

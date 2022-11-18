@@ -267,7 +267,8 @@ as where it is located and how large it is.
 
     $ emborg info
 
-The :ref:`help command <help>` shows you information on how to use *Emborg*.
+The :ref:`help command <emborg_help>` shows you information on how to use 
+*Emborg*.
 
 .. code-block:: bash
 

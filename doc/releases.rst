@@ -56,7 +56,7 @@ Latest development release
 - Suppress log file generation for
   :ref:`configs <configs>`,
   :ref:`due <due>`,
-  :ref:`help <help>`,
+  :ref:`help <emborg_help>`,
   :ref:`log <log>`,
   :ref:`settings <settings>` and
   :ref:`version <version>` commands.

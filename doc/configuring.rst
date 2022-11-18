@@ -748,7 +748,7 @@ manifest_default_format
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 A string that specifies the name of the default format.  The name must be a key 
-in :ref:`manifest_formats`.
+in :ref:`manifest_formats`.  If not specified, ``short`` is used.
 
 
 .. _manifest_formats:
@@ -765,22 +765,24 @@ formatted.  The default value for *manifest_formats* is:
             name = "{path}",
             short = "{path}{Type}",
             date = "{mtime} {path}{Type}",
-            size = "{size} {path}{Type}",
-            owner = "{user} {path}{Type}",
-            group = "{group} {path}{Type}",
-            long = '{mode} {user:6} {group:6} {size:8} {mtime} {path}{extra}',
+            size = "{size:8} {path}{Type}",
+            si = "{Size:6.2} {path}{Type}",
+            owner = "{user:8} {path}{Type}",
+            group = "{group:8} {path}{Type}",
+            long = '{mode:10} {user:6} {group:6} {size:8} {mtime} {path}{extra}',
         )
         manifest_default_format = 'short'
 
-Notice that 7 formats are defined:
+Notice that 8 formats are defined:
 
- |  *name*: used when ``--name-only`` is specified.
- |  *short*: used by when ``--short`` is specified and when sorting by name.
- |  *date*: used by default when sorting by date.
- |  *size*: used by default when sorting by size.
- |  *owner*: used by default when sorting by owner.
- |  *group*: used by default when sorting by group.
- |  *long*: used when ``--long`` is specified.
+    :name: used when ``--name-only`` is specified.
+    :short: used by when ``--short`` is specified and when sorting by name.
+    :date: used by default when sorting by date.
+    :size: size in bytes (fixed format).
+    :si: size in bytes (SI format), used by default when sorting by size.
+    :owner: used by default when sorting by owner.
+    :group: used by default when sorting by group.
+    :long: used when ``--long`` is specified.
 
 Your *manifest_formats* need not define all or even any of these formats.
 The above example shows the formats that are predefined in *Emborg*. You do not 
@@ -1357,6 +1359,20 @@ Only consider archive names starting with this prefix.
 As of Borg 1.2 *prefix* is deprecated and should no longer be used.  Use 
 :ref:`glob_archives` instead.  It provides the same basic functionality in a way 
 that is a little more general.  For more information, see :ref:`archive`.
+
+Prior to the deprecation of *prefix* it was common in *Emborg* settings file to 
+just specify *prefix* and not specify :ref:`archive` with the understanding that 
+the default value of *archive* is ``{prefix}-{{now}}``.  So you might have 
+something like::
+
+    prefix = '{config_name}-'
+
+in your settings file.  This can be converted to::
+
+    archive = '{config_name}-{{now}}'
+    glob_archives = '{config_name}-*'
+
+without changing the intent.
 
 
 .. _remote_path:
