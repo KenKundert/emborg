@@ -89,9 +89,8 @@ the repository.
 BreakLock
 ---------
 
-This command breaks the repository and cache locks. Please use carefully and 
-only while no *Borg* process (on any machine) is trying to access the Cache or 
-the Repository.
+This command breaks the repository and cache locks. Use carefully and only if no 
+*Borg* process (on any machine) is trying to access the Cache or the Repository.
 
 .. code-block:: bash
 
@@ -108,9 +107,7 @@ Check the integrity of the repository and its archives.  The most recently
 created archive is checked if one is not specified unless ``--all`` is given, in 
 which case all archives are checked.
 
-The ``--repair`` option attempts to repair any damage found. Be aware that this 
-is considered an *experimental* feature in *Borg* and so carries extra risk due 
-to its immaturity.
+The ``--repair`` option attempts to repair any damage found.
 
 
 .. _compact:
@@ -254,16 +251,23 @@ and current directory if not.
 Delete
 ------
 
-Delete an archive currently contained in the repository:
+Delete one or more archives currently contained in the repository:
 
 .. code-block:: bash
 
     $ emborg delete continuum-2020-12-05T19:23:09
 
-Only one archive can be deleted per command invocation. If an archive is not 
-given, the latest is deleted.
+If no archive is specified, the latest is deleted.
+
+The disk space associated with deleted archives is not reclaimed until
+the :ref:`compact <manage_compact_cmd>` command is run.  You can specify that 
+a compaction is performed as part of the deletion by setting 
+:ref:`compact_after_delete`.  If set, the ``--fast`` flag causes the compaction 
+to be skipped.  If not set, the ``--fast`` flag has no effect.
 
 Specifying ``--repo`` results in the entire repository being deleted.
+Unlike with *borg* itself, no warning is issued and no additional conformation 
+is required.
 
 
 .. _diff:
@@ -647,6 +651,12 @@ specified to use :ref:`prune <prune>`:
 
     $ emborg prune
 
+The *prune* command deletes archives that are no longer needed as determined by 
+the prune rules.  However, the disk space is not reclaimed until the 
+:ref:`compact <manage_compact_cmd>` command is run.  You can specify that 
+a compaction is performed as part of the prune by setting 
+:ref:`compact_after_delete`.  If set, the ``--fast`` flag causes the compaction 
+to be skipped.  If not set, the ``--fast`` flag has no effect.
 
 .. _restore:
 

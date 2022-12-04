@@ -292,9 +292,9 @@ class BorgCommand(Command):
         Usage:
             emborg borg <borg_args>...
 
-        You can specify the repository to act on using ‘@repo’, which is
+        You can specify the repository to act on using “@repo”, which is
         replaced with the path to the repository.  Specify the repository and
-        archive using ‘@repo::❬archive-name❭’.  The passphrase is set before
+        archive using “@repo::❬archive-name❭”.  The passphrase is set before
         the command is run.
         """
     ).strip()
@@ -325,8 +325,9 @@ class BreakLockCommand(Command):
             emborg breaklock
             emborg break-lock
 
-        Breaks both the local and the repository locks.  Be sure Borg is no
-        longer running before using this command.
+        Breaks both the local and the repository locks.  Use carefully and only
+        if no *Borg* process (on any machine) is trying to access the Cache or
+        the Repository.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = False
@@ -797,7 +798,14 @@ class DeleteCommand(Command):
             -s, --stats    show Borg statistics
             --cache-only   delete only the local cache for the given repository
 
-        If no archive is specified, the latest is deleted.
+        The delete command deletes the specified archives.  If no archive is
+        specified, the latest is deleted.
+
+        The disk space associated with deleted archives is not reclaimed until
+        the compact command is run.  You can specify that a compaction is
+        performed as part of the deletion by setting compact_after_delete.  If
+        set, the --fast flag causes the compaction to be skipped.  If not set,
+        the --fast flag has no effect.
 
         Using --repo causes the entire repository to be deleted.  Unlike borg
         itself, no warning is issued and no additional conformation is required.
@@ -875,6 +883,10 @@ class DiffCommand(Command):
         Options:
             -R, --recursive                     show files in sub directories
                                                 when path is specified
+
+        Shows the differences between two archives.  You can constrain the 
+        output listing to only those files in a particular directory by 
+        adding that path to the end of the command.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1219,7 +1231,7 @@ class HelpCommand(Command):
 # InfoCommand command {{{1
 class InfoCommand(Command):
     NAMES = "info".split()
-    DESCRIPTION = "print information about a backup"
+    DESCRIPTION = "display metadata for a repository or archive"
     USAGE = dedent(
         """
         Usage:
@@ -1227,6 +1239,7 @@ class InfoCommand(Command):
 
         Options:
             -f, --fast               only report local information
+
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1281,12 +1294,14 @@ class InfoCommand(Command):
 
 # InitializeCommand command {{{1
 class InitializeCommand(Command):
-    NAMES = "init".split()
+    NAMES = "init initialize".split()
     DESCRIPTION = "initialize the repository"
     USAGE = dedent(
         """
         Usage:
             emborg init
+
+        This must be done before you create your first archive.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1312,7 +1327,7 @@ class InitializeCommand(Command):
 # ListCommand command {{{1
 class ListCommand(Command):
     NAMES = "list lr archives".split()
-    DESCRIPTION = "list the archives currently contained in the repository"
+    DESCRIPTION = "display available archives"
     USAGE = dedent(
         """
         Usage:
@@ -1352,7 +1367,7 @@ class ListCommand(Command):
 # LogCommand command {{{1
 class LogCommand(Command):
     NAMES = "log".split()
-    DESCRIPTION = "print logfile for the last emborg run"
+    DESCRIPTION = "display log for the last emborg run"
     USAGE = dedent(
         """
         Usage:
@@ -1406,8 +1421,8 @@ class ManifestCommand(Command):
             -R, --recursive                     show files in sub directories
                                                 when path is specified
 
-        Once a backup has been performed, you can list the files available in
-        your archive using::
+        Once a backup has been performed, you can list the files and directories
+        available in your archive using::
 
             emborg manifest
 
@@ -1752,6 +1767,13 @@ class PruneCommand(Command):
             -f, --fast               skip compacting
             -l, --list               show fate of each archive
             -s, --stats              show Borg statistics
+
+        The prune command deletes archives that are no longer needed as
+        determined by the prune rules.  However, the disk space is not reclaimed
+        until the compact command is run.  You can specify that a compaction is
+        performed as part of the prune by setting compact_after_delete.  If set,
+        the --fast flag causes the compaction to be skipped.  If not set, the
+        --fast flag has no effect.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1795,7 +1817,7 @@ class PruneCommand(Command):
             output(out.rstrip())
         prune_status = borg.status
 
-        if cmdline["--fast"]:
+        if fast:
             return prune_status
 
         try:

@@ -42,11 +42,11 @@ emborg without configs:
             >     due               days since last backup
             >     extract           recover file or files from archive
             >     help              give information about commands or other topics
-            >     info              print information about a backup
-            >     init              initialize the repository
+            >     info              display metadata for a repository or archive
+            >     init, initialize  initialize the repository
             >     list, lr, archives
-            >                       list the archives currently contained in the repository
-            >     log               print logfile for the last emborg run
+            >                       display available archives
+            >     log               display log for the last emborg run
             >     manifest, m, la, files, f
             >                       list the files contained in an archive
             >     mount             mount a repository or archive
