@@ -5,6 +5,8 @@
 Accessories
 ===========
 
+.. _borg space:
+
 Borg-Space
 ----------
 

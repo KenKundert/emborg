@@ -116,11 +116,11 @@ the following:
     # commands to be run before and after backups (run from working directory)
     run_before_first_backup = """
         # remove the detritus before backing up
-        ./clean-home >& {log_dir}/clean-home.log
+        ~/bin/clean-home >& {log_dir}/clean-home.log
     """
     run_after_last_backup = """
-        # rebuild my man pages, they were deleted by clean-home
-        ./rebuild-manpages > /dev/null
+        # rebuild my documentation, it was deleted by clean-home
+        ~/bin/rebuild-documentation > /dev/null
     """
 
     # if set, this file or these files must exist or backups will quit with an error
@@ -1022,6 +1022,16 @@ one specifies identical commands to *run_after_last_backup* for each
 configuration in a composite configuration with the intent that the commands 
 will be run only once regardless whether the configurations are run individually 
 or as a group.
+
+For example, the following runs :ref:`borg space` after each back-up to record 
+the size history of your repository:
+
+.. code-block:: python
+
+    run_after_backup = [
+        'borg-space -r -m "Repository is now {{size:.2}}." {config_name}'
+    ]
+
 
 .. _run_before_backup:
 .. _run_before_first_backup:

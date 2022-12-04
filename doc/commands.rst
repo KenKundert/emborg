@@ -260,10 +260,10 @@ Delete one or more archives currently contained in the repository:
 If no archive is specified, the latest is deleted.
 
 The disk space associated with deleted archives is not reclaimed until
-the :ref:`compact <manage_compact_cmd>` command is run.  You can specify that 
-a compaction is performed as part of the deletion by setting 
-:ref:`compact_after_delete`.  If set, the ``--fast`` flag causes the compaction 
-to be skipped.  If not set, the ``--fast`` flag has no effect.
+the :ref:`compact <compact>` command is run.  You can specify that a compaction 
+is performed as part of the deletion by setting :ref:`compact_after_delete`.  If 
+set, the ``--fast`` flag causes the compaction to be skipped.  If not set, the 
+``--fast`` flag has no effect.
 
 Specifying ``--repo`` results in the entire repository being deleted.
 Unlike with *borg* itself, no warning is issued and no additional conformation 
@@ -653,10 +653,10 @@ specified to use :ref:`prune <prune>`:
 
 The *prune* command deletes archives that are no longer needed as determined by 
 the prune rules.  However, the disk space is not reclaimed until the 
-:ref:`compact <manage_compact_cmd>` command is run.  You can specify that 
-a compaction is performed as part of the prune by setting 
-:ref:`compact_after_delete`.  If set, the ``--fast`` flag causes the compaction 
-to be skipped.  If not set, the ``--fast`` flag has no effect.
+:ref:`compact <compact>` command is run.  You can specify that a compaction is 
+performed as part of the prune by setting :ref:`compact_after_delete`.  If set, 
+the ``--fast`` flag causes the compaction to be skipped.  If not set, the 
+``--fast`` flag has no effect.
 
 .. _restore:
 
