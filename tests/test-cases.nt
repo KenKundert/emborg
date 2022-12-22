@@ -1089,9 +1089,7 @@ emborg with configs:
 
     cleanser:
         args: --config test7 list
-        expected:
-            > emborg error: list:
-            >     Repository /⟪EMBORG⟫/tests/repositories does not exist.
+        expected: emborg error: list: Repository /⟪EMBORG⟫/tests/repositories does not exist.
         expected_type: error
 
     harlequin:
