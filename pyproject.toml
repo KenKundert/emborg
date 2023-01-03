@@ -3,7 +3,6 @@ name = "emborg"
 version = "1.34"
 description = "Borg front end."
 readme = "README.rst"
-license = {file = "LICENSE"}
 keywords = ["emborg", "borg", "borgmatic", "backups"]
 authors = [
     {name = "Ken Kundert"},

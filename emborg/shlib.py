@@ -4,7 +4,7 @@
 # shell-script-like things relatively easily in Python.
 
 # License {{{1
-# Copyright (C) 2016-2022 Kenneth S. Kundert
+# Copyright (C) 2016-2023 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -111,12 +111,12 @@ def quote_arg(arg):
             import re
         except ImportError:
 
-            def quote(arg):
-                if not arg:
+            def quote(s):  # type: (str) -> str
+                if not s:
                     return "''"
-                if re.search(r"[^\w@%+=:,./-]", arg, re.ASCII) is None:
-                    return arg
-                return "'" + arg.replace("'", "'\"'\"'") + "'"
+                if re.search(r"[^\w@%+=:,./-]", s, re.ASCII) is None:
+                    return s
+                return "'" + s.replace("'", "'\"'\"'") + "'"
 
     return quote(str(arg))
 
@@ -257,17 +257,17 @@ def mkdir(*paths):
 class mount:
     def __init__(self, path):
         self.path = to_path(path)
-        self.mounted_externally = is_mounted(self.path)
+        self.previously_mounted = is_mounted(self.path)
         modes = 'sOEW0' if PREFERENCES["use_inform"] else 'soeW0'
 
-        if not self.mounted_externally:
+        if not self.previously_mounted:
             Run(["mount", self.path], modes=modes)
 
     def __enter__(self):
         pass
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        if not self.mounted_externally:
+        if not self.previously_mounted:
             umount(self.path)
 
 

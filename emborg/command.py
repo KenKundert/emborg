@@ -984,7 +984,7 @@ class DueCommand(Command):
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "all"
     LOG_COMMAND = False
-    MESSAGES = {}
+    MESSAGES = {}  # type: dict[str, str]
     SHOW_CONFIG_NAME = False
     OLDEST_DATE = None
     OLDEST_CONFIG = None
@@ -1586,8 +1586,8 @@ class ManifestCommand(Command):
         if cmdline['--no-color']:
             healthy_color = broken_color = lambda x: x
         else:
-            healthy_color = Color("green", Color.isTTY())
-            broken_color = Color("red", Color.isTTY())
+            healthy_color = Color("green", enable=Color.isTTY())
+            broken_color = Color("red", enable=Color.isTTY())
         total_size = 0
         for values in lines:
             # this loop can be quite slow. the biggest issue is arrow. parsing
@@ -1953,9 +1953,9 @@ class SettingsCommand(Command):
         show_available = cmdline["--available"]
         width = 26
         leader = (width+2)*' '
-        unknown = Color("yellow", Color.isTTY())
-        known = Color("cyan", Color.isTTY())
-        resolved = Color("magenta", Color.isTTY())
+        unknown = Color("yellow", enable=Color.isTTY())
+        known = Color("cyan", enable=Color.isTTY())
+        resolved = Color("magenta", enable=Color.isTTY())
         color_adjust = len(known('x')) - 1
 
         if show_available:

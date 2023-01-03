@@ -1,6 +1,6 @@
 # Emborg Preferences
 #
-# Copyright (C) 2018-2022 Kenneth S. Kundert
+# Copyright (C) 2018-2023 Kenneth S. Kundert
 
 # License {{{1
 # This program is free software: you can redistribute it and/or modify
@@ -108,133 +108,128 @@ EMBORG_SETTINGS = dict(
 # Borg settings {{{2
 BORG_SETTINGS = dict(
     append_only = dict(
-        cmds = "init",
+        cmds = ["init"],
         desc = "create an append-only mode repository"
     ),
     chunker_params = dict(
-        cmds = "create",
+        cmds = ["create"],
         arg = "PARAMS",
         desc = "specify the chunker parameters"
     ),
     compression = dict(
-        cmds = "create",
+        cmds = ["create"],
         arg = "COMPRESSION",
         desc = "compression algorithm"
     ),
     exclude_caches = dict(
-        cmds = "create",
+        cmds = ["create"],
         desc = "exclude directories that contain a CACHEDIR.TAG file"
     ),
     exclude_nodump = dict(
-        cmds = "create",
+        cmds = ["create"],
         desc = "exclude files flagged NODUMP"
     ),
     exclude_if_present = dict(
-        cmds = "create",
+        cmds = ["create"],
         arg = "NAME",
         desc = "exclude directories that are tagged by containing a filesystem object with the given NAME",
     ),
     lock_wait = dict(
-        cmds = "all",
+        cmds = ["all"],
         arg = "SECONDS",
         desc = "wait at most SECONDS for acquiring a repository/cache lock (default: 1)",
     ),
     keep_within = dict(
-        cmds = "prune",
+        cmds = ["prune"],
         arg = "INTERVAL",
         desc = "keep all archives within this time interval"
     ),
     keep_last = dict(
-        cmds = "prune",
+        cmds = ["prune"],
         arg = "NUM",
         desc = "number of the most recent archives to keep"
     ),
     keep_minutely = dict(
-        cmds = "prune",
+        cmds = ["prune"],
         arg = "NUM",
         desc = "number of minutely archives to keep"
     ),
     keep_hourly = dict(
-        cmds = "prune",
+        cmds = ["prune"],
         arg = "NUM",
         desc = "number of hourly archives to keep"
     ),
     keep_daily = dict(
-        cmds = "prune",
+        cmds = ["prune"],
         arg = "NUM",
         desc = "number of daily archives to keep"
     ),
     keep_weekly = dict(
-        cmds = "prune",
+        cmds = ["prune"],
         arg = "NUM",
         desc = "number of weekly archives to keep"
     ),
     keep_monthly = dict(
-        cmds = "prune",
+        cmds = ["prune"],
         arg = "NUM",
         desc = "number of monthly archives to keep"
     ),
     keep_yearly = dict(
-        cmds = "prune",
+        cmds = ["prune"],
         arg = "NUM",
         desc = "number of yearly archives to keep"
     ),
     one_file_system = dict(
-        cmds = "create",
+        cmds = ["create"],
         desc = "stay in the same file system and do not store mount points of other file systems",
     ),
     remote_path = dict(
-        cmds = "all",
+        cmds = ["all"],
         arg = "CMD",
         desc = "name of borg executable on remote platform",
     ),
     remote_ratelimit = dict(
-        cmds = "all",
+        cmds = ["all"],
         arg = "RATE",
         desc = "set remote network upload rate limit in kiB/s (default: 0=unlimited)",
     ),
     sparse = dict(
-        cmds = "create",
+        cmds = ["create"],
         desc = "detect sparse holes in input (supported only by fixed chunker)"
     ),
     threshold = dict(
-        cmds = "compact",
+        cmds = ["compact"],
         arg = "PERCENT",
         desc = "set minimum threshold in percent for saved space when compacting (default: 10)",
     ),
     umask = dict(
-        cmds = "all",
+        cmds = ["all"],
         arg = "M",
         desc = "set umask to M (local and remote, default: 0077)"
     ),
     upload_buffer = dict(
-        cmds = "all",
+        cmds = ["all"],
         arg = "UPLOAD_BUFFER",
         desc = "set network upload buffer size in MiB (default: 0=no buffer)",
     ),
     upload_ratelimit = dict(
-        cmds = "all",
+        cmds = ["all"],
         arg = "RATE",
         desc = "set rate limit in kiB/s, used when writing to a remote network (default: 0=unlimited)",
     ),
     prefix = dict(
-        cmds = "check delete info list mount prune",
+        cmds = ["check", "delete", "info", "list", "mount", "prune"],
         arg = "PREFIX",
         desc = "only consider archive names starting with this prefix",
     ),
     glob_archives = dict(
-        cmds = "check delete info list mount prune",
+        cmds = ["check", "delete", "info", "list", "mount", "prune"],
         arg = "GLOB",
         desc = "only consider archive names matching the glob",
     ),
 )
 
 # Utilities {{{2
-# convert args to lists
-for opt, attrs in BORG_SETTINGS.items():
-    attrs["cmds"] = attrs["cmds"].split()
-
-
 # utility function that converts setting names to borg option names
 def convert_name_to_option(name):
     return "--" + name.replace("_", "-")
