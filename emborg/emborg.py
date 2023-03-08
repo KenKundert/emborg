@@ -440,12 +440,15 @@ class Emborg:
 
         # expand names contained in braces
         try:
-            resolved = value.format(
-                host_name=hostname,
-                user_name=username,
-                prog_name=PROGRAM_NAME,
-                **self.str_settings,
+            # build kywars in a way so that user can override values normally
+            # provided by emborg itself in settings file.
+            kwargs = dict(
+                host_name = hostname,
+                user_name = username,
+                prog_name = PROGRAM_NAME,
             )
+            kwargs.update(self.str_settings)
+            resolved = value.format(**kwargs)
         except KeyError as e:
             raise Error("unknown setting.", culprit=e)
         if resolved != value:

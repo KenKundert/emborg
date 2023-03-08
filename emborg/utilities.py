@@ -15,10 +15,10 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 # Imports {{{1
-import os
+import arrow
 import pwd
+import os
 import socket
-
 from .shlib import Run, set_prefs as set_shlib_prefs
 set_shlib_prefs(use_inform=True, log_cmd=True)
 
@@ -80,3 +80,108 @@ def error_source():
         filename = get_active_python_file()
         line = tb.tb_next.tb_lineno
     return filename, "line %s" % line
+
+# when {{{1
+def when(time, relative_to=None, as_past=None, as_future=None):
+    """Converts time into a human friendly description of a time difference
+
+    Takes a time and returns a string that is intended for people.  It is a
+    short description of the time difference between the given time and the
+    current time or a reference time.  It is like arrow.humanize(), but provides
+    more resolution.  It is suitable for use with time differences that exceed
+    1 second.  Any smaller than that will round to 0.
+
+    Arguments:
+        time (datetime):
+            The time of the event. May either be in the future or the past.
+        relative_to (datetime):
+            Time to compare against to form the time difference.  If not given,
+            the current time is used.
+        as_ast (bool or str):
+            If true, the word “ago” will be added to the end of the returned
+            time difference if it is negative, indicating it occurred in the
+            past.  It it a string, it should contain ‘{}’, which is replaced
+            with the time difference.
+        as_future (bool or str):
+            If true, the word “in” will be added to the front of the returned
+            time difference if it is positive, indicating it occurs in the
+            past.  It it a string, it should contain ‘{}’, which is replaced
+            with the time difference.
+    Returns:
+        A user friendly string that describes the time difference.
+
+    Examples:
+
+        >>> import arrow
+        >>> now = arrow.now()
+        >>> print(when(now.shift(seconds=60.1)))
+        1 minute
+
+        >>> print(when(now.shift(seconds=2*60), as_future=True))
+        in 2 minutes
+
+        >>> print(when(now.shift(seconds=-60*60), as_past=True))
+        60 minutes ago
+
+        >>> print(when(now.shift(seconds=3.5*60), as_future="{} from now"))
+        3.5 minutes from now
+
+        >>> print(when(now.shift(days=-2*365), as_past="{} in the past"))
+        2 years in the past
+    """
+
+    if relative_to is None:
+        relative_to = arrow.now()
+    difference = time - relative_to
+    seconds = 60*60*24*difference.days + difference.seconds
+
+    def fmt(dt, prec, unit):
+        if prec:
+            num = f'{dt:0.1f}'.rstrip('.0')
+        else:
+            num = f'{dt:0.0f}'
+        if num == '1':
+            offset = f'{num} {unit}'
+        else:
+            offset = f'{num} {unit}s'
+        return offset
+
+    if seconds < 0 and as_past:
+        if as_past is True:
+            as_past = "{} ago"
+        def annotate(dt, prec, unit):
+            return as_past.format(fmt(dt, prec, unit))
+    elif seconds >= 0 and as_future:
+        if as_future is True:
+            as_future = "in {}"
+        def annotate(dt, prec, unit):
+            return as_future.format(fmt(dt, prec, unit))
+    else:
+        annotate = fmt
+
+    seconds = abs(seconds)
+    if seconds < 60:
+        return annotate(seconds, 0, "second")
+    minutes = seconds / 60
+    if minutes < 10:
+        return annotate(minutes, 1, "minute")
+    if minutes < 120:
+        return annotate(minutes, 0, "minute")
+    hours = minutes / 60
+    if hours < 10:
+        return annotate(hours, 1, "hour")
+    if hours < 36:
+        return annotate(hours, 0, "hour")
+    days = hours / 24
+    if days < 14:
+        return annotate(days, 1, "day")
+    weeks = days / 7
+    if weeks < 8:
+        return annotate(weeks, 0, "week")
+    months = days / 30
+    if months < 18:
+        return annotate(months, 0, "month")
+    years = days / 365
+    if years < 10:
+        return annotate(years, 1, "year")
+    return annotate(years, 0, "year")

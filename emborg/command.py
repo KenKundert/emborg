@@ -47,7 +47,7 @@ from .shlib import (
 from time import sleep
 from .collection import Collection
 from .preferences import BORG_SETTINGS, DEFAULT_COMMAND, EMBORG_SETTINGS, PROGRAM_NAME
-from .utilities import gethostname, pager, two_columns
+from .utilities import gethostname, pager, two_columns, when
 
 
 # Utilities {{{1
@@ -588,7 +588,7 @@ class CompareCommand(Command):
                 codicil = e.stdout if e.stdout and not e.stderr else None
                 e.report(codicil=codicil)
             except KeyboardInterrupt:
-                log('user killed diff command.')
+                log('user killed compare command.')
                 diff.kill()
 
         finally:
@@ -996,10 +996,10 @@ class DueCommand(Command):
         email = cmdline["--email"]
 
         def gen_message(date):
+            elapsed = when(date, as_past=True)
             if cmdline["--message"]:
                 since_last_backup = arrow.now() - date
                 days = since_last_backup.total_seconds() / 86400
-                elapsed = date.humanize(only_distance=True)
                 try:
                     return cmdline["--message"].format(
                         days=days, elapsed=elapsed, config=settings.config_name
@@ -1011,7 +1011,7 @@ class DueCommand(Command):
                         codicil = cmdline["--message"],
                     )
             else:
-                return f"The latest {settings.config_name} archive was created {date.humanize()}."
+                return f"The latest {settings.config_name} archive was created {elapsed}."
 
         if email:
 
