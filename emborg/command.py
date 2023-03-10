@@ -996,7 +996,7 @@ class DueCommand(Command):
         email = cmdline["--email"]
 
         def gen_message(date):
-            elapsed = when(date, as_past=True)
+            elapsed = when(date)
             if cmdline["--message"]:
                 since_last_backup = arrow.now() - date
                 days = since_last_backup.total_seconds() / 86400
@@ -1011,7 +1011,7 @@ class DueCommand(Command):
                         codicil = cmdline["--message"],
                     )
             else:
-                return f"The latest {settings.config_name} archive was created {elapsed}."
+                return f"The latest {settings.config_name} archive was created {elapsed} ago."
 
         if email:
 
