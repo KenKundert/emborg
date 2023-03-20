@@ -3,7 +3,7 @@
 Emborg — Front-End to Borg Backup
 =================================
 
-| Version: 1.34.2
+| Version: 1.35
 | Released: 2023-03-20
 | Please report all bugs and suggestions on GitHub_.
 
