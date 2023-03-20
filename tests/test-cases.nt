@@ -628,7 +628,7 @@ emborg with configs:
         expected:
             > run_before_borg on test0
             > run_after_borg on test0
-        cmp_dirs: /⟪EMBORG⟫/tests/CONFIGS configs
+        cmp_dirs: /⟪EMBORG⟫/tests/STARTING_CONFIGS configs
 
     oddment:
         remove: configs
@@ -636,7 +636,7 @@ emborg with configs:
         expected:
             > run_before_borg on test0
             > run_after_borg on test0
-        cmp_dirs: CONFIGS configs
+        cmp_dirs: STARTING_CONFIGS configs
 
     freelance:
         args: --quiet --config test0 mount EMBORG
@@ -728,8 +728,8 @@ emborg with configs:
             >   614B tests/configs/settings
             >   671B tests/configs/test3
             >   965B tests/configs/test4
-            > 1.84kB tests/configs/README
-            > Total size = 7.34kB.
+            > 1.85kB tests/configs/README
+            > Total size = 7.35kB.
         expected_type: regex
 
     sparkler:
@@ -764,7 +764,7 @@ emborg with configs:
             > run_before_borg 1
             > run_after_borg 0
             > run_after_borg 1
-        cmp_dirs: CONFIGS tests/configs
+        cmp_dirs: STARTING_CONFIGS tests/configs
 
     rewrite:
         remove: configs tests
@@ -774,7 +774,7 @@ emborg with configs:
             > run_before_borg 1
             > run_after_borg 0
             > run_after_borg 1
-        cmp_dirs: CONFIGS tests/configs
+        cmp_dirs: STARTING_CONFIGS tests/configs
 
     abuse:
         remove: configs tests
@@ -784,7 +784,7 @@ emborg with configs:
             > run_before_borg 1
             > run_after_borg 0
             > run_after_borg 1
-        cmp_dirs: CONFIGS configs
+        cmp_dirs: STARTING_CONFIGS configs
 
     dozen:
         args: --quiet --config test4 mount
@@ -940,12 +940,12 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test8
             > ⟪EMBORG⟫/tests/configs/test9
         expected_type: sort-lines
-        cmp_dirs: CONFIGS configs
+        cmp_dirs: STARTING_CONFIGS configs
 
     execute:
         args: --quiet --config test5 mount
         expected: Mounting filesystem
-        cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs CONFIGS
+        cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs STARTING_CONFIGS
         dependencies: fuse
 
     complaint:
@@ -998,24 +998,24 @@ emborg with configs:
             >   614B tests/configs/settings
             >   671B tests/configs/test3
             >   965B tests/configs/test4
-            > 1.84kB tests/configs/README
-            > Total size = 7.34kB.
+            > 1.85kB tests/configs/README
+            > Total size = 7.35kB.
         expected_type: regex
 
     intercom:
         remove: configs tests
         args: --quiet --config test6 extract -f tests/configs
-        cmp_dirs: CONFIGS tests/configs
+        cmp_dirs: STARTING_CONFIGS tests/configs
 
     embellish:
         remove: configs tests
         args: --quiet --config test6 extract -f /⟪EMBORG⟫/tests/configs
-        cmp_dirs: CONFIGS tests/configs
+        cmp_dirs: STARTING_CONFIGS tests/configs
 
     rating:
         remove: configs tests
         args: --quiet --config test6 restore configs
-        cmp_dirs: CONFIGS configs
+        cmp_dirs: STARTING_CONFIGS configs
 
     clampdown:
         args: --quiet --config test6 mount
@@ -1068,11 +1068,11 @@ emborg with configs:
     louse:
         remove: configs
         args: --quiet --config test7 restore configs
-        cmp_dirs: CONFIGS configs
+        cmp_dirs: STARTING_CONFIGS configs
 
     sweetener:
         args: --quiet --config test7 mount
-        cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs CONFIGS
+        cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs STARTING_CONFIGS
         dependencies: fuse
 
     florist:
@@ -1210,22 +1210,22 @@ emborg with configs:
     bathmat:
         remove: configs/subdir/file
         args: --quiet --config test8 extract -f configs.symlink/subdir/file
-        cmp_dirs: CONFIGS/subdir ./⟪EMBORG⟫/tests/configs/subdir
+        cmp_dirs: STARTING_CONFIGS/subdir ./⟪EMBORG⟫/tests/configs/subdir
 
     allot:
         remove: configs/subdir/file
         args: --quiet --config test8 extract -f /⟪EMBORG⟫/tests/configs.symlink/subdir/file
-        cmp_dirs: CONFIGS/subdir ./⟪EMBORG⟫/tests/configs/subdir
+        cmp_dirs: STARTING_CONFIGS/subdir ./⟪EMBORG⟫/tests/configs/subdir
 
     clutter:
         remove: configs/subdir
         args: --quiet --config test8 restore configs/subdir
-        cmp_dirs: CONFIGS/subdir configs/subdir
+        cmp_dirs: STARTING_CONFIGS/subdir configs/subdir
 
     interior:
         remove: configs/subdir/file
         args: --quiet --config test8 restore configs/subdir/file
-        cmp_dirs: CONFIGS/subdir configs/subdir
+        cmp_dirs: STARTING_CONFIGS/subdir configs/subdir
 
     craftsman:
         args: --quiet --config test8 mount

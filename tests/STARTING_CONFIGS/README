@@ -1,5 +1,5 @@
 There are 9 base configurations and one composite configurations.
-Before the start of testing, 'CONFIGS' is copied to 'configs'
+Before the start of testing, 'STARTING_CONFIGS' is copied to 'configs'
 
 The tests back up only this directory or the 'configs' subdirectory
     - need a controlled set of files to test manifest

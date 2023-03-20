@@ -7,6 +7,13 @@ Latest development release
 | Released: 2023-03-08
 
 
+1.35 (2023-03-20)
+-----------------
+- Improved the time resolution in :ref:`due <due>` command.
+- Added *si* format to :ref:`manifest <manifest>` command.
+- Allow *config_dir* to be specified through API.
+
+
 1.34 (2022-11-03)
 -----------------
 - Added ability to apply the :ref:`info <info>` command to a particular archive.

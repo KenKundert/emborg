@@ -183,7 +183,7 @@ class EmborgTester(object):
 def initialize(dependency_options):
     with cd(tests_dir):
         rm("configs .config .local repositories configs.symlink".split())
-        cp("CONFIGS", "configs")
+        cp("STARTING_CONFIGS", "configs")
         mkdir(".config repositories .local".split())
         ln("~/.local/bin", ".local/bin")
         ln("~/.local/lib", ".local/lib")
@@ -195,7 +195,7 @@ def initialize(dependency_options):
 @pytest.fixture(scope="session")
 def initialize_configs(initialize, dependency_options):
     with cd(tests_dir):
-        cp("CONFIGS", ".config/emborg")
+        cp("STARTING_CONFIGS", ".config/emborg")
         rm(".config/emborg/subdir")
         for p in lsf(".config/emborg"):
             contents = p.read_text()
