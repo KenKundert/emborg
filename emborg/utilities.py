@@ -136,10 +136,9 @@ def when(time, relative_to=None, as_past=None, as_future=None):
     seconds = 60*60*24*difference.days + difference.seconds
 
     def fmt(dt, prec, unit):
-        if prec:
-            num = f'{dt:0.1f}'.rstrip('.0')
-        else:
-            num = f'{dt:0.0f}'
+        num = f'{dt:0.{prec}f}'
+        if '.' in num:
+            num = num.rstrip('0').rstrip('.')
         if num == '1':
             offset = f'{num} {unit}'
         else:
