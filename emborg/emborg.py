@@ -20,10 +20,7 @@
 import errno
 import os
 import re
-from textwrap import dedent
-
 import arrow
-
 from inform import (
     Color,
     Error,
@@ -31,6 +28,7 @@ from inform import (
     codicil,
     comment,
     conjoin,
+    dedent,
     display,
     done,
     errors_accrued,
@@ -50,7 +48,6 @@ from .shlib import (
     Run, cd, cwd, getmod, mv, render_command, rm, to_path,
     set_prefs as set_shlib_prefs
 )
-
 from . import __version__
 from .collection import Collection, split_lines
 from .hooks import Hooks
@@ -368,8 +365,7 @@ class Emborg:
                 Run(
                     ["mail", "-s", f"{PROGRAM_NAME} failed on {username}@{hostname}"]
                     + self.notify.split(),
-                    stdin=dedent(
-                        f"""\
+                    stdin=dedent(f"""\
                         {PROGRAM_NAME} fails.
 
                         command: {cmd}
@@ -377,8 +373,7 @@ class Emborg:
                         source: {username}@{fullhostname}:{', '.join(str(d) for d in self.src_dirs)}
                         destination: {self.repository!s}
                         error message:
-                        """
-                    ) + indent(msg) + "\n",
+                    """) + indent(msg) + "\n",
                     modes="soeW",
                     encoding="ascii",
                 )
@@ -552,16 +547,14 @@ class Emborg:
                     warn("passphrase given but not needed as encryption set to none.")
                 if encryption.startswith("keyfile"):
                     warn(
-                        dedent(
-                            f"""
+                        dedent(f"""
                             you should use “borg key export” to export the
                             encryption key, and then keep that key in a safe
                             place.  You can do this with emborg using “emborg
                             --config {self.config_name} borg key export @repo
                             ❬/.../out-file❭”.  If you lose this key you lose
                             access to your backups.
-                            """
-                        ).strip(),
+                        """).strip(),
                         wrap=True,
                     )
             else:
@@ -928,12 +921,10 @@ class Emborg:
             now = arrow.now()
             pid = os.getpid()
             lockfile.write_text(
-                dedent(
-                    f"""
+                dedent(f"""
                     started = {now!s}
                     pid = {pid}
-                    """
-                ).lstrip()
+                """).lstrip()
             )
 
         # open logfile

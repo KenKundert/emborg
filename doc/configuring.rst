@@ -342,6 +342,54 @@ features are described in the `Borg patterns documentation
 <https://borgbackup.readthedocs.io/en/stable/usage/help.html>`_.
 
 
+.. _retention:
+
+Archive Retention
+-----------------
+
+You use the retention limits (the ``keep_X`` settings) to specify how long to 
+keep archives after they have been created.  A good description of the use of 
+these settings can be found on the `Borg Prune Command 
+<https://borgbackup.readthedocs.io/en/stable/usage/prune.html>`_ page.
+
+Generally you want to thin the archives out more and more as they age.  When 
+choosing your retention limits you need to consider the nature of the files you 
+are archiving.  Specifically you need to consider how often the files change, 
+whether you would want to recover prior versions of the files you keep and if so 
+how many prior versions are of interest, and how long precious files may be 
+missing or damaged before you notice that they need to be restored.
+
+If files are changing all the time, long high retention limits result in high 
+storage requirements.  If you want to make sure you retain the latest version of 
+a file but you do not need prior versions, then you can reduce your retention 
+limits to reduce your storage requirements.  For example, consider a directory 
+of log files.  Log files generally change all the time, but they also tend to be 
+cumulative, meaning that the latest file contains the information contained in 
+prior versions of the same file, so keeping those prior versions is of low 
+value.  In this situation using “*keep_last N*” where *N* is small is a good 
+approach.
+
+Now consider a directory of files that should be kept forever, such as family 
+photos or legal documents.  The loss of these files due to disk corruption or 
+accidental deletion might not be noticed for years.  In this case you would want 
+to specify “*keep_yearly N*” where *N* is large.  These files never change, so 
+the de-duplication feature of *Borg* avoids growth in storage requirements 
+despite high retention limits.
+
+You cannot specify retention limits on a per file or per directory basis within 
+a single configuration.  Instead, if you feel it is necessary, you would create 
+individual configurations for files with different retention needs.  For 
+example, as a system administrator you might want to create separate 
+configurations for operating system files, which tend to need low retention 
+limits, and users home directories, which benefit from longer retention limits.
+
+Remember that your retention limits are not enforced until you run the 
+:ref:`prune command <prune>`.  Furthermore, with *Borg 1.2* and later, after 
+running the *prune command*, the disk space is not reclaimed until you run the 
+:ref:`compact command <compact>`.  You can automate pruning and compaction using 
+the :ref:`prune_after_create` and :ref:`compact_after_delete` settings.
+
+
 .. _confirming_configuration:
 
 Confirming Your Configuration
