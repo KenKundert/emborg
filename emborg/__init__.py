@@ -1,4 +1,4 @@
-__version__ = "1.35"
-__released__ = "2023-03-20"
+__version__ = "1.35.1"
+__released__ = "2023-04-08"
 
 from .emborg import Emborg
