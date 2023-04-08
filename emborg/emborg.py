@@ -728,7 +728,7 @@ class Emborg:
                     del os.environ[self.borg_passcode_env_var_set_by_emborg]
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
-            log("elapsed = {!s}".format(ends_at - starts_at))
+            log("elapsed: {!s}".format(ends_at - starts_at))
         narrate("Borg exit status:", borg.status)
         if borg.status == 1 and borg.stderr:
             warnings = borg.stderr.partition(72*'-')[0]
@@ -777,7 +777,7 @@ class Emborg:
                 self.report_borg_error(e, executable)
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
-            log("elapsed = {!s}".format(ends_at - starts_at))
+            log("elapsed: {!s}".format(ends_at - starts_at))
         if borg.status == 1:
             warn('warning emitted by Borg, see logfile for details.')
         if borg.stdout:
@@ -939,7 +939,7 @@ class Emborg:
                 mv(self.logfile, self.prev_logfile)
             get_informer().set_logfile(self.logfile)
 
-        log("working dir =", self.working_dir)
+        log("working directory:", self.working_dir)
         return self
 
     # exit {{{2

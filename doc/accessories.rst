@@ -33,7 +33,7 @@ logfile will be overwritten by subsequent *create* commands.
 from each run into a single accumulating log file.  To arrange this you can use 
 :ref:`run_after_borg <run_after_borg>`::
 
-    run_after_borg = 'ntlog --delete --keep-for 7 ~/.local/share/emborg/{config_name}.log'
+    run_after_borg = 'ntlog --keep-for 7d ~/.local/share/emborg/{config_name}.log'
 
 This accumulates the log files as they are created to 
 ~/.local/share/emborg/{config_name}.log.nt.

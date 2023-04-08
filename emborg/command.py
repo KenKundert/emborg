@@ -239,13 +239,13 @@ class Command:
         # run_early() is used for commands that do not need settings and should
         # work even if the settings files do not exist or are not valid.
         if hasattr(cls, "run_early"):
-            narrate("running {} pre-command".format(name))
+            narrate(f"running pre-command: {name}")
             return cls.run_early(name, args if args else [], settings, options)
 
     @classmethod
     def execute(cls, name, args, settings, options):
         if hasattr(cls, "run"):
-            narrate("running {} command".format(name))
+            narrate(f"running command: {name}")
             exit_status = cls.run(name, args if args else [], settings, options)
             return 0 if exit_status is None else exit_status
 
@@ -256,7 +256,7 @@ class Command:
         # run_late() is used for commands that want to create a summary that
         # includes the results from all the configurations.
         if hasattr(cls, "run_late"):
-            narrate("running {} post-command".format(name))
+            narrate(f"running post-command: {name}")
             return cls.run_late(name, args if args else [], settings, options)
 
     @classmethod
