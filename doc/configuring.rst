@@ -537,6 +537,23 @@ is not colored.  In general it is best to use the "light" colorscheme on dark
 backgrounds and the "dark" colorscheme on light backgrounds.
 
 
+.. _compact_after_delete:
+
+compact_after_delete
+~~~~~~~~~~~~~~~~~~~~
+
+If True, the :ref:`compact command <compact>` is run after deleting an archive 
+or pruning a repository.
+
+.. note::
+
+    This is an important setting if you are using *Borg 1.2* or later.  You 
+    should either set this true or manage the compaction in another way.  
+    Setting it true results in slightly slower backups.  The alternative is 
+    generally to configure *cron* or *anacron* to run the *compact* command 
+    routinely for you.
+
+
 .. _configurations:
 
 configurations
@@ -1204,15 +1221,6 @@ chunker_params
 Parameters used by the chunker command.
 More information is available from `chunker_params Borg documentation
 <https://borgbackup.readthedocs.io/en/stable/usage/notes.html#chunker-params>`_.
-
-
-.. _compact_after_delete:
-
-compact_after_delete
-~~~~~~~~~~~~~~~~~~~~
-
-If True, the :ref:`compact command <compact>` is run after deleting an archive 
-or pruning a repository.
 
 
 .. _compression:

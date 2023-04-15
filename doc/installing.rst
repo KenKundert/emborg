@@ -120,6 +120,7 @@ The second file is the configuration file for *backups*:
 
     check_after_create = 'latest'
     prune_after_create = True
+    compact_after_delete = True
     keep_daily = 7
     keep_weekly = 4
     keep_monthly = 12
@@ -202,6 +203,7 @@ The third file is the configuration file for *snapshots*:
         **/.*.swp
     '''
     prune_after_create = True
+    compact_after_delete = True
     keep_within = '1d'
 
 In this case the repository is on the local machine and it is not encrypted. It 
@@ -240,8 +242,9 @@ using:
     $ emborg due
 
 However, you must remember to run this command. *Emborg* also provides 
-*emborg-overdue* to provide automated reminders.  You configure *emborg-overdue* 
-using a configuration file: ~/.config/emborg/overdue.conf.  For example:
+:ref:`emborg-overdue <emborg_overdue>` to provide automated reminders.  You 
+configure *emborg-overdue* using a configuration file: 
+~/.config/emborg/overdue.conf.  For example:
 
 .. code-block:: python
 
@@ -324,6 +327,7 @@ This assumes that most of the settings will be placed in *root*:
     '''
 
     check_after_create = 'latest'
+    compact_after_delete = True
     prune_after_create = True
     keep_daily = 7
     keep_weekly = 4
