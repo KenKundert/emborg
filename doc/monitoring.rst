@@ -114,6 +114,16 @@ The first example runs emborg-overdue at 5:34 AM every day while saving the
 output into a file.  The use of the ``--mail`` option causes *emborg-overdue* to 
 send mail to the maintainer when backups are found to be overdue.
 
+.. note::
+
+    By default Linux machines are not configured to send email.  If you are 
+    using the ``--mail`` option to *emborg-overdue* be sure that to check that 
+    it is working.  You can do so by sending mail to your self using the *mail* 
+    command.  If you do not receive your test message you will need to set up 
+    email forwarding on your machine.  You can do so by installing and 
+    configuring `PostFix as a null client
+    <http://www.postfix.org/STANDARD_CONFIGURATION_README.html#null_client>`_.
+
 The second example is similar except the output is suppressed rather than being 
 saved to a file.
 
