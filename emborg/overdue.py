@@ -64,6 +64,7 @@ from . import __released__, __version__
 from .preferences import CONFIG_DIR, DATA_DIR, OVERDUE_FILE, OVERDUE_LOG_FILE
 from .python import PythonFile
 from .shlib import Run, to_path, set_prefs as set_shlib_prefs
+from .utilities import read_latest
 
 # Globals {{{1
 set_shlib_prefs(use_inform=True, log_cmd=True)
@@ -180,6 +181,11 @@ def main():
                         raise Error("too many sentinel files.", *paths, sep="\n    ")
                     path = paths[0]
                 mtime = arrow.get(path.stat().st_mtime)
+                if path.suffix == '.nt':
+                    latest = read_latest(path)
+                    mtime = latest.get('create')
+                    if not mtime:
+                        raise Error('backup time is not available.')
                 delta = now - mtime
                 age = 24 * delta.days + delta.seconds / 3600
                 report = age > max_age

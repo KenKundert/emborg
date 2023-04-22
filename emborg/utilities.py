@@ -19,6 +19,8 @@ import arrow
 import pwd
 import os
 import socket
+import nestedtext as nt
+from inform import Error, narrate, os_error, warn
 from .shlib import Run, set_prefs as set_shlib_prefs
 set_shlib_prefs(use_inform=True, log_cmd=True)
 
@@ -136,9 +138,10 @@ def when(time, relative_to=None, as_past=None, as_future=None):
     seconds = 60*60*24*difference.days + difference.seconds
 
     def fmt(dt, prec, unit):
-        num = f'{dt:0.{prec}f}'
-        if '.' in num:
-            num = num.rstrip('0').rstrip('.')
+        if prec:
+            num = f'{dt:0.1f}'.rstrip('.0')
+        else:
+            num = f'{dt:0.0f}'
         if num == '1':
             offset = f'{num} {unit}'
         else:
@@ -184,3 +187,39 @@ def when(time, relative_to=None, as_past=None, as_future=None):
     if years < 10:
         return annotate(years, 1, "year")
     return annotate(years, 0, "year")
+
+
+# update_latest {{{1
+def update_latest(command, path):
+    narrate(f"updating date file for {command}: {str(path)}")
+    latest = {}
+    try:
+        latest = nt.load(path, dict)
+    except nt.NestedTextError as e:
+        warn(e)
+    except FileNotFoundError:
+        pass
+    except OSError as e:
+        warn(os_error(e))
+    latest[command] = str(arrow.now())
+    try:
+        nt.dump(latest, path)
+    except nt.NestedTextError as e:
+        warn(e)
+    except OSError as e:
+        warn(os_error(e))
+
+# read_latest {{{1
+def read_latest(path):
+    try:
+        latest = nt.load(path, dict)
+        for cmd, date in latest.items():
+            try:
+                latest[cmd] = arrow.get(date)
+            except arrow.parser.ParserError:
+                raise Error(f"{cmd} date not given in iso format.", culprit=path)
+        return latest
+    except nt.NestedTextError as e:
+        raise Error(e)
+    except OSError as e:
+        raise Error(os_error(e))

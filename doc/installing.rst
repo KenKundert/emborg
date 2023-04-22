@@ -322,6 +322,7 @@ This assumes that most of the settings will be placed in *root*:
         /proc
         /root/.cache
         /run
+        /sys
         /tmp
         /var
     '''
@@ -336,6 +337,10 @@ This assumes that most of the settings will be placed in *root*:
 Again, this is a rather minimal example. In this case, *repokey* is used as the 
 encryption method, which is only suitable if the repository is on a server you 
 control.
+
+When backing up the root file system it is important to exclude directories that 
+cannot or should not be backed up.  Those include: /dev, /proc, /run, /sys, and 
+/tmp.
 
 As before you need to initialize the repository before it can be used:
 

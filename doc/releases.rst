@@ -6,6 +6,10 @@ Latest development release
 | Version: 1.35.1
 | Released: 2023-04-08
 
+- :ref:`due <due>` command now reports the latest :ref:`prune <prune>` and 
+  :ref:`compact <compact>` operations as well as the latest :ref:`create 
+  <create>` operation.
+
 
 1.35 (2023-03-20)
 -----------------

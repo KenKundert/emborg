@@ -138,7 +138,7 @@ Checking for Overdue Backups from the Client
 
 *emborg-overdue* can also be configured to run on the client.  This can be used 
 when you do not control the server and so cannot run *emborg-overdue* there.  
-The configuration is identical, except you give the path to the *lastbackup* 
+The configuration is identical, except you give the path to the *latest.nt* 
 file.  For example:
 
 .. code-block:: python
@@ -148,8 +148,8 @@ file.  For example:
     default_max_age = 12  # hours
     root = '~/.local/share/emborg'
     repositories = [
-        dict(host='earth (cache)', path='cache.lastbackup', max_age=0.2),
-        dict(host='earth (home)', path='home.lastbackup'),
+        dict(host='earth (cache)', path='cache.latest.nt', max_age=0.2),
+        dict(host='earth (home)', path='home.latest.nt'),
     ]
 
 Again, *emborg-overdue* is generally run from cron.

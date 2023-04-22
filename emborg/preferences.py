@@ -45,7 +45,7 @@ LOG_FILE = "{config_name}.log"
 OVERDUE_LOG_FILE = "overdue.log"
 PREV_LOG_FILE = "{config_name}.log.prev"
 LOCK_FILE = "{config_name}.lock"
-DATE_FILE = "{config_name}.lastbackup"
+DATE_FILE = "{config_name}.latest.nt"
 
 CONFIGS_SETTING = "configurations"
 DEFAULT_CONFIG_SETTING = "default_configuration"
@@ -303,8 +303,6 @@ INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent(
         /sys
         /tmp
         /var/cache
-        /var/lib/dnf
-        /var/lock
         /var/run
         /var/tmp
     '''                      # list of files or directories to skip

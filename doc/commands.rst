@@ -300,33 +300,56 @@ the archive to your local files.
 Due
 ---
 
-When run with no options it indicates when the last backup was created.  For 
-example:
+When run with no options it indicates when the last backup and squeeze 
+operations were performed.  A backup operation is the running of the :ref:`create 
+<create>` command.  A squeeze operation is the running of both the :ref:`prune 
+<prune>` and :ref:`compact <compact>` commands.  The time to the latest squeeze 
+operation is the time to the older of the most recent *prune* or *compact* 
+commands.  For example:
 
 .. code-block:: bash
 
     $ emborg due
-    backup was performed 19 hours ago.
+    home: 11 hours since last backup.  2 weeks since last squeeze.
 
-Adding the --days option results in the message only being printed if the backup 
-has not been performed within the specified number of days. Adding the --email 
-option results in the message being sent to the specified address rather than 
-printed.  This allows you to run the :ref:`due <due>` command from a cron script 
-in order to send your self reminders to do a backup if one has not occurred for 
-a while.  In these case it is often run with the --no-log option to avoid 
-replacing the log file with one that is inherently uninteresting:
+Adding the --backup-days option or --squeeze-days results in the message only 
+being printed if the backup or squeeze has not been performed within the 
+specified number of days.  If both are specified and both limits are violated, 
+only the backup violation is reported as it is considered the most urgent.
+
+Adding the --email option results in the message being sent to the specified 
+address rather than printed.  This allows you to run the :ref:`due <due>` 
+command from a cron script in order to send your self reminders to do a backup 
+if one has not occurred for a while.  It is often run with the --no-log option 
+to avoid replacing the log file with one that is inherently uninteresting:
 
 .. code-block:: bash
 
-    $ emborg --no-log due --days 1 --email me@mydomain.com
+    $ emborg --no-log due --backup-days 1 --backup-days 7 --email me@mydomain.com
 
 You can specify a specific message to be printed with --message. In this case, 
-{days} is replaced by the number of days since the last backup. You can add 
-floating-point format codes to specify the resolution used. For example: 
-{days:.1f}. Also, {elapsed} is replaced with a humanized description of how long 
-it has been since the last backup, and {config} is replaced with the name of the 
-configuration being reported on. So ``--message '{elapsed} since last backup of 
-{config}.'`` might produce something like this:
+the following replacements are available:
+
+    {action}:
+        Replaced with the type of operation reported on.  It is either *backup* 
+        or *squeeze*.
+    {config}:
+        Replaced with the name of the configuration being reported on.
+    {cmd}:
+        Replaced with the name of the command being reported on.  It can be 
+        *create*, *prune* or *compact*.  It will be *create* if reporting on 
+        a backup operation, and either *prune* or *compact* if reporting on 
+        a squeeze operation, depending on which is older.
+    {days}:
+        Replaced by the number of days since the last backup or squeeze.
+        You can add floating-point format codes to specify the resolution used.  
+        For example: {days:.1f}.
+    {elapsed}:
+        Replaced with a humanized description of how long it has been since the 
+        last backup.
+
+So ``--message '{elapsed} since last {action} of {config}.'`` might produce 
+something like this:
 
 .. code-block:: text
 

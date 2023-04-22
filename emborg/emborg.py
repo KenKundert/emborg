@@ -825,6 +825,16 @@ class Emborg:
             return f"{self.repository!s}::{archive}"
         return self.repository
 
+    # get_roots() {{{2
+    def get_roots(self):
+        try:
+            # run borg_options('create') to populate settings.roots
+            self.borg_options('create', None, (), False)
+            return [str(to_path(self.working_dir, r)) for r in self.roots]
+        except Error:
+            return []
+
+
     # is_config() {{{2
     def is_first_config(self):
         return self.config_name == self.configs[0]

@@ -186,7 +186,6 @@ emborg without configs:
             > Search for and replace any fields delimited with ⟪ and ⟫.
             > Delete any configurations you do not need.
             > Generally you will use either home or root, but not both.
-        cmp_dirs: /⟪EMBORG⟫/tests/INITIAL_CONFIGS .config/emborg
 
     jerkin:
         remove: .config
@@ -592,10 +591,10 @@ emborg with configs:
     magnate:
         args: --quiet due
         expected:
-            > The latest test0 archive was created (just now|(\d+ )?(seconds|minutes) ago|a minute ago)\.
-            > The latest test1 archive was created (just now|(\d+ )?(seconds|minutes) ago|a minute ago)\.
-            > The latest test2 archive was created (just now|(\d+ )?(seconds|minutes) ago|a minute ago)\.
-            > The latest test3 archive was created (just now|(\d+ )?(seconds|minutes) ago|a minute ago)\.
+            > test0: (just now|(\d+ )?(seconds|minutes)) since last backup\.  67 years since last squeeze\.
+            > test1: (just now|(\d+ )?(seconds|minutes)) since last backup\.  67 years since last squeeze\.
+            > test2: (just now|(\d+ )?(seconds|minutes)) since last backup\.  67 years since last squeeze\.
+            > test3: (just now|(\d+ )?(seconds|minutes)) since last backup\.  67 years since last squeeze\.
         expected_type: regex
 
     build:
@@ -607,6 +606,7 @@ emborg with configs:
             >   settings directory: /⟪EMBORG⟫/tests/.config/emborg
             >              logfile: /⟪EMBORG⟫/tests/.local/share/emborg/test0.log
             >       last backed up: .*
+            >           last prune: .*
             > run_before_borg on test0
             >
             > Repository ID: \w*
@@ -722,14 +722,14 @@ emborg with configs:
             >   182B tests/configs/test8
             >   191B tests/configs/test5
             >   526B tests/configs/test0
-            >   556B tests/configs/overdue.conf
+            >   548B tests/configs/overdue.conf
             >   559B tests/configs/test2
             >   612B tests/configs/test1
             >   614B tests/configs/settings
             >   671B tests/configs/test3
             >   965B tests/configs/test4
             > 1.85kB tests/configs/README
-            > Total size = 7.35kB.
+            > Total size = 7.34kB.
         expected_type: regex
 
     sparkler:
@@ -992,14 +992,14 @@ emborg with configs:
             >   182B tests/configs/test8
             >   191B tests/configs/test5
             >   526B tests/configs/test0
-            >   556B tests/configs/overdue.conf
+            >   548B tests/configs/overdue.conf
             >   559B tests/configs/test2
             >   612B tests/configs/test1
             >   614B tests/configs/settings
             >   671B tests/configs/test3
             >   965B tests/configs/test4
             > 1.85kB tests/configs/README
-            > Total size = 7.35kB.
+            > Total size = 7.34kB.
         expected_type: regex
 
     intercom:

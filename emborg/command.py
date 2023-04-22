@@ -27,6 +27,7 @@ from inform import (
     Error,
     comment,
     conjoin,
+    cull,
     display,
     full_stop,
     indent,
@@ -46,8 +47,12 @@ from .shlib import (
 )
 from time import sleep
 from .collection import Collection
-from .preferences import BORG_SETTINGS, DEFAULT_COMMAND, EMBORG_SETTINGS, PROGRAM_NAME
-from .utilities import gethostname, pager, two_columns, when
+from .preferences import (
+    BORG_SETTINGS, DEFAULT_COMMAND, EMBORG_SETTINGS, PROGRAM_NAME
+)
+from .utilities import (
+    gethostname, pager, read_latest, two_columns, update_latest, when
+)
 
 
 # Utilities {{{1
@@ -453,6 +458,9 @@ class CompactCommand(Command):
         if out:
             output(out.rstrip())
 
+        # update the date file
+        update_latest('compact', settings.date_file)
+
         return borg.status
 
 
@@ -731,10 +739,8 @@ class CreateCommand(Command):
                         except Error as e:
                             e.reraise(culprit=(setting, i, cmd.split()[0]))
 
-        # update the date files
-        narrate("update date file")
-        now = arrow.now()
-        settings.date_file.write_text(str(now))
+        # update the date file
+        update_latest('create', settings.date_file)
 
         if cmdline["--fast"]:
             return create_status
@@ -955,12 +961,14 @@ class DueCommand(Command):
             emborg due [options]
 
         Options:
-            -d <num>, --days <num>     emit message if this many days have passed
-                                       since last backup
-            -e <addr>, --email <addr>  send email message rather than print message
-            -m <msg>, --message <msg>  the message to emit
-            -o, --oldest               with composite configuration, only report
-                                       the oldest
+            -d <num>, --backup-days <num>   emit message if this many days have passed
+                                            since last backup
+            -D <num>, --squeeze-days <num>  emit message if this many days have passed
+                                            since last prune or compact
+            -e <addr>, --email <addr>       send email message rather than print message
+            -m <msg>, --message <msg>       the message to emit
+            -o, --oldest                    with composite configuration, only report
+                                            the oldest
 
         If you specify the days, then the message is only printed if the backup
         is overdue.  If not overdue, nothing is printed.  The message is always
@@ -984,25 +992,34 @@ class DueCommand(Command):
     REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "all"
     LOG_COMMAND = False
-    MESSAGES = {}  # type: dict[str, str]
     SHOW_CONFIG_NAME = False
-    OLDEST_DATE = None
-    OLDEST_CONFIG = None
+    BACKUP_MESSAGES = {}  # type: dict[str, str]
+    OLDEST_BACKUP_DATE = None
+    OLDEST_BACKUP_CONFIG = None
+    SQUEEZE_MESSAGES = {}  # type: dict[str, str]
+    OLDEST_SQUEEZE_DATE = None
+    OLDEST_SQUEEZE_CONFIG = None
 
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         email = cmdline["--email"]
+        config = settings.config_name
+        backup_days = cmdline.get("--backup-days")
+        squeeze_days = cmdline.get("--squeeze-days")
+        exit_status = None
 
-        def gen_message(date):
+        def gen_message(date, cmd='create'):
             elapsed = when(date)
+            action = 'backup' if cmd == 'create' else 'squeeze'
             if cmdline["--message"]:
                 since_last_backup = arrow.now() - date
                 days = since_last_backup.total_seconds() / 86400
                 try:
                     return cmdline["--message"].format(
-                        days=days, elapsed=elapsed, config=settings.config_name
+                        days=days, elapsed=elapsed, config=config,
+                        cmd=cmd, action=action
                     )
                 except KeyError as e:
                     raise Error(
@@ -1011,55 +1028,94 @@ class DueCommand(Command):
                         codicil = cmdline["--message"],
                     )
             else:
-                return f"The latest {settings.config_name} archive was created {elapsed} ago."
+                # return f"The latest {config} archive was created {elapsed} ago."
+                #return f"{config}: {elapsed} since last {cmd}."
+                return f"{elapsed} since last {action}."
 
-        if email:
+        def email_message(msg, action=None):
+            if action == 'backup':
+                messages = cls.BACKUP_MESSAGES
+            else:
+                messages = cls.SQUEEZE_MESSAGES
+            messages[config] = dedent(
+                f"""
+                {full_stop(msg)}
 
-            def save_message(msg):
-                cls.MESSAGES[settings.config_name] = dedent(
-                    f"""
-                    {msg}
-                    config = {settings.config_name}
-                    source host = {hostname}
-                    source directories = {', '.join(str(d) for d in settings.src_dirs)}
-                    destination = {settings.repository}
-                    """
-                ).lstrip()
+                config: {config}
+                source host: {hostname}
+                source directories: {', '.join(settings.get_roots())}
+                destination: {settings.repository}
+                """
+            ).lstrip()
 
+        def save_message(msg, action=None):
+            if action == 'backup':
+                messages = cls.BACKUP_MESSAGES
+            else:
+                messages = cls.SQUEEZE_MESSAGES
+            messages[config] = msg
+
+        process_message = email_message if email else save_message
+
+        # Get date of last backup, and squeeze
+        latest = read_latest(settings.date_file)
+        missing_date = arrow.get("19560105", "YYYYMMDD")
+        backup_date = latest.get('create', missing_date)
+        prune_date = latest.get('prune', missing_date)
+        compact_date = latest.get('compact', missing_date)
+        if prune_date < compact_date:
+            squeeze_date = prune_date
+            squeeze_cmd = 'prune'
         else:
-
-            def save_message(msg):
-                cls.MESSAGES[settings.config_name] = msg
-
-        # Get date of last backup
-        date_file = settings.date_file
-        try:
-            backup_date = arrow.get(date_file.read_text())
-        except FileNotFoundError:
-            backup_date = arrow.get("19560105", "YYYYMMDD")
-        except arrow.parser.ParserError:
-            raise Error("date not given in iso format.", culprit=date_file)
+            squeeze_date = compact_date
+            squeeze_cmd = 'compact'
 
         # Record the name of the oldest config
-        if not cls.OLDEST_DATE or backup_date < cls.OLDEST_DATE:
-            cls.OLDEST_DATE = backup_date
-            cls.OLDEST_CONFIG = settings.config_name
+        if not cls.OLDEST_BACKUP_DATE or backup_date < cls.OLDEST_BACKUP_DATE:
+            cls.OLDEST_BACKUP_DATE = backup_date
+            cls.OLDEST_BACKUP_CONFIG = config
+        if not cls.OLDEST_SQUEEZE_DATE or squeeze_date < cls.OLDEST_SQUEEZE_DATE:
+            cls.OLDEST_SQUEEZE_DATE = squeeze_date
+            cls.OLDEST_SQUEEZE_CONFIG = config
 
         # Warn user if backup is overdue
-        if cmdline.get("--days"):
+        if backup_days:
             since_last_backup = arrow.now() - backup_date
             days = since_last_backup.total_seconds() / 86400
             try:
-                if days > float(cmdline["--days"]):
-                    save_message(gen_message(backup_date))
+                if days > float(backup_days):
+                    process_message(gen_message(backup_date), 'backup')
+                    exit_status = 1
                     if not email:
-                        return 1
+                        return exit_status
             except ValueError:
-                raise Error("expected a number for --days.")
-            return
+                raise Error("expected a number for --backup-days.")
+            if not squeeze_days:
+                return exit_status
+
+        # Warn user if prune or compact is overdue
+        if squeeze_days:
+            since_last_squeeze = arrow.now() - squeeze_date
+            days = since_last_squeeze.total_seconds() / 86400
+            try:
+                if days > float(squeeze_days):
+                    process_message(
+                        gen_message(squeeze_date, squeeze_cmd),
+                        'squeeze'
+                    )
+                    exit_status = 1
+                    if not email:
+                        return exit_status
+            except ValueError:
+                raise Error("expected a number for --squeeze-days.")
+            return exit_status
 
         # Otherwise, simply report age of backups
-        save_message(gen_message(backup_date))
+        msg = '  '.join(
+            gen_message(*args)
+            for args in cull([(backup_date,), (squeeze_date, squeeze_cmd)])
+        )
+        process_message(f"{config}: {msg}")
 
     @classmethod
     def run_late(cls, command, args, settings, options):
@@ -1067,14 +1123,23 @@ class DueCommand(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         email = cmdline["--email"]
 
-        if not cls.MESSAGES:
+        # determine whether to give backup or squeeze message
+        if cls.BACKUP_MESSAGES:
+            messages = cls.BACKUP_MESSAGES
+            config = cls.OLDEST_BACKUP_CONFIG
+        else:
+            messages = cls.SQUEEZE_MESSAGES
+            config = cls.OLDEST_SQUEEZE_CONFIG
+        if not messages:
             return
 
+        # determine whether to give message for oldest or all configs
         if cmdline["--oldest"]:
-            message = cls.MESSAGES[cls.OLDEST_CONFIG]
+            message = messages[config]
         else:
-            message = "\n".join(cls.MESSAGES.values())
+            message = "\n".join(messages.values())
 
+        # output the message
         if email:
             Run(
                 ["mail", "-s", f"{PROGRAM_NAME}: backup is overdue", email],
@@ -1253,23 +1318,24 @@ class InfoCommand(Command):
         fast = cmdline["--fast"]
         archive = cmdline["<archive>"]
 
-        # run borg_options('create') to populate settings.roots
-        try:
-            settings.borg_options('create', None, (), False)
-            roots = (str(r) for r in settings.roots)
-        except Error:
-            roots = ['not set']
-
         # report local information
         if not archive:
             output(f"              config: {settings.config_name}")
-            output(f'               roots: {", ".join(roots)}')
+            output(f'               roots: {", ".join(settings.get_roots())}')
             output(f"         destination: {settings.destination()}")
             output(f"  settings directory: {settings.config_dir}")
             output(f"             logfile: {settings.logfile}")
             try:
-                backup_date = arrow.get(settings.date_file.read_text())
-                output(f"      last backed up: {backup_date}, {backup_date.humanize()}")
+                latest = read_latest(settings.date_file)
+                date = latest.get('create')
+                if date:
+                    output(f"      last backed up: {date}, {when(date)} ago")
+                date = latest.get('prune')
+                if date:
+                    output(f"          last prune: {date}, {when(date)} ago")
+                date = latest.get('compact')
+                if date:
+                    output(f"        last compact: {date}, {when(date)} ago")
             except FileNotFoundError as e:
                 narrate(os_error(e))
             except arrow.parser.ParserError as e:
@@ -1816,6 +1882,9 @@ class PruneCommand(Command):
         if out:
             output(out.rstrip())
         prune_status = borg.status
+
+        # update the date file
+        update_latest('prune', settings.date_file)
 
         if fast:
             return prune_status
