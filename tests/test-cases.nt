@@ -591,10 +591,10 @@ emborg with configs:
     magnate:
         args: --quiet due
         expected:
-            > test0: (just now|(\d+ )?(seconds|minutes)) since last backup\.  67 years since last squeeze\.
-            > test1: (just now|(\d+ )?(seconds|minutes)) since last backup\.  67 years since last squeeze\.
-            > test2: (just now|(\d+ )?(seconds|minutes)) since last backup\.  67 years since last squeeze\.
-            > test3: (just now|(\d+ )?(seconds|minutes)) since last backup\.  67 years since last squeeze\.
+            > test0: (just now|(\d+ )?(seconds|minutes)) since last backup\.
+            > test1: (just now|(\d+ )?(seconds|minutes)) since last backup\.
+            > test2: (just now|(\d+ )?(seconds|minutes)) since last backup\.
+            > test3: (just now|(\d+ )?(seconds|minutes)) since last backup\.
         expected_type: regex
 
     build:

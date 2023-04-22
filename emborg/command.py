@@ -1059,16 +1059,24 @@ class DueCommand(Command):
 
         # Get date of last backup, and squeeze
         latest = read_latest(settings.date_file)
-        missing_date = arrow.get("19560105", "YYYYMMDD")
-        backup_date = latest.get('create', missing_date)
-        prune_date = latest.get('prune', missing_date)
-        compact_date = latest.get('compact', missing_date)
-        if prune_date < compact_date:
+        backup_date = latest.get('create')
+        prune_date = latest.get('prune')
+        compact_date = latest.get('compact')
+        if not compact_date or not prune_date:
+            squeeze_date = None
+            squeeze_cmd = None
+        elif prune_date < compact_date:
             squeeze_date = prune_date
             squeeze_cmd = 'prune'
         else:
             squeeze_date = compact_date
             squeeze_cmd = 'compact'
+
+        # disable squeeze check if there are no prune settings
+        intervals = "within last minutely hourly daily weekly monthly yearly"
+        prune_settings = [("keep_" + s) for s in intervals.split()]
+        if not any(settings.value(s) for s in prune_settings):
+            squeeze_date = None
 
         # Record the name of the oldest config
         if not cls.OLDEST_BACKUP_DATE or backup_date < cls.OLDEST_BACKUP_DATE:
@@ -1079,7 +1087,7 @@ class DueCommand(Command):
             cls.OLDEST_SQUEEZE_CONFIG = config
 
         # Warn user if backup is overdue
-        if backup_days:
+        if backup_days and backup_date:
             since_last_backup = arrow.now() - backup_date
             days = since_last_backup.total_seconds() / 86400
             try:
@@ -1094,7 +1102,7 @@ class DueCommand(Command):
                 return exit_status
 
         # Warn user if prune or compact is overdue
-        if squeeze_days:
+        if squeeze_days and squeeze_date:
             since_last_squeeze = arrow.now() - squeeze_date
             days = since_last_squeeze.total_seconds() / 86400
             try:
@@ -1113,7 +1121,8 @@ class DueCommand(Command):
         # Otherwise, simply report age of backups
         msg = '  '.join(
             gen_message(*args)
-            for args in cull([(backup_date,), (squeeze_date, squeeze_cmd)])
+            for args in [(backup_date,), (squeeze_date, squeeze_cmd)]
+            if args[0]
         )
         process_message(f"{config}: {msg}")
 
