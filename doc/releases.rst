@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.35.2
-| Released: 2023-04-21
+| Version: 1.35.3
+| Released: 2023-04-22
 
 - :ref:`due <due>` command now reports the latest :ref:`prune <prune>` and 
   :ref:`compact <compact>` operations as well as the latest :ref:`create 
