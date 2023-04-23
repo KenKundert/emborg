@@ -46,6 +46,3 @@ from each run into a single accumulating log file.  To arrange this you can use
 
 This accumulates the log files as they are created to 
 ~/.local/share/emborg/{config_name}.log.nt.
-
-
-

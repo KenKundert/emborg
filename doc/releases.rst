@@ -6,9 +6,15 @@ Latest development release
 | Version: 1.35.3
 | Released: 2023-04-22
 
-- :ref:`due <due>` command now reports the latest :ref:`prune <prune>` and 
-  :ref:`compact <compact>` operations as well as the latest :ref:`create 
-  <create>` operation.
+- :ref:`due <due>` and :ref:`info <info>` commands now report the latest 
+  :ref:`prune <prune>` and :ref:`compact <compact>` operations as well as the 
+  latest :ref:`create <create>` operation.
+
+.. note::
+
+    If you use :ref:`emborg-overdue <client_overdue>` from the client you will 
+    need to change the paths you specify in *overdue.conf*.  They now need to 
+    end in ``.latest.nt`` rather than ``.lastbackup``.
 
 
 1.35 (2023-03-20)

@@ -1338,7 +1338,7 @@ class InfoCommand(Command):
                 latest = read_latest(settings.date_file)
                 date = latest.get('create')
                 if date:
-                    output(f"      last backed up: {date}, {when(date)} ago")
+                    output(f"         last create: {date}, {when(date)} ago")
                 date = latest.get('prune')
                 if date:
                     output(f"          last prune: {date}, {when(date)} ago")
