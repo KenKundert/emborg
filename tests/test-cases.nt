@@ -605,8 +605,8 @@ emborg with configs:
             >          destination: /⟪EMBORG⟫/tests/repositories
             >   settings directory: /⟪EMBORG⟫/tests/.config/emborg
             >              logfile: /⟪EMBORG⟫/tests/.local/share/emborg/test0.log
-            >       last backed up: .*
-            >           last prune: .*
+            >      create last run: .*
+            >       prune last run: .*
             > run_before_borg on test0
             >
             > Repository ID: \w*
