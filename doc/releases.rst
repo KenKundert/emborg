@@ -6,6 +6,7 @@ Latest development release
 | Version: 1.35.3
 | Released: 2023-04-22
 
+- specifying an integer for ``--date`` now finds archive by index.
 - :ref:`due <due>` and :ref:`info <info>` commands now report the latest 
   :ref:`prune <prune>` and :ref:`compact <compact>` operations as well as the 
   latest :ref:`create <create>` operation.

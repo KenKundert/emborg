@@ -98,21 +98,31 @@ def get_name_of_latest_archive(settings):
 def get_name_of_nearest_archive(settings, date):
     archives = get_available_archives(settings)
     try:
-        target = arrow.get(date, tzinfo='local')
-    except arrow.parser.ParserError as e:
+        index = int(date) + 1
+        if index > len(archives):
+            warn('index is too large, using oldest archive.', culprit=date)
+            index = 0
+        if index < 0:
+            raise Error('index must be positive.', culprit=date)
+        archive = archives[-index]
+        return archive["name"]
+    except ValueError:
         try:
-            seconds = Quantity(date, 'd', scale='s')
-            target = arrow.now().shift(seconds=-seconds)
-        except QuantiPhyError:
-            codicil = join(
-                full_stop(e),
-                'Alternatively relative time formats are accepted:',
-                'Ns, Nm, Nh, Nd, Nw, NM, Ny.  Example 2w is 2 weeks.'
-            )
-            raise Error(
-                "invalid date specification.",
-                culprit=date, codicil=codicil, wrap=True
-            )
+            target = arrow.get(date, tzinfo='local')
+        except arrow.parser.ParserError as e:
+            try:
+                seconds = Quantity(date, scale='s')
+                target = arrow.now().shift(seconds=-seconds)
+            except QuantiPhyError:
+                codicil = join(
+                    full_stop(e),
+                    'Alternatively relative time formats are accepted:',
+                    'Ns, Nm, Nh, Nd, Nw, NM, Ny.  Example 2w is 2 weeks.'
+                )
+                raise Error(
+                    "invalid date specification.",
+                    culprit=date, codicil=codicil, wrap=True
+                )
 
     # find oldest archive that is younger than specified target
     archive = prev_archive = None
@@ -478,7 +488,6 @@ class CompareCommand(Command):
             -d <date>, --date <date>            date of the desired archive
             -i, --interactive                   perform an interactive comparison
 
-
         Reports and allows you to manage the differences between your local
         files and those in an archive.  The base command simply reports the
         differences:
@@ -492,12 +501,14 @@ class CompareCommand(Command):
 
             $ emborg compare -i
 
-        You can specify the archive by name or by date or age.  If you do not
-        you will use the most recent archive:
+        You can specify the archive by name or by date or age or index, with 0
+        being the most recent.  If you do not you will use the most recent
+        archive:
 
             $ emborg compare -a continuum-2020-12-04T17:41:28
             $ emborg compare -d 2020-12-04
             $ emborg compare -d 1w
+            $ emborg compare -d 2
 
         You can specify a path to a file or directory to compare, if you do not
         you will compare the files and directories of the current working
@@ -1202,6 +1213,11 @@ class ExtractCommand(Command):
 
             $ emborg extract --date 3d  home/shaunte/bin
 
+        You can also specify the date by index, with 0 being the most recent
+        archive, 1 being the next most recent, etc.
+
+            $ emborg extract --date 3  home/shaunte/bin
+
         In this case 3d means 3 days.  You can use s, m, h, d, w, M, and y to
         represent seconds, minutes, hours, days, weeks, months, and years.
 
@@ -1529,6 +1545,11 @@ class ManifestCommand(Command):
 
             emborg manifest --date 2w
 
+        Finally you can specify the date by index, with 0 being the most recent
+        archive, 1 being the next most recent, etc.
+
+            emborg manifest --date 14
+
         There are a variety of ways that you use to sort the output.  For
         example, sort by size, use:
 
@@ -1750,7 +1771,9 @@ class MountCommand(Command):
         If the specified mount point (backups in this example) exists in the
         current directory, it must be a directory.  If it does not exist, it is
         created.  If you do not specify a mount point, the value of the
-        default_mount_point setting is used if provided.
+        default_mount_point setting is used if provided.  If you do not specify
+        a mount point, the directory specified in the default_mount_point
+        setting is used.
 
         If you do not specify an archive or date, the most recently created
         archive is mounted.
@@ -1767,6 +1790,11 @@ class MountCommand(Command):
 
         where s, m, h, d, w, M, and y represents seconds, minutes, hours, days,
         weeks, months, and years.
+
+        Finally you can specify the date by index, with 0 being the most recent
+        archive, 1 being the next most recent, etc.
+
+            emborg mount --date 14 backups
 
         You can mount a particular archive using:
 
@@ -1955,6 +1983,11 @@ class RestoreCommand(Command):
 
         In this case 3d means 3 days.  You can use s, m, h, d, w, M, and y to
         represent seconds, minutes, hours, days, weeks, months, and years.
+
+        Finally you can specify the date by index, with 0 being the most recent
+        archive, 1 being the next most recent, etc.
+
+            emborg manifest --date 14
 
         This command is very similar to the extract command except that it is
         meant to be replace files while in place.  The extract command is

@@ -401,6 +401,14 @@ Alternatively, you can specify the date in relative terms:
 In this case 3d means 3 days. You can use s, m, h, d, w, M, and y to represent 
 seconds, minutes, hours, days, weeks, months, and years.
 
+Finally, if you specify a simple number, it is taken to be the index of the 
+desired archive, where 0 represents the most recent, 1 the next most recent, 
+etc.
+
+.. code-block:: bash
+
+    $ emborg extract --date 3  home/shaunte/bin
+
 The extracted files are placed in the current working directory with
 the original hierarchy. Thus, the above commands create the directory:
 
@@ -557,6 +565,14 @@ You can also specify the date in relative terms:
 where s, m, h, d, w, M, and y represents seconds, minutes, hours, days, weeks, 
 months, and years.
 
+Finally, if you specify a simple number, it is taken to be the index of the 
+desired archive, where 0 represents the most recent, 1 the next most recent, 
+etc.
+
+.. code-block:: bash
+
+    $ emborg manifest --date 7
+
 The *manifest* command provides a variety of sorting and formatting options. The 
 formatting options are under the control of the :ref:`manifest_formats` setting.  
 For example:
@@ -616,8 +632,8 @@ would a normal read-only filesystem.
 In this example, *backups* acts as a mount point. If it exists, it must be 
 a directory. If it does not exist, it is created.
 
-If you do not specify a mount point, the value of *default_mount_point* setting 
-is used if set.
+If you do not specify a mount point, the value of :ref:`default_mount_point` 
+setting is used if set.
 
 If you do not specify an archive, as above, the most recently created archive
 is mounted.
@@ -645,6 +661,14 @@ You can also specify the date in relative terms:
 
 where s, m, h, d, w, M, and y represents seconds, minutes, hours, days, weeks, 
 months, and years.
+
+Finally, if you specify a simple number, it is taken to be the index of the 
+desired archive, where 0 represents the most recent, 1 the next most recent, 
+etc.
+
+.. code-block:: bash
+
+    $ emborg mount --date 7 backups
 
 When a date is given, the oldest archive that is younger than the specified date 
 or time is used.
@@ -718,6 +742,14 @@ Or you can specify the date in relative terms:
 
 In this case 3d means 3 days. You can use s, m, h, d, w, M, and y to
 represent seconds, minutes, hours, days, weeks, months, and years.
+
+Finally, if you specify a simple number, it is taken to be the index of the 
+desired archive, where 0 represents the most recent, 1 the next most recent, 
+etc.
+
+.. code-block:: bash
+
+    $ emborg restore --date 7 resume.doc
 
 This command is very similar to the :ref:`extract <extract>` command except that 
 it is meant to replace files in place.  It also takes similar options.
