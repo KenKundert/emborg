@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.35.4
-| Released: 2023-04-25
+| Version: 1.35.5
+| Released: 2023-05-01
 
 - specifying an integer for ``--date`` now finds archive by index.
 - :ref:`due <due>` and :ref:`info <info>` commands now report the latest 
