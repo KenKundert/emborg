@@ -51,7 +51,7 @@ emborg without configs:
             >                       list the files contained in an archive
             >     mount             mount a repository or archive
             >     prune             prune the repository of excess archives
-            >     restore           Restore the given files or directories in place
+            >     restore           restore requested files or directories in place
             >     settings, setting
             >                       display settings of chosen configuration
             >     umount, unmount   un-mount a previously mounted repository or archive

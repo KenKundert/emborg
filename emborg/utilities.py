@@ -190,7 +190,7 @@ def when(time, relative_to=None, as_past=None, as_future=None):
 
 
 # update_latest {{{1
-def update_latest(command, path):
+def update_latest(command, path, repo_size=None):
     narrate(f"updating date file for {command}: {str(path)}")
     latest = {}
     try:
@@ -201,7 +201,10 @@ def update_latest(command, path):
         pass
     except OSError as e:
         warn(os_error(e))
-    latest[command] = str(arrow.now())
+    latest[f"{command} last run"] = str(arrow.now())
+    if repo_size:
+        latest['repository size'] = repo_size
+
     try:
         nt.dump(latest, path)
     except nt.NestedTextError as e:
@@ -213,11 +216,12 @@ def update_latest(command, path):
 def read_latest(path):
     try:
         latest = nt.load(path, dict)
-        for cmd, date in latest.items():
-            try:
-                latest[cmd] = arrow.get(date)
-            except arrow.parser.ParserError:
-                raise Error(f"{cmd} date not given in iso format.", culprit=path)
+        for k, v in latest.items():
+            if "last run" in k:
+                try:
+                    latest[k] = arrow.get(v)
+                except arrow.parser.ParserError:
+                    warn(f"{k}: date not given in iso format.", culprit=path)
         return latest
     except nt.NestedTextError as e:
         raise Error(e)

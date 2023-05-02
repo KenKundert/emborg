@@ -183,9 +183,9 @@ def main():
                 mtime = arrow.get(path.stat().st_mtime)
                 if path.suffix == '.nt':
                     latest = read_latest(path)
-                    mtime = latest.get('create')
+                    mtime = latest.get('create last run')
                     if not mtime:
-                        raise Error('backup time is not available.')
+                        raise Error('backup time is not available.', culprit=path)
                 delta = now - mtime
                 age = 24 * delta.days + delta.seconds / 3600
                 report = age > max_age

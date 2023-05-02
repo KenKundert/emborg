@@ -750,9 +750,6 @@ class CreateCommand(Command):
                         except Error as e:
                             e.reraise(culprit=(setting, i, cmd.split()[0]))
 
-        # update the date file
-        update_latest('create', settings.date_file)
-
         if cmdline["--fast"]:
             return create_status
 
@@ -761,7 +758,7 @@ class CreateCommand(Command):
             # check the archives if requested
             activity = "checking"
             if settings.check_after_create:
-                announce("Checking archive ...")
+                announce("Checking repository ...")
                 if settings.check_after_create == "latest":
                     args = []
                 elif settings.check_after_create in [True, "all"]:
@@ -784,21 +781,38 @@ class CreateCommand(Command):
             # prune the repository if requested
             activity = "pruning"
             if settings.prune_after_create:
-                announce("Pruning archives ...")
+                announce("Pruning repository ...")
                 prune = PruneCommand()
                 args = ["--stats"] if cmdline["--stats"] else []
                 prune_status = prune.run("prune", args, settings, options)
             else:
                 prune_status = 0
 
+            # get the size of the repository
+            activity = "sizing"
+            # now output the information from borg about the repository
+            info = settings.run_borg(
+                cmd = "info",
+                args = [settings.destination()],
+                emborg_opts = options,
+                borg_opts = ['--json'],
+                strip_prefix = True,
+            )
+            out = info.stdout
+            out = json.loads(out)
+            repo_size = Quantity(out['cache']['stats']['unique_csize'], 'B')
+
+            # update the date file
+            update_latest('create', settings.date_file, repo_size.render(prec='full'))
+
         except Error as e:
             e.reraise(
                 codicil = (
-                    f"This error occurred while {activity} the archives.",
+                    f"This error occurred while {activity} the repository.",
                     "No error was reported while creating the archive.",
                 )
             )
-        return max([create_status, check_status, prune_status])
+        return max([create_status, check_status, prune_status, info.status])
 
 # DeleteCommand command {{{1
 class DeleteCommand(Command):
@@ -1039,8 +1053,6 @@ class DueCommand(Command):
                         codicil = cmdline["--message"],
                     )
             else:
-                # return f"The latest {config} archive was created {elapsed} ago."
-                #return f"{config}: {elapsed} since last {cmd}."
                 return f"{elapsed} since last {action}."
 
         def email_message(msg, action=None):
@@ -1066,13 +1078,13 @@ class DueCommand(Command):
                 messages = cls.SQUEEZE_MESSAGES
             messages[config] = msg
 
-        process_message = email_message if email else save_message
+        deliver_message = email_message if email else save_message
 
         # Get date of last backup, and squeeze
         latest = read_latest(settings.date_file)
-        backup_date = latest.get('create')
-        prune_date = latest.get('prune')
-        compact_date = latest.get('compact')
+        backup_date = latest.get('create last run')
+        prune_date = latest.get('prune last run')
+        compact_date = latest.get('compact last run')
         if not compact_date or not prune_date:
             squeeze_date = None
             squeeze_cmd = None
@@ -1103,7 +1115,7 @@ class DueCommand(Command):
             days = since_last_backup.total_seconds() / 86400
             try:
                 if days > float(backup_days):
-                    process_message(gen_message(backup_date), 'backup')
+                    deliver_message(gen_message(backup_date), 'backup')
                     exit_status = 1
                     if not email:
                         return exit_status
@@ -1118,7 +1130,7 @@ class DueCommand(Command):
             days = since_last_squeeze.total_seconds() / 86400
             try:
                 if days > float(squeeze_days):
-                    process_message(
+                    deliver_message(
                         gen_message(squeeze_date, squeeze_cmd),
                         'squeeze'
                     )
@@ -1130,12 +1142,13 @@ class DueCommand(Command):
             return exit_status
 
         # Otherwise, simply report age of backups
-        msg = '  '.join(
-            gen_message(*args)
-            for args in [(backup_date,), (squeeze_date, squeeze_cmd)]
-            if args[0]
-        )
-        process_message(f"{config}: {msg}")
+        if not backup_days and not squeeze_days:
+            msg = '  '.join(
+                gen_message(*args)
+                for args in [(backup_date,), (squeeze_date, squeeze_cmd)]
+                if args[0]
+            )
+            deliver_message(f"{config}: {msg}")
 
     @classmethod
     def run_late(cls, command, args, settings, options):
@@ -1352,13 +1365,13 @@ class InfoCommand(Command):
             output(f"             logfile: {settings.logfile}")
             try:
                 latest = read_latest(settings.date_file)
-                date = latest.get('create')
+                date = latest.get('create last run')
                 if date:
                     output(f"     create last run: {date}, {when(date)} ago")
-                date = latest.get('prune')
+                date = latest.get('prune last run')
                 if date:
                     output(f"      prune last run: {date}, {when(date)} ago")
-                date = latest.get('compact')
+                date = latest.get('compact last run')
                 if date:
                     output(f"    compact last run: {date}, {when(date)} ago")
             except FileNotFoundError as e:
@@ -1655,9 +1668,9 @@ class ManifestCommand(Command):
         if sort_key and '{' + sort_key not in keys:
             keys = keys + '{' + sort_key + '}'
         args = [
-            settings.destination(archive),
             '--json-lines',
             '--format', keys,
+            settings.destination(archive),
         ]
         borg = settings.run_borg(
             cmd="list", args=args, emborg_opts=options,
@@ -1949,7 +1962,7 @@ class PruneCommand(Command):
 # RestoreCommand command {{{1
 class RestoreCommand(Command):
     NAMES = "restore".split()
-    DESCRIPTION = "Restore the given files or directories in place"
+    DESCRIPTION = "restore requested files or directories in place"
     USAGE = dedent(
         """
         Usage:
