@@ -6,6 +6,12 @@ Latest development release
 | Version: 1.35.5
 | Released: 2023-05-01
 
+This release provides new mechanisms to allow you to monitor your pruning and 
+compaction operations to help assure that these activities not neglected.  Both 
+a prune and a compact operation must be performed to release disk space by 
+eliminating expired archives.  The combination of these to operations is 
+referred to by *Emborg* as a squeeze.
+
 - specifying an integer for ``--date`` now finds archive by index.
 - :ref:`due <due>` and :ref:`info <info>` commands now report the latest 
   :ref:`prune <prune>` and :ref:`compact <compact>` operations as well as the 
