@@ -6,9 +6,11 @@ Latest development release
 | Version: 1.35.5
 | Released: 2023-05-01
 
-This release provides new mechanisms to allow you to monitor your pruning and 
-compaction operations to help assure that these activities not neglected.  Both 
-a prune and a compact operation must be performed to release disk space by 
+1.36 (2023-05-15)
+-----------------
+This release provides new mechanisms that allow you to monitor your pruning and 
+compaction operations to help assure that these activities are not neglected.  
+Both a prune and a compact operation must be performed to release disk space by 
 eliminating expired archives.  The combination of these to operations is 
 referred to by *Emborg* as a squeeze.
 
@@ -22,6 +24,10 @@ referred to by *Emborg* as a squeeze.
     If you use :ref:`emborg-overdue <client_overdue>` from the client you will 
     need to change the paths you specify in *overdue.conf*.  They now need to 
     end in ``.latest.nt`` rather than ``.lastbackup``.
+
+.. note::
+
+    If you use :ref:`borg space`, you will need to upgrade to version 2.
 
 
 1.35 (2023-03-20)
