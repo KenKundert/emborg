@@ -133,7 +133,12 @@ class EmborgTester(object):
             if 'regex' in self.expected_type:
                 matches = bool(re.fullmatch(expected, result))
             else:
-                matches = expected == result
+                if 'error' in self.expected_type:
+                    # because error messages use wrapping the white space can
+                    # vary, so simply eliminate the white space
+                    matches = expected.split() == result.split()
+                else:
+                    matches = expected == result
 
         if matches and self.cmp_dirs:
             gen_dir, ref_dir = self.cmp_dirs
