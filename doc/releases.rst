@@ -6,6 +6,11 @@ Latest development release
 | Version: 1.36
 | Released: 2023-05-15
 
+1.37 (2023-05-18)
+-----------------
+- Add missing dependencies.
+
+
 1.36 (2023-05-15)
 -----------------
 This release provides new mechanisms that allow you to monitor your pruning and 

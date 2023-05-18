@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = "1.5"
-__released__ = "2022-11-04"
+__version__ = "1.6"
+__released__ = "2023-05-18"
 
 # Imports {{{1
 try:
@@ -454,14 +454,14 @@ def lsf(*args, **kwargs):
 # Path list functions (leaves, cartesian_product, brace_expand, etc.) {{{1
 def _leaves(path, hidden, report):
     try:
-        for each in path.iterdir():
-            if each.is_dir():
+        if path.is_file():
+            if hidden or not path.name.startswith("."):
+                yield path
+        elif path.is_dir():
+            for each in path.iterdir():
                 if hidden or not each.name.startswith("."):
                     for p in _leaves(each, hidden, report):
                         yield p
-            elif each.is_file():
-                if hidden or not each.name.startswith("."):
-                    yield each
     except OSError as e:
         if report:
             report(e)
