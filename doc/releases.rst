@@ -6,9 +6,10 @@ Latest development release
 | Version: 1.36
 | Released: 2023-05-15
 
+
 1.37 (2023-05-18)
 -----------------
-- Add missing dependencies.
+- Add missing dependency.
 
 
 1.36 (2023-05-15)
