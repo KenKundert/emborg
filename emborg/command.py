@@ -1002,16 +1002,19 @@ class DueCommand(Command):
         If you specify the message, the following replacements are available:
             days: the number of days since the backup
             elapsed: the time that has elapsed since the backup
+            config: the name of the configuration
+            cmd: the command name being reported on (‘create’, ‘prune’, or ‘compact’)
+            action: the action being reported on (‘backup’ or ‘squeeze’)
 
         Examples:
             > emborg due
-            The latest complete archive was create 19 hours ago.
+            home: 9 hours since last backup.  4.6 days since last squeeze.
 
-            > emborg due -d0.5 -m "It has been {days:.1f} days since the last backup."
+            > emborg due -d0.5 -m "It has been {days:.1f} days since the last {action}."
             It has been 0.8 days since the last backup.
 
-            > emborg due -d90 -m "It has been {elapsed} since the last backup."
-            It has been 4 months since the last backup.
+            > emborg due -D10 -m "It has been {elapsed} since the last {cmd} of {config}."
+            It has been 2 weeks since the last prune of home.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = False
