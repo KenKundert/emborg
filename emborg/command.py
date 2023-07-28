@@ -25,9 +25,7 @@ from docopt import docopt
 from inform import (
     Color,
     Error,
-    comment,
     conjoin,
-    cull,
     display,
     full_stop,
     indent,
@@ -194,7 +192,7 @@ def get_archive_paths(paths, settings):
 
                     resolved_paths.append(path)
                     paths_not_found.remove(name)
-                except ValueError as e:
+                except ValueError:
                     pass
         if paths_not_found:
             raise Error(
@@ -462,7 +460,6 @@ class CompactCommand(Command):
             borg_opts = borg_opts,
             args = [settings.destination()],
             emborg_opts = options,
-            show_borg_output = bool(borg_opts),
         )
         out = borg.stdout
         if out:
@@ -584,7 +581,7 @@ class CompareCommand(Command):
 
         # run borg to mount
         try:
-            borg = settings.run_borg(
+            settings.run_borg(
                 cmd = "mount",
                 args = [settings.destination(archive), mount_point],
                 emborg_opts = options,
@@ -687,8 +684,7 @@ class CreateCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         borg_opts = []
-        if cmdline["--stats"] or settings.show_stats:
-            borg_opts.append("--stats")
+        show_stats = cmdline["--stats"] or settings.show_stats
         if cmdline["--list"]:
             borg_opts.append("--list")
         if cmdline["--progress"] or settings.show_progress:
@@ -721,17 +717,18 @@ class CreateCommand(Command):
 
         # run borg
         src_dirs = settings.src_dirs
-        with settings.hooks:
+        with settings.hooks as hooks:
             try:
                 borg = settings.run_borg(
                     cmd = "create",
                     borg_opts = borg_opts,
                     args = [settings.destination(True)] + src_dirs,
                     emborg_opts = options,
-                    show_borg_output = bool(borg_opts),
+                    show_borg_output = show_stats,
                     use_working_dir = True,
                 )
                 create_status = borg.status
+                hooks.report_results(borg)
             except Error as e:
                 if e.stderr and "is not a valid repository" in e.stderr:
                     e.reraise(codicil="Run 'emborg init' to initialize the repository.")
@@ -751,6 +748,8 @@ class CreateCommand(Command):
                             e.reraise(culprit=(setting, i, cmd.split()[0]))
 
         if cmdline["--fast"]:
+            # update the date file
+            update_latest('create', settings.date_file)
             return create_status
 
         # check and prune the archives if requested
@@ -1929,7 +1928,7 @@ class PruneCommand(Command):
             args = [settings.destination()],
             emborg_opts = options,
             strip_prefix = include_external_archives,
-            show_borg_output = bool(borg_opts),
+            show_borg_output = "--stats" in borg_opts,
         )
         out = borg.stdout
         if out:

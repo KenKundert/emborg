@@ -32,7 +32,6 @@ from inform import (
     display,
     done,
     errors_accrued,
-    full_stop,
     get_informer,
     indent,
     is_str,
@@ -48,7 +47,6 @@ from .shlib import (
     Run, cd, cwd, getmod, mv, render_command, rm, to_path,
     set_prefs as set_shlib_prefs
 )
-from . import __version__
 from .collection import Collection, split_lines
 from .hooks import Hooks
 from .patterns import (
@@ -606,7 +604,7 @@ class Emborg:
         if passcommand:
             if passcode:
                 warn("passphrase unneeded.", culprit="passcommand")
-            narrate(f"Setting BORG_PASSCOMMAND.")
+            narrate("Setting BORG_PASSCOMMAND.")
             os.environ['BORG_PASSCOMMAND'] = passcommand
             self.borg_passcode_env_var_set_by_emborg = 'BORG_PASSCOMMAND'
             return
@@ -634,7 +632,7 @@ class Emborg:
 
         if passcode:
             os.environ['BORG_PASSPHRASE'] = passcode
-            narrate(f"Setting BORG_PASSPHRASE.")
+            narrate("Setting BORG_PASSPHRASE.")
             self.borg_passcode_env_var_set_by_emborg = 'BORG_PASSPHRASE'
             return
 
@@ -705,6 +703,7 @@ class Emborg:
                     show_borg_output
                     or "--verbose" in borg_opts
                     or "--progress" in borg_opts
+                    or "--list" in borg_opts
                     or "verbose" in emborg_opts
                     or "narrate" in emborg_opts
                 )

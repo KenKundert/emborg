@@ -16,7 +16,7 @@
 
 
 # Imports {{{1
-from inform import Error, full_stop, log
+from inform import Error, full_stop, log, os_error
 from .preferences import EMBORG_SETTINGS
 import requests
 
@@ -36,9 +36,14 @@ class Hooks:
             if c.is_active():
                 self.active_hooks.append(c)
 
+    def report_results(self, borg):
+        for hook in self.active_hooks:
+            hook.borg = borg
+
     def __enter__(self):
         for hook in self.active_hooks:
             hook.signal_start()
+        return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         for hook in self.active_hooks:
@@ -64,7 +69,7 @@ class Hooks:
             result = 'success'
         log(f'signaling {result} of backups to {self.NAME}: {url}.')
         try:
-            response = requests.get(url)
+            requests.get(url)
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 
@@ -83,6 +88,7 @@ class HealthChecks(Hooks):
         self.url = settings.healthchecks_url
         if not self.url:
             self.url = self.URL
+        self.borg = None
 
     def signal_start(self):
         url = f'{self.url}/{self.uuid}/start'
@@ -97,22 +103,30 @@ class HealthChecks(Hooks):
             result = 'failure'
             if isinstance(exception, OSError):
                 status = 1
-                payload = str(exception)
+                payload = os_error(exception)
             else:
-                status = exception.status
-                payload = exception.stderr
+                try:
+                    status = exception.status
+                    payload = exception.stderr
+                except AttributeError:
+                    status = 1
+                    payload = str(exception)
         else:
             result = 'success'
-            status = 0
-            payload = ''
+            if self.borg:
+                status = self.borg.status
+                payload = self.borg.stderr
+            else:
+                status = 0
+                payload = ''
 
         url = f'{self.url}/{self.uuid}/{status}'
         log(f'signaling {result} of backups to {self.NAME}: {url}.')
         try:
             if payload:
-                response = requests.post(url, data=payload.encode('utf-8'))
+                requests.post(url, data=payload.encode('utf-8'))
             else:
-                response = requests.post(url)
+                requests.post(url)
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 

@@ -24,9 +24,8 @@ from parametrize_from_file import parametrize
 from functools import partial
 import pytest
 import re
-from inform import is_str, Color, Error, indent
+from inform import is_str, Color, Error, dedent, indent
 from shlib import Run, cd, cp, cwd, ln, lsf, mkdir, rm, set_prefs, to_path, touch
-from textwrap import dedent
 from voluptuous import Schema, Optional, Required, Any
 
 

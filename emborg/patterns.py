@@ -38,8 +38,8 @@ def check_root(root, working_dir):
     if not abs_root.exists():
         raise Error("not found.", culprit=root)
     # the following is a bit cleaner, but not available until python 3.9
-    #if not abs_root.is_relative_to(working_dir):
-    #    raise Error("not in working directory:", working_dir, culprit=root)
+    # if not abs_root.is_relative_to(working_dir):
+    #     raise Error("not in working directory:", working_dir, culprit=root)
     try:
         abs_root.relative_to(working_dir)
     except ValueError:

@@ -151,13 +151,17 @@ def when(time, relative_to=None, as_past=None, as_future=None):
     if seconds < 0 and as_past:
         if as_past is True:
             as_past = "{} ago"
+
         def annotate(dt, prec, unit):
             return as_past.format(fmt(dt, prec, unit))
+
     elif seconds >= 0 and as_future:
         if as_future is True:
             as_future = "in {}"
+
         def annotate(dt, prec, unit):
             return as_future.format(fmt(dt, prec, unit))
+
     else:
         annotate = fmt
 
@@ -204,6 +208,8 @@ def update_latest(command, path, repo_size=None):
     latest[f"{command} last run"] = str(arrow.now())
     if repo_size:
         latest['repository size'] = repo_size
+    elif 'repository size' in latest:
+        del latest['repository size']
 
     try:
         nt.dump(latest, path)
