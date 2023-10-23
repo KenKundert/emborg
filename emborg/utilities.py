@@ -128,8 +128,8 @@ def when(time, relative_to=None, as_past=None, as_future=None):
         >>> print(when(now.shift(seconds=3.5*60), as_future="{} from now"))
         3.5 minutes from now
 
-        >>> print(when(now.shift(days=-2*365), as_past="{} in the past"))
-        2 years in the past
+        >>> print(when(now.shift(days=-2*365), as_past="last run {} ago"))
+        last run 2 years ago
     """
 
     if relative_to is None:
@@ -139,7 +139,9 @@ def when(time, relative_to=None, as_past=None, as_future=None):
 
     def fmt(dt, prec, unit):
         if prec:
-            num = f'{dt:0.1f}'.rstrip('.0')
+            num = f'{dt:0.1f}'
+            if num.endswith('.0'):
+                num = num[:-2]
         else:
             num = f'{dt:0.0f}'
         if num == '1':
@@ -209,7 +211,8 @@ def update_latest(command, path, repo_size=None):
     if repo_size:
         latest['repository size'] = repo_size
     elif 'repository size' in latest:
-        del latest['repository size']
+        if repo_size is False:
+            del latest['repository size']
 
     try:
         nt.dump(latest, path)

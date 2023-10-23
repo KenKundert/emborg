@@ -749,7 +749,7 @@ class CreateCommand(Command):
 
         if cmdline["--fast"]:
             # update the date file
-            update_latest('create', settings.date_file)
+            update_latest('create', settings.date_file, repo_size=False)
             return create_status
 
         # check and prune the archives if requested

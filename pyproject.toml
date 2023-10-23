@@ -29,6 +29,11 @@ dependencies = [
     "requests",
 ]
 
+[project.optional-dependencies]
+avendesora = [
+    'avendesora',
+]
+
 [project.scripts]
 emborg = "emborg.main:main"
 emborg-overdue = "emborg.overdue:main"
