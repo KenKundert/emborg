@@ -398,6 +398,8 @@ class CheckCommand(Command):
         verify = ["--verify-data"] if cmdline["--verify-data"] else []
         repair = ['--repair'] if cmdline['--repair'] else []
         if repair:
+            if 'dry-run' in options:
+                raise Error(f"--dry-run is not available with check command.")
             os.environ['BORG_CHECK_I_KNOW_WHAT_I_AM_DOING'] = 'YES'
 
         # identify archive or archives to check
@@ -453,6 +455,8 @@ class CompactCommand(Command):
         borg_opts = []
         if cmdline["--progress"] or settings.show_progress:
             borg_opts.append("--progress")
+        if 'dry-run' in options:
+            raise Error(f"--dry-run is not available with compact command.")
 
         # run borg
         borg = settings.run_borg(
@@ -883,7 +887,7 @@ class DeleteCommand(Command):
 
         try:
             # compact the repository if requested
-            if settings.compact_after_delete:
+            if settings.compact_after_delete and not 'dry-run' in options:
                 narrate("Compacting repository ...")
                 compact = CompactCommand()
                 compact_status = compact.run("compact", [], settings, options)
