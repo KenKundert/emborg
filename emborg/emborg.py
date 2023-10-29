@@ -80,7 +80,11 @@ from .python import PythonFile
 from .utilities import getfullhostname, gethostname, getusername
 
 # Globals {{{1
-borg_commands_with_dryrun = "create extract delete prune upgrade recreate".split()
+borg_commands_with_dryrun = "create delete extract prune upgrade recreate".split()
+dangerous_borg_commands_without_dryrun = "check compact"
+    # The commands that modify the repository and do not support --dry-run.
+    # When specifying --dry-run user expects to be safe.  These commands may not
+    # be safe.  Refuse to run if user requests --dry-run on these commands.
 set_shlib_prefs(use_inform=True, log_cmd=True, encoding=DEFAULT_ENCODING)
 
 # Utilities {{{1
@@ -528,8 +532,11 @@ class Emborg:
             emborg_opts.append("verbose")
         if "verbose" in emborg_opts:
             borg_opts.append("--verbose")
-        if "dry-run" in emborg_opts and cmd in borg_commands_with_dryrun:
-            borg_opts.append("--dry-run")
+        if "dry-run" in emborg_opts:
+            if cmd in borg_commands_with_dryrun:
+                borg_opts.append("--dry-run")
+            elif cmd in dangerous_borg_commands_without_dryrun:
+                raise Error(f"--dry-run is not available with {cmd} command.")
 
         if cmd == "create":
             if "verbose" in emborg_opts and "--list" not in borg_opts:
