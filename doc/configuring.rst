@@ -938,6 +938,15 @@ They will be replaced by their value:
 
 The notifier is only used if the command is not running from a TTY.
 
+Use of *notifier* requires that you have a notification daemon installed (ex 
+`Dunst <https://wiki.archlinux.org/title/Dunst>`_).  The notification daemon 
+provides the *notify-send* command.  If you do not have the *notify-send* 
+command, do not set *notifier*.
+
+The *notify* and *notifier* settings operate independently.  You may specify 
+none, one, or both.  Generally, one uses just one: *notifier* if you primarily 
+use *Emborg* interactively and *notify* if used from cron or anacron.
+
 
 .. _notify:
 
@@ -949,6 +958,15 @@ specified, an email will be sent to each of the addresses to notify them of any
 problems that occurred while running *Emborg*.
 
 The email is only sent if the command is not running from a TTY.
+
+Use of *notify* requires that you have a mail daemon installed (ex `PostFix 
+<http://www.postfix.org>`_).  The mail daemon provides the *mail* command.  If 
+you do not have the *mail* command, do not set *notify*.
+
+The *notify* and *notifier* settings operate independently.  You may specify 
+none, one, or both.  Generally, one uses just one: *notifier* if you primarily 
+use *Emborg* interactively and *notify* if used from cron or anacron.
+
 
 
 .. _passcommand:
