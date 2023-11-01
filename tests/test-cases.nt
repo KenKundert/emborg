@@ -591,10 +591,17 @@ emborg with configs:
     magnate:
         args: --quiet due
         expected:
-            > test0: (just now|(\d+(\.\d)? )?(seconds|minutes)) since last backup\.
-            > test1: (just now|(\d+(\.\d)? )?(seconds|minutes)) since last backup\.
-            > test2: (just now|(\d+(\.\d)? )?(seconds|minutes)) since last backup\.
-            > test3: (just now|(\d+(\.\d)? )?(seconds|minutes)) since last backup\.
+            > test0 backup run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test0 check run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            >
+            > test1 backup run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test1 check run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            >
+            > test2 backup run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test2 check run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            >
+            > test3 backup run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test3 check run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
         expected_type: regex
 
     build:

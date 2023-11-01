@@ -22,8 +22,8 @@ need to be adjusted to get the latest version):
 .. code-block:: bash
 
     $ cd ~/bin
-    $ wget https://github.com/borgbackup/borg/releases/download/1.1.17/borg-linux64
-    $ wget https://github.com/borgbackup/borg/releases/download/1.1.17/borg-linux64.asc
+    $ wget https://github.com/borgbackup/borg/releases/download/1.2.6/borg-linux64
+    $ wget https://github.com/borgbackup/borg/releases/download/1.2.6/borg-linux64.asc
     $ gpg --recv-keys 6D5BEF9ADD2075805747B70F9F88FB52FAF7B393
     $ gpg --verify borg-linux64.asc
     $ rm borg-linux64.asc
@@ -48,6 +48,11 @@ Or, if you want the development version, use:
 
     $ git clone https://github.com/KenKundert/emborg.git
     $ pip install --user ./emborg
+
+You may also need to install and configure either a notification daemon or 
+a mail daemon.  This allows errors to be reported when you are not running 
+*Emborg* in a terminal.  More information can be found by reading about the 
+:ref:`notifier` and :ref:`notify` *Emborg* settings.
 
 
 Configuring Emborg to Backup A Home Directory

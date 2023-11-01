@@ -30,6 +30,7 @@ from inform import (
     full_stop,
     indent,
     is_str,
+    is_collection,
     join,
     log,
     narrate,
@@ -382,6 +383,12 @@ class CheckCommand(Command):
 
         The most recently created archive is checked if one is not specified
         unless --all is given, in which case all archives are checked.
+
+        Be aware that the --repair option is considered a dangerous operation
+        that might result in the complete loss of corrupt archives.  It is
+        recommended that you create a backup copy of your repository and check
+        your hardware for the source of the corruption before using this
+        option.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -419,7 +426,11 @@ class CheckCommand(Command):
         if out:
             output(out.rstrip())
 
-        return borg.status
+        if borg.status:
+            raise Error('repository is corrupt.')
+
+        # update the date file
+        update_latest('check', settings.date_file)
 
 
 # CompactCommand command {{{1
@@ -760,6 +771,7 @@ class CreateCommand(Command):
         try:
             # check the archives if requested
             activity = "checking"
+            check_status = 0
             if settings.check_after_create:
                 announce("Checking repository ...")
                 if settings.check_after_create == "latest":
@@ -777,9 +789,10 @@ class CreateCommand(Command):
                     )
                     args = []
                 check = CheckCommand()
-                check_status = check.run("check", args, settings, options)
-            else:
-                check_status = 0
+                try:
+                    check.run("check", args, settings, options)
+                except Error:
+                    check_status = 1
 
             # prune the repository if requested
             activity = "pruning"
@@ -989,14 +1002,18 @@ class DueCommand(Command):
             emborg due [options]
 
         Options:
-            -d <num>, --backup-days <num>   emit message if this many days have passed
-                                            since last backup
-            -D <num>, --squeeze-days <num>  emit message if this many days have passed
-                                            since last prune or compact
-            -e <addr>, --email <addr>       send email message rather than print message
-            -m <msg>, --message <msg>       the message to emit
-            -o, --oldest                    with composite configuration, only report
-                                            the oldest
+            -d, --backup-days <num>   emit message if this many days have passed
+                                      since last backup
+            -D, --squeeze-days <num>  emit message if this many days have passed
+                                      since last prune and compact
+            -C, --check-days <num>    emit message if this many days have passed
+                                      since last check
+            -e, --email <addr>        send email message rather than print message
+                                      may be comma separated list of addresses
+            -s, --subject <subject>   subject line if sending email
+            -m, --message <msg>       the message to emit
+            -o, --oldest              with composite configuration, only report
+                                      the oldest
 
         If you specify the days, then the message is only printed if the backup
         is overdue.  If not overdue, nothing is printed.  The message is always
@@ -1024,12 +1041,9 @@ class DueCommand(Command):
     COMPOSITE_CONFIGS = "all"
     LOG_COMMAND = False
     SHOW_CONFIG_NAME = False
-    BACKUP_MESSAGES = {}  # type: dict[str, str]
-    OLDEST_BACKUP_DATE = None
-    OLDEST_BACKUP_CONFIG = None
-    SQUEEZE_MESSAGES = {}  # type: dict[str, str]
-    OLDEST_SQUEEZE_DATE = None
-    OLDEST_SQUEEZE_CONFIG = None
+    MESSAGES = {}       # type: dict[str, str]
+    OLDEST_DATE = {}    # type: dict[str, str]
+    OLDEST_CONFIG = {}  # type: dict[str, str]
 
     @classmethod
     def run(cls, command, args, settings, options):
@@ -1039,11 +1053,15 @@ class DueCommand(Command):
         config = settings.config_name
         backup_days = cmdline.get("--backup-days")
         squeeze_days = cmdline.get("--squeeze-days")
+        check_days = cmdline.get("--check-days")
         exit_status = None
 
-        def gen_message(date, cmd='create'):
+        def gen_message(cmd):
+            action = 'squeeze' if cmd in ['prune', 'compact'] else cmd
+            date = last_run[cmd]
+            if not date or date == arrow.get(0):
+                return f"{config} {action} never run."
             elapsed = when(date)
-            action = 'backup' if cmd == 'create' else 'squeeze'
             if cmdline["--message"]:
                 since_last_backup = arrow.now() - date
                 days = since_last_backup.total_seconds() / 86400
@@ -1059,102 +1077,110 @@ class DueCommand(Command):
                         codicil = cmdline["--message"],
                     )
             else:
-                return f"{elapsed} since last {action}."
+                return f"{config} {action} run {elapsed} ago."
 
-        def email_message(msg, action=None):
-            if action == 'backup':
-                messages = cls.BACKUP_MESSAGES
-            else:
-                messages = cls.SQUEEZE_MESSAGES
-            messages[config] = dedent(
-                f"""
-                {full_stop(msg)}
+        def email_message(cmd):
+            if not cmd:
+                return
+            action = 'squeeze' if cmd in ['prune', 'compact'] else cmd
+            msg = gen_message(cmd)
 
-                config: {config}
-                source host: {hostname}
-                source directories: {', '.join(settings.get_roots())}
-                destination: {settings.repository}
-                """
-            ).lstrip()
+            if config not in cls.MESSAGES:
+                cls.MESSAGES[config] = {}
+            cls.MESSAGES[config][action] = msg
+            cls.MESSAGES['source'] = {}
+            cls.MESSAGES['source']['host'] = hostname
+            cls.MESSAGES['source']['roots'] = settings.get_roots()
 
-        def save_message(msg, action=None):
-            if action == 'backup':
-                messages = cls.BACKUP_MESSAGES
-            else:
-                messages = cls.SQUEEZE_MESSAGES
-            messages[config] = msg
+        def save_message(cmd):
+            if not cmd:
+                return
+            action = 'squeeze' if cmd in ['prune', 'compact'] else cmd
+            msg = gen_message(cmd)
+            if config not in cls.MESSAGES:
+                cls.MESSAGES[config] = {}
+            cls.MESSAGES[config][action] = msg
 
         deliver_message = email_message if email else save_message
 
         # Get date of last backup, and squeeze
         latest = read_latest(settings.date_file)
-        backup_date = latest.get('create last run')
-        prune_date = latest.get('prune last run')
-        compact_date = latest.get('compact last run')
-        if not compact_date or not prune_date:
-            squeeze_date = None
+        last_run = dict(
+            backup = latest.get('create last run'),
+            prune = latest.get('prune last run'),
+            compact = latest.get('compact last run'),
+            check = latest.get('check last run'),
+        )
+        if not last_run['compact'] or not last_run['prune']:
+            last_run['squeeze'] = None
             squeeze_cmd = None
-        elif prune_date < compact_date:
-            squeeze_date = prune_date
+        elif last_run['prune'] < last_run['compact']:
+            last_run['squeeze'] = last_run['prune']
             squeeze_cmd = 'prune'
         else:
-            squeeze_date = compact_date
+            last_run['squeeze'] = last_run['compact']
             squeeze_cmd = 'compact'
 
         # disable squeeze check if there are no prune settings
         intervals = "within last minutely hourly daily weekly monthly yearly"
         prune_settings = [("keep_" + s) for s in intervals.split()]
         if not any(settings.value(s) for s in prune_settings):
-            squeeze_date = None
+            last_run['squeeze'] = None
 
         # Record the name of the oldest config
-        if not cls.OLDEST_BACKUP_DATE or backup_date < cls.OLDEST_BACKUP_DATE:
-            cls.OLDEST_BACKUP_DATE = backup_date
-            cls.OLDEST_BACKUP_CONFIG = config
-        if not cls.OLDEST_SQUEEZE_DATE or squeeze_date < cls.OLDEST_SQUEEZE_DATE:
-            cls.OLDEST_SQUEEZE_DATE = squeeze_date
-            cls.OLDEST_SQUEEZE_CONFIG = config
+        for action in ['backup', 'squeeze', 'check']:
+            if not last_run.get(action):
+                last_run[action] = arrow.get(0)
+            if (
+                action not in cls.OLDEST_DATE or
+                not cls.OLDEST_DATE[action] or last_run[action] < cls.OLDEST_DATE[action]
+            ):
+                cls.OLDEST_DATE[action] = last_run['check']
+                cls.OLDEST_CONFIG[action] = config
 
         # Warn user if backup is overdue
-        if backup_days and backup_date:
-            since_last_backup = arrow.now() - backup_date
+        if backup_days and last_run['backup']:
+            since_last_backup = arrow.now() - last_run['backup']
             days = since_last_backup.total_seconds() / 86400
             try:
                 if days > float(backup_days):
-                    deliver_message(gen_message(backup_date), 'backup')
+                    deliver_message('backup')
                     exit_status = 1
-                    if not email:
-                        return exit_status
             except ValueError:
                 raise Error("expected a number for --backup-days.")
-            if not squeeze_days:
+            if not squeeze_days and not check_days:
                 return exit_status
 
         # Warn user if prune or compact is overdue
-        if squeeze_days and squeeze_date:
-            since_last_squeeze = arrow.now() - squeeze_date
+        if squeeze_days and last_run['squeeze']:
+            since_last_squeeze = arrow.now() - last_run['squeeze']
             days = since_last_squeeze.total_seconds() / 86400
             try:
                 if days > float(squeeze_days):
-                    deliver_message(
-                        gen_message(squeeze_date, squeeze_cmd),
-                        'squeeze'
-                    )
+                    deliver_message(squeeze_cmd)
                     exit_status = 1
-                    if not email:
-                        return exit_status
             except ValueError:
                 raise Error("expected a number for --squeeze-days.")
+            if not check_days:
+                return exit_status
+
+        # Warn user if check is overdue
+        if check_days and last_run['check']:
+            since_last_check = arrow.now() - last_run['check']
+            days = since_last_check.total_seconds() / 86400
+            try:
+                if days > float(check_days):
+                    deliver_message('check')
+                    exit_status = 1
+            except ValueError:
+                raise Error("expected a number for --check-days.")
             return exit_status
 
         # Otherwise, simply report age of backups
-        if not backup_days and not squeeze_days:
-            msg = '  '.join(
-                gen_message(*args)
-                for args in [(backup_date,), (squeeze_date, squeeze_cmd)]
-                if args[0]
-            )
-            deliver_message(f"{config}: {msg}")
+        if not backup_days and not squeeze_days and not check_days:
+            deliver_message('backup')
+            deliver_message(squeeze_cmd)
+            deliver_message('check')
 
     @classmethod
     def run_late(cls, command, args, settings, options):
@@ -1162,26 +1188,54 @@ class DueCommand(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         email = cmdline["--email"]
 
-        # determine whether to give backup or squeeze message
-        if cls.BACKUP_MESSAGES:
-            messages = cls.BACKUP_MESSAGES
-            config = cls.OLDEST_BACKUP_CONFIG
-        else:
-            messages = cls.SQUEEZE_MESSAGES
-            config = cls.OLDEST_SQUEEZE_CONFIG
+        # determine whether to give message for oldest or all configs
+        messages = cls.MESSAGES
         if not messages:
             return
-
-        # determine whether to give message for oldest or all configs
         if cmdline["--oldest"]:
-            message = messages[config]
-        else:
-            message = "\n".join(messages.values())
+            oldest = {}
+            for action in ['backup', 'squeeze', 'check']:
+                oldest_config = cls.OLDEST_CONFIG[action]
+                if action in messages[oldest_config]:
+                    if oldest_config not in oldest:
+                        oldest[oldest_config] = {}
+                    oldest[oldest_config][action] = messages[oldest_config][action]
+            messages = oldest
+
+        # convert messages to a indented table
+        last_config = None
+        lines = []
+        for config in messages:
+            if config == 'source':
+                continue
+            if last_config and last_config != config:
+                lines.append("")
+            last_config = config
+            for action in messages[config]:
+                message = messages[config][action].replace(r'\n', '\n')
+                lines.append(message)
+
+        # add source if given (is only given for email)
+        source = messages.get('source')
+        if source:
+            lines.append('\nsource:')
+            messages['source'] = source
+            for key, value in source.items():
+                if is_collection(value):
+                    val = '\n    ' + '\n    '.join(value)
+                    lines.append(indent(f"{key}: {val}"))
+                else:
+                    lines.append(indent(f"{key}: {value}"))
+
+        message = '\n'.join(lines)
 
         # output the message
         if email:
+            subject = cmdline["--subject"]
+            if not subject:
+                subject = f"{PROGRAM_NAME}: backup is overdue"
             Run(
-                ["mail", "-s", f"{PROGRAM_NAME}: backup is overdue", email],
+                ["mail", "-s", subject] + email.split(','),
                 stdin = message,
                 modes = "soeW",
             )

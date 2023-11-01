@@ -215,7 +215,7 @@ def update_latest(command, path, repo_size=None):
             del latest['repository size']
 
     try:
-        nt.dump(latest, path)
+        nt.dump(latest, path, sort_keys=True)
     except nt.NestedTextError as e:
         warn(e)
     except OSError as e:

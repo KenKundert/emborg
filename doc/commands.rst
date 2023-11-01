@@ -107,7 +107,11 @@ Check the integrity of the repository and its archives.  The most recently
 created archive is checked if one is not specified unless ``--all`` is given, in 
 which case all archives are checked.
 
-The ``--repair`` option attempts to repair any damage found.
+The ``--repair`` option attempts to repair any damage found.  Be aware that the 
+--repair option is considered a dangerous operation that might result in the 
+complete loss of corrupt archives.  It is recommended that you create a backup 
+copy of your repository and check your hardware for the source of the corruption 
+before using this option.
 
 
 .. _compact:
