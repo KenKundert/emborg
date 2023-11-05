@@ -553,6 +553,8 @@ or pruning a repository.
     generally to configure *cron* or *anacron* to run the *compact* command 
     routinely for you.
 
+    Do not use this setting if you are not using *Borg* version 1.2 or later.
+
 
 .. _configurations:
 

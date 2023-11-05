@@ -7,6 +7,15 @@ Latest development release
 | Released: 2023-11-01
 
 
+1.38 (2023-11-04)
+-----------------
+- Added ‘last checked date’ reporting to :ref:`due command<due>`.
+- Do not run :ref:`check --repair <check>` and :ref:`compact <compact>` commands
+  if `--dry-run` is requested.
+- Pass output of *Borg* *create* command to hooks to allow it to be reported to 
+  healthchecks.io_.
+
+
 1.37 (2023-05-18)
 -----------------
 - Add missing dependency.
