@@ -1434,6 +1434,9 @@ class InfoCommand(Command):
                 date = latest.get('compact last run')
                 if date:
                     output(f"    compact last run: {date}, {when(date)} ago")
+                date = latest.get('check last run')
+                if date:
+                    output(f"      check last run: {date}, {when(date)} ago")
             except FileNotFoundError as e:
                 narrate(os_error(e))
             except arrow.parser.ParserError as e:

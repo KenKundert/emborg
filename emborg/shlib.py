@@ -452,6 +452,7 @@ def lsf(*args, **kwargs):
 
 
 # Path list functions (leaves, cartesian_product, brace_expand, etc.) {{{1
+# _leaves()  {{{2
 def _leaves(path, hidden, report):
     try:
         if path.is_file():
@@ -999,8 +1000,8 @@ def which(name, path=None, flags=os.X_OK):
     if path is None:
         path = os.environ.get("PATH", "")
     for p in path.split(os.pathsep):
-        p = os.path.join(p, name)
-        if os.access(p, flags):
+        p = to_path(p, name)
+        if p.is_executable():
             result.append(p)
     return result
 

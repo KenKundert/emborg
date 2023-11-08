@@ -5,6 +5,17 @@ Monitoring
 ==========
 
 
+Due and Info
+------------
+
+The :ref:`due <due>` and :ref:`info <info>` commands allow you to interactively 
+check on the current status of your backups.  Besides the :ref:`prune <create>` 
+command, it is good hygiene to run the :ref:`prune <prune>`, :ref:`prune 
+<compact>` and :ref:`prune <check>` on a regular basis.  Either the :ref:`due 
+<due>` or :ref:`info <info>` command can be used to determine when each were 
+last run.
+
+
 .. _emborg_overdue:
 
 Overdue
