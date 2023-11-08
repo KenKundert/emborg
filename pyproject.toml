@@ -1,6 +1,6 @@
 [project]
 name = "emborg"
-version = "1.38"
+version = "1.38.1"
 description = "Borg front end."
 readme = "README.rst"
 keywords = ["emborg", "borg", "borgmatic", "backups"]
