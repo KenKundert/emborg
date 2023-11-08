@@ -614,6 +614,7 @@ emborg with configs:
             >              logfile: /⟪EMBORG⟫/tests/.local/share/emborg/test0.log
             >      create last run: .*
             >       prune last run: .*
+            >       check last run: .*
             > run_before_borg on test0
             >
             > Repository ID: \w*
