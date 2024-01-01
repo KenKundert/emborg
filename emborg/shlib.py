@@ -4,7 +4,7 @@
 # shell-script-like things relatively easily in Python.
 
 # License {{{1
-# Copyright (C) 2016-2023 Kenneth S. Kundert
+# Copyright (C) 2016-2024 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -616,9 +616,8 @@ class Cmd(object):
             # this is particularly problematic the duplicity arguments in embalm
             cmd = [str(c) for c in self.cmd]
         if _use_log(self.log):
-            from inform import log
-
-            log("running:", render_command(cmd, option_args=self.option_args))
+            from inform import indent, log
+            log(f"running:\n{indent(render_command(cmd, option_args=self.option_args))}")
 
         # indicate streams to intercept
         streams = {}
@@ -669,9 +668,8 @@ class Cmd(object):
         else:
             cmd = self.cmd
         if _use_log(self.log):
-            from inform import log
-
-            log("running:", render_command(cmd, option_args=self.option_args))
+            from inform import indent, log
+            log(f"running:\n{indent(render_command(cmd, option_args=self.option_args))}")
 
         if self.save_stdout or self.save_stderr:
             try:

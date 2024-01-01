@@ -1,6 +1,6 @@
 # Emborg Preferences
 #
-# Copyright (C) 2018-2023 Kenneth S. Kundert
+# Copyright (C) 2018-2024 Kenneth S. Kundert
 
 # License {{{1
 # This program is free software: you can redistribute it and/or modify
@@ -59,6 +59,7 @@ EMBORG_SETTINGS = dict(
     avendesora_field="name of field in Avendesora that holds the passphrase",
     borg_executable="path to borg",
     check_after_create="run check as the last step of an archive creation",
+    cmd_name="name of command being run (read only)",
     colorscheme="the color scheme",
     config_dir="absolute path to configuration directory (read-only)",
     config_name="name of active configuration (set by program)",

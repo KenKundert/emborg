@@ -3,8 +3,14 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.38.1
-| Released: 2023-11-08
+| Version: 1.38.2
+| Released: 2024-01-01
+
+
+1.39 (2024-??-??)
+-----------------
+- Add date of last check to output of info command.
+- Miscellaneous refinements.
 
 
 1.38 (2023-11-04)

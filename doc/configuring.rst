@@ -1091,7 +1091,10 @@ successfully completes.  These commands often recreate useful files that were
 deleted by the :ref:`run_before_backup <run_before_backup>` commands.
 
 May be specified as a list of strings or as a multi-line string with one command 
-per line (lines that begin with ``#`` are ignored).
+per line (lines that begin with ``#`` are ignored).  If given as a string, 
+a shell is used to run the command or commands.  If given as a list of strings, 
+a shell is not used, meaning that shell path and variable expansions, 
+redirections and pipelines are not available.
 
 The commands specified in *run_after_backup* are run each time an archive is 
 created whereas commands specified in *run_after_last_backup* are run only if 
@@ -1129,7 +1132,10 @@ starts the backup. These commands often delete large files that can be easily
 recreated from those files that are backed up.
 
 May be specified as a list of strings or as a multi-line string with one command 
-per line (lines that begin with ``#`` are ignored).
+per line (lines that begin with ``#`` are ignored).  If given as a string, 
+a shell is used to run the command or commands.  If given as a list of strings, 
+a shell is not used, meaning that shell path and variable expansions, 
+redirections and pipelines are not available.
 
 The commands specified in *run_before_backup* are run each time an archive is 
 created whereas commands specified in *run_before_first_backup* are run only if 
@@ -1157,7 +1163,10 @@ after the last one is run.  These can be used, for example, to mount and then
 unmount a remote repository, if such a thing is needed.
 
 May be specified as a list of strings or as a multi-line string with one command 
-per line (lines that begin with ``#`` are ignored).
+per line (lines that begin with ``#`` are ignored).  If given as a string, 
+a shell is used to run the command or commands.  If given as a list of strings, 
+a shell is not used, meaning that shell path and variable expansions, 
+redirections and pipelines are not available.
 
 
 .. _show_progress:

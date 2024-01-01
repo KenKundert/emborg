@@ -46,3 +46,25 @@ from each run into a single accumulating log file.  To arrange this you can use
 
 This accumulates the log files as they are created to 
 ~/.local/share/emborg/{config_name}.log.nt.
+
+If your text editor is configured to use fold markers, you can configure *ntlog* 
+to add headers to the composite logfile that contain fold markers.  In doing so 
+you can collapse large log entries into a single line folds until they are 
+needed, at which point you can easily open the fold and examine the contents of 
+the log file.  Here is an example that adds headers with Vim fold markers to the 
+composite log file::
+
+    run_after_borg = [
+        [
+            'ntlog',
+            '--keep-for', '2w',
+            '--day', 'D MMMM YYYY  {{{{{{1',
+            '--entry', 'h:mm A  {{{{{{2',
+            '--fold-marker', '{{{{{{ ❬❬❬',
+            '/home/me/.local/share/emborg/{config_name}.log',
+        ],
+    ]
+
+If you use Vim, you can figure it to fold the composite log file with ``:set 
+foldmethod=marker``.  You can then open a fold using ``zo`` and close it with 
+``zc``.

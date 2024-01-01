@@ -1,7 +1,7 @@
 # Emborg Settings
 
 # License {{{1
-# Copyright (C) 2018-2023 Kenneth S. Kundert
+# Copyright (C) 2018-2024 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,9 +32,11 @@ from inform import (
     display,
     done,
     errors_accrued,
+    full_stop,
     get_informer,
     indent,
     is_str,
+    is_collection,
     join,
     log,
     narrate,
@@ -310,10 +312,15 @@ class Emborg:
             includes = Collection(settings.get(INCLUDE_SETTING))
             includes = [config] + list(includes.values())
 
+        # check file permissions
         if settings.get("passphrase"):
             if getmod(path) & 0o077:
                 warn("file permissions are too loose.", culprit=path)
                 codicil(f"Recommend running: chmod 600 {path!s}")
+
+        # add command name to settings so it can be used in expansions
+        if 'cmd_name' in kwargs:
+            settings['cmd_name'] = kwargs['cmd_name']
 
         self.settings.update(settings)
 
@@ -406,7 +413,7 @@ class Emborg:
         value = self.settings.get(name, default)
         if not is_str(value) or name in self.do_not_expand:
             return value
-        return self.resolve(value)
+        return self.resolve(name, value)
 
     # get values {{{2
     def values(self, name, default=()):
@@ -420,23 +427,25 @@ class Emborg:
         )
         if name in self.do_not_expand:
             return values
-        return [self.resolve(v) for v in values]
+        return [self.resolve(name, v) for v in values]
 
     # resolve {{{2
-    def resolve(self, value):
+    def resolve(self, name, value):
         """Expand any embedded names in value"""
 
         # escape any double braces
         try:
             value = value.replace("{{", r"\b").replace("}}", r"\e")
         except AttributeError:
+            if is_collection(value):
+                return [self.resolve(name, v) for v in value]
             if isinstance(value, int) and not isinstance(value, bool):
                 return str(value)
             return value
 
         # expand names contained in braces
         try:
-            # build kywars in a way so that user can override values normally
+            # build kwargs in a way so that user can override values normally
             # provided by emborg itself in settings file.
             kwargs = dict(
                 host_name = hostname,
@@ -447,8 +456,10 @@ class Emborg:
             resolved = value.format(**kwargs)
         except KeyError as e:
             raise Error("unknown setting.", culprit=e)
+        except ValueError as e:
+            raise Error(full_stop(e), codicil=name)
         if resolved != value:
-            resolved = self.resolve(resolved)
+            resolved = self.resolve(name, resolved)
 
         # restore escaped double braces with single braces
         return resolved.replace(r"\b", "{").replace(r"\e", "}")
@@ -648,9 +659,11 @@ class Emborg:
         for i, cmd in enumerate(self.values(setting)):
             narrate(f"staging {setting}[{i}] command.")
             try:
-                Run(cmd, "SoEW")
+                Run(cmd, "SoEW" if is_str(cmd) else 'soEW')
             except Error as e:
-                e.reraise(culprit=(setting, i, cmd.split()[0]))
+                if is_str(cmd):
+                    cmd = cmd.split()
+                e.reraise(culprit=(setting, i, cmd[0]))
 
         # the following two statements are only useful from run_before_borg
         self.settings[setting] = []  # erase the setting so it is not run again
@@ -898,11 +911,11 @@ class Emborg:
         if not data_dir.exists():
             # data dir does not exist, create it
             data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
-        self.date_file = data_dir / self.resolve(DATE_FILE)
+        self.date_file = data_dir / self.resolve('DATE_FILE', DATE_FILE)
         self.data_dir = data_dir
 
         # perform locking
-        lockfile = self.lockfile = data_dir / self.resolve(LOCK_FILE)
+        lockfile = self.lockfile = data_dir / self.resolve('LOCK_FILE', LOCK_FILE)
             # This must be outside if statement because of breaklock command.
             # It want to remove lock file even though it does not require exclusivity.
 
@@ -942,10 +955,10 @@ class Emborg:
         # open logfile
         # do this after checking lock so we do not overwrite logfile
         # of emborg process that is currently running
-        self.logfile = data_dir / self.resolve(LOG_FILE)
+        self.logfile = data_dir / self.resolve('LOG_FILE', LOG_FILE)
         log_command = self.log_command and "no-log" not in self.emborg_opts
         if log_command:
-            self.prev_logfile = data_dir / self.resolve(PREV_LOG_FILE)
+            self.prev_logfile = data_dir / self.resolve('PREV_LOG_FILE', PREV_LOG_FILE)
             rm(self.prev_logfile)
             if self.logfile.exists():
                 mv(self.logfile, self.prev_logfile)

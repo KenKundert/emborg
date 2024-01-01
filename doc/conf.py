@@ -49,14 +49,14 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'emborg'
-copyright = u'2018-2023, Ken Kundert'
+copyright = u'2018-2024, Ken Kundert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = '1.38.1'
+release = '1.38.2'
 # The short X.Y version.
 version = '.'.join(release.split('.')[0:2])
 

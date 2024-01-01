@@ -36,41 +36,41 @@ Options:
 
 
 # Imports {{{1
-try:
-    import os
-    import sys
-    from docopt import docopt
-    from inform import (
-        Error, Inform, LoggingCache, cull, display, error, os_error, terminate
-    )
-    from . import __released__, __version__
-    from .command import Command
-    from .hooks import Hooks
-    from .emborg import ConfigQueue, Emborg
+import os
+import sys
+from docopt import docopt
+from inform import (
+    Error, Inform, LoggingCache, cull, display, error, os_error, terminate
+)
+from . import __released__, __version__
+from .command import Command
+from .hooks import Hooks
+from .emborg import ConfigQueue, Emborg
 
-    # Globals {{{1
-    version = f"{__version__} ({__released__})"
-    commands = """
-    Commands:
-    {commands}
+# Globals {{{1
+version = f"{__version__} ({__released__})"
+commands = """
+Commands:
+{commands}
 
-    Use 'emborg help <command>' for information on a specific command.
-    Use 'emborg help' for list of available help topics.
-    """
-    synopsis = __doc__
-    expanded_synopsis = synopsis + commands.format(commands=Command.summarize())
+Use 'emborg help <command>' for information on a specific command.
+Use 'emborg help' for list of available help topics.
+"""
+synopsis = __doc__
+expanded_synopsis = synopsis + commands.format(commands=Command.summarize())
 
 
-    # Main {{{1
-    def main():
-        with Inform(
-            error_status = 2,
-            flush = True,
-            logfile = LoggingCache(),
-            prog_name = 'emborg',
-            version = version,
-        ) as inform:
+# Main {{{1
+def main():
+    with Inform(
+        error_status = 2,
+        flush = True,
+        logfile = LoggingCache(),
+        prog_name = 'emborg',
+        version = version,
+    ) as inform:
 
+        try:
             # read command line
             cmdline = docopt(expanded_synopsis, options_first=True, version=version)
             config = cmdline["--config"]
@@ -96,44 +96,43 @@ try:
             Hooks.provision_hooks()
             worst_exit_status = 0
 
-            try:
-                # find the command
-                cmd, cmd_name = Command.find(command)
+            # find the command
+            cmd, cmd_name = Command.find(command)
 
-                # execute the command initialization
-                exit_status = cmd.execute_early(cmd_name, args, None, emborg_opts)
-                if exit_status is not None:
-                    terminate(exit_status)
+            # execute the command initialization
+            exit_status = cmd.execute_early(cmd_name, args, None, emborg_opts)
+            if exit_status is not None:
+                terminate(exit_status)
 
-                queue = ConfigQueue(cmd)
-                while queue:
-                    with Emborg(config, emborg_opts, queue=queue) as settings:
-                        try:
-                            exit_status = cmd.execute(
-                                cmd_name, args, settings, emborg_opts
-                            )
-                        except Error as e:
-                            exit_status = 2
-                            settings.fail(e, cmd=' '.join(sys.argv))
-                            e.terminate()
+            queue = ConfigQueue(cmd)
+            while queue:
+                with Emborg(config, emborg_opts, queue=queue, cmd_name=cmd_name) as settings:
+                    try:
+                        exit_status = cmd.execute(
+                            cmd_name, args, settings, emborg_opts
+                        )
+                    except Error as e:
+                        exit_status = 2
+                        settings.fail(e, cmd=' '.join(sys.argv))
+                        e.terminate()
 
-                    if exit_status and exit_status > worst_exit_status:
-                        worst_exit_status = exit_status
-
-                # execute the command termination
-                exit_status = cmd.execute_late(cmd_name, args, None, emborg_opts)
                 if exit_status and exit_status > worst_exit_status:
                     worst_exit_status = exit_status
 
-            except Error as e:
-                e.report()
-                exit_status = 2
-            except OSError as e:
-                exit_status = 2
-                error(os_error(e))
+            # execute the command termination
+            exit_status = cmd.execute_late(cmd_name, args, None, emborg_opts)
             if exit_status and exit_status > worst_exit_status:
                 worst_exit_status = exit_status
-            terminate(worst_exit_status)
 
-except KeyboardInterrupt:
-    display("Terminated by user.")
+        except Error as e:
+            e.report()
+            exit_status = 2
+        except OSError as e:
+            exit_status = 2
+            error(os_error(e))
+        except KeyboardInterrupt:
+            exit_status = 0
+            display("Terminated by user.")
+        if exit_status and exit_status > worst_exit_status:
+            worst_exit_status = exit_status
+        terminate(worst_exit_status)

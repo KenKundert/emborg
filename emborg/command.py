@@ -1028,7 +1028,9 @@ class DueCommand(Command):
 
         Examples:
             > emborg due
-            home: 9 hours since last backup.  4.6 days since last squeeze.
+            root backup completed 9 hours ago.
+            root squeeze completed 4.6 days ago.
+            root check completed 12 days ago.
 
             > emborg due -d0.5 -m "It has been {days:.1f} days since the last {action}."
             It has been 0.8 days since the last backup.
@@ -1077,7 +1079,7 @@ class DueCommand(Command):
                         codicil = cmdline["--message"],
                     )
             else:
-                return f"{config} {action} run {elapsed} ago."
+                return f"{config} {action} completed {elapsed} ago."
 
         def email_message(cmd):
             if not cmd:
@@ -2180,7 +2182,7 @@ class SettingsCommand(Command):
                 try:
                     if is_str(v) and "{" in v and k not in settings.do_not_expand:
                         output(resolved(
-                            f'{leader}{render(settings.resolve(v), level=6)}'
+                            f'{leader}{render(settings.resolve(k, v), level=6)}'
                         ))
                 except Error:
                     pass

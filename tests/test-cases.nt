@@ -74,6 +74,7 @@ emborg without configs:
             >            borg_executable: path to borg
             >         check_after_create: run check as the last step of an archive
             >                             creation
+            >                   cmd_name: name of command being run (read only)
             >                colorscheme: the color scheme
             >       compact_after_delete: run compact after deleting an archive or
             >                             pruning a repository
@@ -211,6 +212,7 @@ emborg with configs:
             >            borg_executable: path to borg
             >         check_after_create: run check as the last step of an archive
             >                             creation
+            >                   cmd_name: name of command being run (read only)
             >                colorscheme: the color scheme
             >       compact_after_delete: run compact after deleting an archive or
             >                             pruning a repository
@@ -345,6 +347,7 @@ emborg with configs:
             >                 archive: '{config_name}-{{now}}'
             >                          'test0-{now}'
             >      check_after_create: True
+            >                cmd_name: 'settings'
             >              config_dir: '/⟪EMBORG⟫/tests/.config/emborg'
             >             config_name: 'test0'
             >          configurations: """
@@ -591,17 +594,17 @@ emborg with configs:
     magnate:
         args: --quiet due
         expected:
-            > test0 backup run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
-            > test0 check run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test0 backup completed (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test0 check completed (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
             >
-            > test1 backup run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
-            > test1 check run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test1 backup completed (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test1 check completed (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
             >
-            > test2 backup run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
-            > test2 check run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test2 backup completed (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test2 check completed (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
             >
-            > test3 backup run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
-            > test3 check run (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test3 backup completed (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
+            > test3 check completed (just now|(\d+(\.\d)? )?(seconds?|minutes?)) ago\.
         expected_type: regex
 
     build:
