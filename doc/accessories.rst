@@ -57,9 +57,10 @@ composite log file::
     run_after_borg = [
         [
             'ntlog',
-            '--keep-for', '2w',
+            '--keep-for', '1w',
             '--day', 'D MMMM YYYY  {{{{{{1',
             '--entry', 'h:mm A  {{{{{{2',
+            '--description', '{cmd_name}',
             '--fold-marker', '{{{{{{ ❬❬❬',
             '/home/me/.local/share/emborg/{config_name}.log',
         ],
