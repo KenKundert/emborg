@@ -1,23 +1,7 @@
 Emborg — Front-End to Borg Backup
 =================================
 
-.. image:: https://pepy.tech/badge/emborg/month
-    :target: https://pepy.tech/project/emborg
-
-.. image:: https://img.shields.io/readthedocs/emborg.svg
-   :target: https://emborg.readthedocs.io/en/latest/?badge=latest
-
-..  image:: https://github.com/KenKundert/emborg/actions/workflows/build.yaml/badge.svg
-    :target: https://github.com/KenKundert/emborg/actions/workflows/build.yaml
-
-.. image:: https://coveralls.io/repos/github/KenKundert/emborg/badge.svg?branch=master
-    :target: https://coveralls.io/github/KenKundert/emborg?branch=master
-
-.. image:: https://img.shields.io/pypi/v/emborg.svg
-    :target: https://pypi.python.org/pypi/emborg
-
-.. image:: https://img.shields.io/pypi/pyversions/emborg.svg
-    :target: https://pypi.python.org/pypi/emborg/
+|downloads| |build status| |coverage| |rtd status| |pypi version| |python version|
 
 :Author: Ken Kundert
 :Version: 1.38.2
@@ -50,3 +34,23 @@ Then, for information on a specific topic use::
 
 It is worth browsing all of the available topics at least once to get a sense of
 all that *Emborg* can do.
+
+
+.. |downloads| image:: https://pepy.tech/badge/emborg/month
+    :target: https://pepy.tech/project/emborg
+
+..  |build status| image:: https://github.com/KenKundert/emborg/actions/workflows/build.yaml/badge.svg
+    :target: https://github.com/KenKundert/emborg/actions/workflows/build.yaml
+
+.. |coverage| image:: https://coveralls.io/repos/github/KenKundert/emborg/badge.svg?branch=master
+    :target: https://coveralls.io/github/KenKundert/emborg?branch=master
+
+.. |rtd status| image:: https://img.shields.io/readthedocs/emborg.svg
+   :target: https://emborg.readthedocs.io/en/latest/?badge=latest
+
+.. |pypi version| image:: https://img.shields.io/pypi/v/emborg.svg
+    :target: https://pypi.python.org/pypi/emborg
+
+.. |python version| image:: https://img.shields.io/pypi/pyversions/emborg.svg
+    :target: https://pypi.python.org/pypi/emborg/
+
