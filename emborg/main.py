@@ -71,6 +71,15 @@ def main():
     ) as inform:
 
         try:
+            worst_exit_status = 0
+
+            # emborg fails if the current working directory does not exist and
+            # the message returned by OSError does not make the problem obvious.
+            try:
+                os.getcwd()
+            except OSError as e:
+                raise Error(os_error(e), codicil="Does the current working directory exist?")
+
             # read command line
             cmdline = docopt(expanded_synopsis, options_first=True, version=version)
             config = cmdline["--config"]
@@ -94,7 +103,6 @@ def main():
                 inform.narrate = True
 
             Hooks.provision_hooks()
-            worst_exit_status = 0
 
             # find the command
             cmd, cmd_name = Command.find(command)
@@ -125,8 +133,8 @@ def main():
                 worst_exit_status = exit_status
 
         except Error as e:
-            e.report()
             exit_status = 2
+            e.report()
         except OSError as e:
             exit_status = 2
             error(os_error(e))

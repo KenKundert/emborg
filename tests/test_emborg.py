@@ -18,7 +18,6 @@
 # Imports {{{1
 import arrow
 import json
-import nestedtext as nt
 import os
 from parametrize_from_file import parametrize
 from functools import partial

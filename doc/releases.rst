@@ -7,9 +7,10 @@ Latest development release
 | Released: 2024-01-01
 
 
-1.39 (2024-??-??)
+1.39 (2024-04-29)
 -----------------
 - Add date of last check to output of info command.
+- Added :ref:`cmd_name` setting.
 - Miscellaneous refinements.
 
 

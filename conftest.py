@@ -8,9 +8,9 @@ set_prefs(use_inform=True)
 
 # add command line options used to signal missing dependencies to pytest
 def pytest_addoption(parser):
-    #parser.addoption(
-    #    "--borg-version", action="store", default="99.99.99", help="version number of borg"
-    #)
+    # parser.addoption(
+    #     "--borg-version", action="store", default="99.99.99", help="version number of borg"
+    # )
     parser.addoption(
         "--no-fuse", action="store_true", default=None, help="fuse is not available"
     )

@@ -47,3 +47,15 @@ changelog = "https://emborg.readthedocs.io/en/latest/releases.html"
 [build-system]
 requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
+
+[tool.ruff]
+exclude = [".tox", "doc"]
+
+[tool.ruff.lint]
+select = ["F"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"emborg/overdue.py" = ["F841"]
+

@@ -1562,3 +1562,49 @@ be specified using absolute paths (ex: :ref:`default_mount_point`,
 
 If specified, *working_dir* must be specified using an absolute path.
 If not specified, *working_dir* defaults to ``/``.
+
+
+Read Only Settings
+------------------
+
+These settings are set by *Emborg* itself.  They are useful as place-holders in 
+other settings.
+
+.. _cmd_name:
+
+cmd_name
+~~~~~~~~
+
+The name of the *Emborg* command currently being run.
+
+
+.. _config_dir:
+
+config_dir
+~~~~~~~~~~~
+
+Absolute path to *Emborg*'s configuration directory.
+
+
+.. _config_name:
+
+config_name
+~~~~~~~~~~~
+
+Name of active configuration.
+
+
+.. _home_dir:
+
+home_dir
+~~~~~~~~
+
+Absolute path to user's home directory.
+
+
+.. _log_dir:
+
+log_dir
+~~~~~~~
+
+Absolute path to the *Emborg*'s logging directory.

@@ -18,7 +18,7 @@
 
 # Imports {{{1
 from os.path import expanduser as expand_user
-from inform import Error, error, log
+from inform import Error, error
 from .shlib import to_path
 
 

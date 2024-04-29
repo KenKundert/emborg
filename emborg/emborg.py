@@ -28,6 +28,7 @@ from inform import (
     codicil,
     comment,
     conjoin,
+    cull,
     dedent,
     display,
     done,
@@ -89,7 +90,6 @@ set_shlib_prefs(use_inform=True, log_cmd=True, encoding=DEFAULT_ENCODING)
 hostname = gethostname()
 fullhostname = getfullhostname()
 username = getusername()
-
 
 # borg_options_arg_count {{{2
 borg_options_arg_count = {
@@ -809,26 +809,35 @@ class Emborg:
     # report_borg_error() {{{2
     def report_borg_error(self, e, cmd):
         narrate('Borg terminates with exit status:', e.status)
+        if e.stdout:
+            log('borg stdout:', indent(e.stdout), sep='\n')
+        else:
+            log('borg stdout: ❬empty❭')
+        if e.stderr:
+            log('borg stderr:', indent(e.stderr), sep='\n')
+        else:
+            log('borg stderr: ❬empty❭')
         codicil = None
         if e.stderr:
             if 'previously located at' in e.stderr:
                 codicil = dedent(f'''
                     If repository was intentionally relocated, re-run with --relocated:
                         emborg --relocated {cmd} ...
-                ''')
+                ''', strip_nl='b')
             if 'Failed to create/acquire the lock' in e.stderr:
-                codicil = [
-                    'If another Emborg or Borg process is using this repository,',
-                    'please wait for it to finish.',
-                    'Perhaps you still have an archive mounted?',
-                    'If so, use ‘emborg umount’ to unmount it.',
-                    'Perhaps a previous run was killed or terminated with an error?',
-                    'If so, use ‘emborg breaklock’ to clear the lock.',
-                ]
+                codicil = dedent('''
+                    If another Emborg or Borg process is using this repository,
+                    please wait for it to finish.
+                    Perhaps you still have an archive mounted?
+                    If so, use ‘emborg umount’ to unmount it.
+                    Perhaps a previous run was killed or terminated with an error?
+                    If so, use ‘emborg breaklock’ to clear the lock.
+                ''', strip_nl='b')
 
             if 'Mountpoint must be a writable directory' in e.stderr:
                 codicil = 'Perhaps an archive is already mounted there?'
-        e.reraise(culprit=cmd, codicil=codicil)
+
+        e.reraise(culprit=cull((cmd, self.config_name)), codicil=codicil)
 
     # destination() {{{2
     def destination(self, archive=None):

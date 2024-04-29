@@ -74,13 +74,13 @@ emborg without configs:
             >            borg_executable: path to borg
             >         check_after_create: run check as the last step of an archive
             >                             creation
-            >                   cmd_name: name of command being run (read only)
+            >                   cmd_name: name of Emborg command being run (read only)
             >                colorscheme: the color scheme
             >       compact_after_delete: run compact after deleting an archive or
             >                             pruning a repository
             >                 config_dir: absolute path to configuration directory
             >                             (read-only)
-            >                config_name: name of active configuration (set by program)
+            >                config_name: name of active configuration (read only)
             >             configurations: available Emborg configurations
             >                cronhub_url: the cronhub.io URL for back-ups monitor
             >               cronhub_uuid: the cronhub.io UUID for back-ups monitor
@@ -212,13 +212,13 @@ emborg with configs:
             >            borg_executable: path to borg
             >         check_after_create: run check as the last step of an archive
             >                             creation
-            >                   cmd_name: name of command being run (read only)
+            >                   cmd_name: name of Emborg command being run (read only)
             >                colorscheme: the color scheme
             >       compact_after_delete: run compact after deleting an archive or
             >                             pruning a repository
             >                 config_dir: absolute path to configuration directory
             >                             (read-only)
-            >                config_name: name of active configuration (set by program)
+            >                config_name: name of active configuration (read only)
             >             configurations: available Emborg configurations
             >                cronhub_url: the cronhub.io URL for back-ups monitor
             >               cronhub_uuid: the cronhub.io UUID for back-ups monitor
@@ -667,7 +667,7 @@ emborg with configs:
             > run_before_borg on test0
             > run_after_backup on test0
             > run_after_last_backup on test0
-            > emborg error: create:
+            > emborg error: create, test0:
             >     Failed to create/acquire the lock /⟪EMBORG⟫/tests/repositories/lock (timeout).
             >         If another Emborg or Borg process is using this repository,
             >         please wait for it to finish.
@@ -1101,7 +1101,7 @@ emborg with configs:
     cleanser:
         args: --config test7 list
         expected:
-            > emborg error: list:
+            > emborg error: list, test7:
             >     Repository /⟪EMBORG⟫/tests/repositories does not exist.
         expected_type: error
 
