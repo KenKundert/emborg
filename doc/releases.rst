@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.39
-| Released: 2024-04-29
+| Version: 1.39.1
+| Released: 2024-05-27
 
 - Enhance :ref:`emborg-overdue <emborg-overdue>` command.
 
