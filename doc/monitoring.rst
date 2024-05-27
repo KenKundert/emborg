@@ -47,6 +47,8 @@ Here is an example config file:
     dumper = 'dumper@continuum.com'
     default_max_age = 12  # hours
     root = '/mnt/borg-backups/repositories'
+    colorscheme = 'dark'
+    status_message = "{host}: {age} ago{overdue: — PAST DUE}"
     repositories = [
         dict(host='mercury (/)', path='mercury-root-root'),
         dict(host='venus (/)', path='venus-root-root'),
@@ -60,15 +62,25 @@ Here is an example config file:
     ]
 
 The dictionaries in *repositories* can contain the following fields: *host*, 
-*path*, *maintainer*, *max_age*. *host* is an arbitrary string that is used as 
-description of the repository.  It is included in the email that is sent when 
-problems occur to identify the backup and so should be unique.  It is a good 
-idea for it to contain both the host name and the source directory being backed 
-up.  *path* is either the archive name or a full absolute path to the archive.  
-If *path* is an absolute path, it is used, otherwise it is added to the end of 
-*root*.  *maintainer* is an email address, an email is sent to this address if 
-there is an issue.  *max_age* is the number of hours that may pass before an 
-archive is considered overdue.
+*path*, *maintainer*, *max_age*.
+
+*host*:
+    An arbitrary string that is used as description of the repository.  It is 
+    included in the email that is sent when problems occur to identify the 
+    backup and so should be unique.  It is a good idea for it to contain both 
+    the host name and the source directory being backed up.
+*path*:
+    Is either the archive name or a full absolute path to the archive.  The 
+    modification time of the target of this path is used as the time of the last 
+    backup.  If *path* is an absolute path, it is used, otherwise it is added to 
+    the end of *root*.
+*maintainer*:
+    An email address, an email is sent to this address if there is an issue.  
+    *max_age* is the number of hours that may pass before an archive is 
+    considered overdue.
+*max_age*:
+    The maximum age in hours.  If the back-up occurred more than this many hours 
+    in the past it is considered over due.
 
 *repositories* can also be specified as multi-line string:
 
@@ -93,6 +105,44 @@ on '|' and the 4 values are expected to be given in order.  If the *maintainer*
 is not given, the *default_maintainer* is used. If *max_age* is not given, the 
 *default_max_age* is used.
 
+There are some additional settings available:
+
+*default_maintainer*:
+    Email address of the account running the checks.  This will be the sender 
+    address on any email sent as a result of an over due back-up.
+*dumper*:
+    Email address of the account monitoring the checks.  This will be the 
+    recipient address on any email sent as a result of an over due back-up.
+*root*:
+    The directory used as the root when converting relative paths given in 
+    *repositories* to absolute paths.  By default this will be the *Emborg* log 
+    file directory.
+*default_max_age*:
+    The default maximum age in hours.  It is used if a maximum age is not given 
+    for a particular repository.
+*colorscheme*:
+    The color scheme of your terminal.  May be "dark" or "light" or None.  If 
+    None, the output is not colored.
+*message*:
+    The format of the summary for each host.  The string may contain keys within 
+    braces that will be replaced before output.  The following keys are 
+    supported:
+
+    | *host*: replaced by the host field from the config file, a string.
+    | *max_age*: replaced by the max_age field from the config file, a float.
+    | *mtime*: replaced by modification time, a datetime object.
+    | *hours*: replaced by the number of hours since last update, a float.
+    | *age*: replaced by time since last update, a string.
+    | *overdue*: is the back-up overdue.
+
+    The message is a Python formatted string, and so the various fields can include
+    formatting directives.  For example:
+
+    - strings than include field width and justification, ex. {host:>20}
+    - floats can include width, precision and form, ex. {hours:0.1f}
+    - datetime can include Arrow formats, ex: {mdime:DD MMM YY @ H:mm A}
+    - overdue can include true/false strings: {overdue:PAST DUE!/current}
+
 To run the program interactively, just make sure *emborg-overdue* has been 
 installed and is on your path. Then type:
 
@@ -111,35 +161,36 @@ and add something like the following:
 
 .. code-block:: text
 
-    34 5 * * * ~/.local/bin/emborg-overdue --mail > ~/.local/share/emborg/emborg-overdue.out 2>&
+    34 5 * * * ~/.local/bin/emborg-overdue --quiet --mail
 
 or:
 
 .. code-block:: text
 
-    34 5 * * * ~/.local/bin/emborg-overdue --quiet --mail
+    34 5 * * * ~/.local/bin/emborg-overdue --quiet --notify
 
 to your crontab.
 
-The first example runs emborg-overdue at 5:34 AM every day while saving the 
-output into a file.  The use of the ``--mail`` option causes *emborg-overdue* to 
-send mail to the maintainer when backups are found to be overdue.
+The first example runs emborg-overdue at 5:34 AM every day.  The use of the 
+``--mail`` option causes *emborg-overdue* to send mail to the maintainer when 
+backups are found to be overdue.
 
 .. note::
 
     By default Linux machines are not configured to send email.  If you are 
     using the ``--mail`` option to *emborg-overdue* be sure that to check that 
     it is working.  You can do so by sending mail to your self using the *mail* 
-    command.  If you do not receive your test message you will need to set up 
-    email forwarding on your machine.  You can do so by installing and 
+    or *mailx* command.  If you do not receive your test message you will need 
+    to set up email forwarding on your machine.  You can do so by installing and 
     configuring `PostFix as a null client
     <http://www.postfix.org/STANDARD_CONFIGURATION_README.html#null_client>`_.
 
-The second example is similar except the output is suppressed rather than being 
-saved to a file.
+The second example uses ``--notify``, which sends a notification if a back-up is 
+overdue and there is not access to the tty (your terminal).
 
 Alternately you can run *emborg-overdue* from cron.daily (described in the 
 :ref:`root example <root example>`).
+
 
 
 .. _client_overdue:

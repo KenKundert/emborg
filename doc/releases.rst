@@ -6,10 +6,12 @@ Latest development release
 | Version: 1.39
 | Released: 2024-04-29
 
+- Enhance :ref:`emborg-overdue <emborg-overdue>` command.
+
 
 1.39 (2024-04-29)
 -----------------
-- Add date of last check to output of info command.
+- Add date of last check to output of :ref:`info <info>` command.
 - Added :ref:`cmd_name` setting.
 - Miscellaneous refinements.
 

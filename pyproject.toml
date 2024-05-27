@@ -23,7 +23,8 @@ dependencies = [
     "arrow>=0.15",
     # "avendesora",  # optional
     "docopt",
-    "inform>=1.28",
+    # inform>=1.30  # — required for new version of emborg-overdue
+        "inform>=1.29.1",
     "nestedtext",
     "quantiphy",
     "requests",

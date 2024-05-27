@@ -65,7 +65,7 @@ any number of setups, which you might want if you wanted to backup to multiple
 repositories for redundancy or if you want to use different rules for different 
 sets of files. Regardless, you use a separate configuration for each set up, 
 plus there is a common configuration file shared by all setups. You are free to 
-place most settings in either file, which ever is most convenient.  All the 
+place most settings in either file, whichever is most convenient.  All the 
 configuration files are placed in ~/.config/emborg. If you run *Emborg* without 
 creating your configuration files, *Emborg* will create some starter files for 
 you.  A configuration is specified using Python, thus the content of these files 

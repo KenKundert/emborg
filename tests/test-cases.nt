@@ -466,7 +466,6 @@ emborg with configs:
         expected:
             > run_before_borg on test0
             > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > run_after_borg on test0
             > ⟪EMBORG⟫/tests/configs
             > ⟪EMBORG⟫/tests/configs/README
             > ⟪EMBORG⟫/tests/configs/overdue.conf
@@ -487,6 +486,7 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test7patterns
             > ⟪EMBORG⟫/tests/configs/test8
             > ⟪EMBORG⟫/tests/configs/test9
+            > run_after_borg on test0
         expected_type: regex
 
     shiver:
@@ -494,7 +494,6 @@ emborg with configs:
         expected:
             > run_before_borg on test0
             > Archive: test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > run_after_borg on test0
             > ⟪EMBORG⟫/tests/configs/test0
             > ⟪EMBORG⟫/tests/configs/test1
             > ⟪EMBORG⟫/tests/configs/test2
@@ -509,6 +508,7 @@ emborg with configs:
             > ⟪EMBORG⟫/tests/configs/test7patterns
             > ⟪EMBORG⟫/tests/configs/test8
             > ⟪EMBORG⟫/tests/configs/test9
+            > run_after_borg on test0
         expected_type: regex
 
     whiplash:
@@ -718,8 +718,6 @@ emborg with configs:
             > run_before_borg 0
             > run_before_borg 1
             > Archive: test4-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
-            > run_after_borg 0
-            > run_after_borg 1
             >     0B tests/configs/
             >     0B tests/configs/subdir/
             >     0B tests/configs/subdir/file
@@ -733,14 +731,16 @@ emborg with configs:
             >   182B tests/configs/test8
             >   191B tests/configs/test5
             >   526B tests/configs/test0
-            >   548B tests/configs/overdue.conf
             >   559B tests/configs/test2
+            >   594B tests/configs/overdue.conf
             >   612B tests/configs/test1
             >   614B tests/configs/settings
             >   671B tests/configs/test3
             >   965B tests/configs/test4
             > 1.85kB tests/configs/README
-            > Total size = 7.34kB.
+            > Total size = 7.38kB.
+            > run_after_borg 0
+            > run_after_borg 1
         expected_type: regex
 
     sparkler:
@@ -1003,14 +1003,14 @@ emborg with configs:
             >   182B tests/configs/test8
             >   191B tests/configs/test5
             >   526B tests/configs/test0
-            >   548B tests/configs/overdue.conf
             >   559B tests/configs/test2
+            >   594B tests/configs/overdue.conf
             >   612B tests/configs/test1
             >   614B tests/configs/settings
             >   671B tests/configs/test3
             >   965B tests/configs/test4
             > 1.85kB tests/configs/README
-            > Total size = 7.34kB.
+            > Total size = 7.38kB.
         expected_type: regex
 
     intercom:

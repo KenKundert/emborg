@@ -3,7 +3,7 @@
 set nonomatch
 
 (cd tests && ./clean)
-rm -rf .mypy_cache
+rm -rf .mypy_cache .ruff_cache doc/.build
 
 # the rest is common to all python directories
 rm -f *.pyc *.pyo */*.pyc */*.pyo .test*.sum expected result install.out

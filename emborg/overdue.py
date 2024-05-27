@@ -11,17 +11,34 @@ Usage:
     emborg-overdue [options]
 
 Options:
-    -c, --no-color   Do not color the output
-    -h, --help       Output basic usage information
-    -m, --mail       Send mail message if backup is overdue
-    -p, --no-passes  Do not show hosts that are not overdue
-    -q, --quiet      Suppress output to stdout
-    -v, --verbose    Give more information about each host
-    --version        Show software version
+    -c, --no-color       Do not color the output
+    -h, --help           Output basic usage information
+    -m, --mail           Send mail message if backup is overdue
+    -n, --notify         Send notification if backup is overdue
+    -p, --no-passes      Do not show hosts that are not overdue
+    -q, --quiet          Suppress output to stdout
+    -v, --verbose        Give more information about each repository
+    -M, --message <msg>  Status message template for each repository
+    --version            Show software version
 
 The program requires a configuration file: ~/.config/emborg/overdue.conf. The
 contents are described here:
     https://emborg.readthedocs.io/en/stable/utilities.html#overdue
+
+The message given by --message may contain the following keys in braces:
+    host: replaced by the host field from the config file, a string.
+    max_age: replaced by the max_age field from the config file, a float in hours.
+    mtime: replaced by modification time, a datetime object.
+    hours: replaced by the number of hours since last update, a float.
+    age: replaced by time since last update, a string.
+    overdue: is the back-up overdue.
+
+The status message is a Python formatted string, and so the various fields can include
+formatting directives.  For example:
+- strings than include field width and justification, ex. {host:>20}
+- floats can include width, precision and form, ex. {hours:0.1f}
+- datetime can include Arrow formats, ex: {mdime:DD MMM YY @ H:mm A}
+- overdue can include true/false strings: {overdue:PAST DUE!/current}
 """
 
 # License {{{1
@@ -50,13 +67,17 @@ from inform import (
     Color,
     Error,
     Inform,
+    InformantFactory,
+    conjoin,
     display,
     error,
+    fatal,
     fmt,
     get_prog_name,
     is_str,
     os_error,
     terminate,
+    truth,
     warn,
 )
 
@@ -72,20 +93,24 @@ username = pwd.getpwuid(os.getuid()).pw_name
 hostname = socket.gethostname()
 now = arrow.now()
 
-verbose_overdue_message = dedent("""\
+default_colorscheme = "dark"
+current_color = "green"
+overdue_color = "red"
+
+verbose_status_message = dedent("""\
     HOST: {host}
         sentinel file: {path!s}
         last modified: {mtime}
-        since last change: {age:0.1f} hours
+        since last change: {hours:0.1f} hours
         maximum age: {max_age} hours
-        overdue: {report}
+        overdue: {overdue}
 """)
-terse_overdue_message = "{host}: {age:0.1f} hours{overdue}"
-mail_overdue_message = dedent(
+terse_status_message = "{host}: {age} ago"
+mail_status_message = dedent(
     f"""
     Backup of {{host}} is overdue:
        from: {username}@{hostname} at {now}
-       message: the backup sentinel file has not changed in {{age:0.1f}} hours.
+       message: the backup sentinel file has not changed in {{hours:0.1f}} hours.
        sentinel file: {{path!s}}
     """
 ).strip()
@@ -101,17 +126,39 @@ error_message = dedent(
 
 # Main {{{1
 def main():
+    # read the settings file
+    try:
+        settings_file = PythonFile(CONFIG_DIR, OVERDUE_FILE)
+        settings = settings_file.run()
+    except Error as e:
+        e.terminate()
+
+    # gather needed settings
+    default_maintainer = settings.get("default_maintainer")
+    default_max_age = settings.get("default_max_age", 28)
+    dumper = settings.get("dumper", f"{username}@{hostname}")
+    repositories = settings.get("repositories")
+    root = settings.get("root")
+    colorscheme = settings.get("colorscheme", default_colorscheme)
+    status_message = settings.get("status_message", terse_status_message)
+
     version = f"{__version__} ({__released__})"
     cmdline = docopt(__doc__, version=version)
     quiet = cmdline["--quiet"]
     problem = False
-    use_color = Color.isTTY() and not cmdline["--no-color"]
-    passes = Color("green", enable=use_color)
-    fails = Color("red", enable=use_color)
+    report_as_current = InformantFactory(
+        clone=display, message_color=current_color
+    )
+    report_as_overdue = InformantFactory(
+        clone=display, message_color=overdue_color,
+        notify=cmdline['--notify'] and not Color.isTTY()
+    )
+    if cmdline["--message"]:
+        status_message = cmdline["--message"]
+    if cmdline["--no-color"]:
+        colorscheme = None
     if cmdline["--verbose"]:
-        overdue_message = verbose_overdue_message
-    else:
-        overdue_message = terse_overdue_message
+        status_message = verbose_status_message
 
     # prepare to create logfile
     log = to_path(DATA_DIR, OVERDUE_LOG_FILE) if OVERDUE_LOG_FILE else False
@@ -125,22 +172,10 @@ def main():
                 warn(os_error(e))
                 log = False
 
-    with Inform(flush=True, quiet=quiet, logfile=log, version=version):
-
-        # read the settings file
-        try:
-            settings_file = PythonFile(CONFIG_DIR, OVERDUE_FILE)
-            settings = settings_file.run()
-        except Error as e:
-            e.terminate()
-
-        # gather needed settings
-        default_maintainer = settings.get("default_maintainer")
-        default_max_age = settings.get("default_max_age", 28)
-        dumper = settings.get("dumper", f"{username}@{hostname}")
-        repositories = settings.get("repositories")
-        root = settings.get("root")
-
+    with Inform(
+        flush=True, quiet=quiet, logfile=log,
+        colorscheme=colorscheme, version=version
+    ):
         # process repositories table
         backups = []
         if is_str(repositories):
@@ -187,17 +222,28 @@ def main():
                     if not mtime:
                         raise Error('backup time is not available.', culprit=path)
                 delta = now - mtime
-                age = 24 * delta.days + delta.seconds / 3600
-                report = age > max_age
-                overdue = ' — overdue' if report else ''
-                color = fails if report else passes
-                if report or not cmdline["--no-passes"]:
-                    display(color(fmt(overdue_message)))
+                hours = 24 * delta.days + delta.seconds / 3600
+                age = mtime.humanize(only_distance=True)
+                overdue = truth(hours > max_age)
+                report = report_as_overdue if overdue else report_as_current
+                if overdue or not cmdline["--no-passes"]:
+                    replacements = dict(
+                        host=host, path=path, mtime=mtime, age=age,
+                        max_age=max_age, overdue=overdue
+                    )
+                    try:
+                        report(status_message.format(**replacements))
+                    except KeyError as e:
+                        fatal(
+                            f"‘{e.args[0]}’ is an unknown key.",
+                            culprit='--message',
+                            codicil=f"Choose from: {conjoin(replacements.keys())}.",
+                        )
 
-                if report:
+                if overdue:
                     problem = True
                     subject = f"backup of {host} is overdue"
-                    msg = fmt(mail_overdue_message)
+                    msg = fmt(mail_status_message)
                     send_mail(maintainer, subject, msg)
             except OSError as e:
                 problem = True

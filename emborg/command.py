@@ -1020,11 +1020,13 @@ class DueCommand(Command):
         printed if days is not specified.
 
         If you specify the message, the following replacements are available:
-            days: the number of days since the backup
-            elapsed: the time that has elapsed since the backup
-            config: the name of the configuration
+            days: the number of days since the backup, a float.
+            elapsed: the time that has elapsed since the backup, a string.
+            config: the name of the configuration, a string.
             cmd: the command name being reported on (‘create’, ‘prune’, or ‘compact’)
             action: the action being reported on (‘backup’ or ‘squeeze’)
+        The message is treated as a Python formatted string and so the various keys
+        can include formatting directives.
 
         Examples:
             > emborg due
@@ -1067,16 +1069,17 @@ class DueCommand(Command):
             if cmdline["--message"]:
                 since_last_backup = arrow.now() - date
                 days = since_last_backup.total_seconds() / 86400
+                replacements = dict(
+                    days=days, elapsed=elapsed, config=config,
+                    cmd=cmd, action=action
+                )
                 try:
-                    return cmdline["--message"].format(
-                        days=days, elapsed=elapsed, config=config,
-                        cmd=cmd, action=action
-                    )
+                    return cmdline["--message"].format(**replacements)
                 except KeyError as e:
                     raise Error(
-                        "unknown key in:",
-                        culprit = e.args[0],
-                        codicil = cmdline["--message"],
+                        f"‘{e.args[0]}’ is an unknown key.",
+                        culprit = "--message",
+                        codicil = f"Choose from: {conjoin(replacements.keys())}."
                     )
             else:
                 return f"{config} {action} completed {elapsed} ago."
