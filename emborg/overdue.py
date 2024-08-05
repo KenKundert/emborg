@@ -229,7 +229,7 @@ def main():
                 if overdue or not cmdline["--no-passes"]:
                     replacements = dict(
                         host=host, path=path, mtime=mtime, age=age,
-                        max_age=max_age, overdue=overdue
+                        hours=hours, max_age=max_age, overdue=overdue
                     )
                     try:
                         report(status_message.format(**replacements))

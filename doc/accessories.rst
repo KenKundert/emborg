@@ -62,7 +62,7 @@ composite log file::
             '--entry', 'h:mm A  {{{{{{2',
             '--description', '{cmd_name}',
             '--fold-marker', '{{{{{{ ❬❬❬',
-            '/home/me/.local/share/emborg/{config_name}.log',
+            '{log_dir}/{config_name}.log',
         ],
     ]
 

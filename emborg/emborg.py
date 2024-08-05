@@ -979,6 +979,9 @@ class Emborg:
     # exit {{{2
     def __exit__(self, exc_type, exc_val, exc_tb):
 
+        # flush stdout
+        print(end='', flush=True)
+
         # delete lockfile
         if self.requires_exclusivity:
             self.lockfile.unlink()

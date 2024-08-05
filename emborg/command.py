@@ -192,7 +192,8 @@ def get_archive_paths(paths, settings):
                     path = path.relative_to(settings.working_dir)
 
                     resolved_paths.append(path)
-                    paths_not_found.remove(name)
+                    if name in paths_not_found:
+                        paths_not_found.remove(name)
                 except ValueError:
                     pass
         if paths_not_found:

@@ -21,10 +21,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Borg
-        run:
+        run: |
           sudo apt install borgbackup
       - name: Install packages
-        run:
+        run: |
           python -m pip install --upgrade pip
           pip install .
           pip install tox
