@@ -1,6 +1,7 @@
 # Add missing dependency command line options to pytest command.
 
 import os
+import re
 import pytest
 from inform import Error, Info as CmdLineOpts
 from shlib import Run, set_prefs
@@ -28,6 +29,9 @@ def dependency_options(request):
         raise SystemExit
     borg_version = borg.stdout
     borg_version = borg_version.split()[-1]
+    borg_version = borg_version.partition('a')[0]  # strip off alpha version
+    borg_version = borg_version.partition('b')[0]  # strip off beta version
+    borg_version = borg_version.partition('rc')[0]  # strip off release candidate version
     borg_version = tuple(int(i) for i in borg_version.split('.'))
     options.borg_version = borg_version
 
