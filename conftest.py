@@ -1,7 +1,6 @@
 # Add missing dependency command line options to pytest command.
 
 import os
-import re
 import pytest
 from inform import Error, Info as CmdLineOpts
 from shlib import Run, set_prefs

@@ -6,7 +6,11 @@ Latest development release
 | Version: 1.39.1
 | Released: 2024-05-27
 
+
+1.40 (2024-08-05)
+-----------------
 - Enhance :ref:`emborg-overdue <emborg-overdue>` command.
+- Fix bug in :ref:`restore <restore>` when there are multiple roots.
 
 
 1.39 (2024-04-29)
