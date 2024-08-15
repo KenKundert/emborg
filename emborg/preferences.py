@@ -20,6 +20,7 @@
 from .shlib import to_path
 from appdirs import user_config_dir, user_data_dir
 from inform import dedent
+import os
 
 # Preferences {{{1
 # Constants {{{2
@@ -38,6 +39,10 @@ if config_dir.exists():
 else:
     CONFIG_DIR = user_config_dir(PROGRAM_NAME)
 DATA_DIR = user_data_dir(PROGRAM_NAME)
+if os.getenv("EMBORG_TEST", "") == "1":
+    # As a simplification, always use the Linux directories in tests.
+    CONFIG_DIR = str(to_path("~/.config/emborg"))
+    DATA_DIR = str(to_path("~/.local/share/emborg"))
 
 SETTINGS_FILE = "settings"
 OVERDUE_FILE = "overdue.conf"

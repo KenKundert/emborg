@@ -192,6 +192,7 @@ def initialize(dependency_options):
         ln("~/.local/lib", ".local/lib")
         ln("configs", "configs.symlink")
         os.environ["HOME"] = str(cwd())
+        os.environ["EMBORG_TEST"] = "1"
     return dependency_options
 
 # initialize_configs fixture {{{3
