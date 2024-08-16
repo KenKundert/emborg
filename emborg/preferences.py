@@ -20,7 +20,6 @@
 from .shlib import to_path
 from appdirs import user_config_dir, user_data_dir
 from inform import dedent
-import os
 
 # Preferences {{{1
 # Constants {{{2
