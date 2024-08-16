@@ -7,6 +7,7 @@ tests/.local
 tests/configs
 tests/home
 tests/Users
+tests/Library
 .bump.cfg.nt
 
 # C extensions

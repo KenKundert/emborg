@@ -4,7 +4,7 @@ emborg without configs:
         args: version
         expected: emborg version: \d+\.\d+(\.\d+(\.?\w+\d+)?)? \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
         expected_type: regex
-        remove: .config
+        remove: ⟪CONFIG_DIR⟫
 
     suburb:
         args: help
@@ -182,14 +182,14 @@ emborg without configs:
     labor:
         args:
         expected:
-            > Configuration directory created: /⟪EMBORG⟫/tests/.config/emborg.
+            > Configuration directory created: /⟪EMBORG⟫/tests/⟪CONFIG_DIR⟫/emborg.
             > Includes example settings files. Edit them to suit your needs.
             > Search for and replace any fields delimited with ⟪ and ⟫.
             > Delete any configurations you do not need.
             > Generally you will use either home or root, but not both.
 
     jerkin:
-        remove: .config
+        remove: ⟪CONFIG_DIR⟫
 
 
 emborg with configs:
@@ -348,7 +348,7 @@ emborg with configs:
             >                          'test0-{now}'
             >      check_after_create: True
             >                cmd_name: 'settings'
-            >              config_dir: '/⟪EMBORG⟫/tests/.config/emborg'
+            >              config_dir: '/⟪EMBORG⟫/tests/⟪CONFIG_DIR⟫/emborg'
             >             config_name: 'test0'
             >          configurations: """
             >                              test0 test1 test2 test3 test4 test5 test6 test7 test8 test9
@@ -367,7 +367,7 @@ emborg with configs:
             >                          'test0-*'
             >                home_dir: '/⟪EMBORG⟫/tests'
             >             keep_within: '1d'
-            >                 log_dir: '/⟪EMBORG⟫/tests/.local/share/emborg'
+            >                 log_dir: '/⟪EMBORG⟫/tests/⟪DATA_DIR⟫/emborg'
             >      prune_after_create: True
             >              repository: '~/repositories'
             >        run_after_backup: """
@@ -613,8 +613,8 @@ emborg with configs:
             >               config: test0
             >                roots: /⟪EMBORG⟫/tests/configs
             >          destination: /⟪EMBORG⟫/tests/repositories
-            >   settings directory: /⟪EMBORG⟫/tests/.config/emborg
-            >              logfile: /⟪EMBORG⟫/tests/.local/share/emborg/test0.log
+            >   settings directory: /⟪EMBORG⟫/tests/⟪CONFIG_DIR⟫/emborg
+            >              logfile: /⟪EMBORG⟫/tests/⟪DATA_DIR⟫/emborg/test0.log
             >      create last run: .*
             >       prune last run: .*
             >       check last run: .*

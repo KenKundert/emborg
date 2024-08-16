@@ -16,6 +16,7 @@
 # Anything after the first -- is passed to pytest.
 
 # Imports {{{1
+import appdirs
 import arrow
 import json
 import os
@@ -47,6 +48,9 @@ tests_dir = to_path(__file__).parent
 emborg_dir = str(tests_dir.parent)
 emborg_dir_wo_slash = emborg_dir.strip('/')
     # remove the leading slashes, it will be added back in tests if needed
+os.environ["HOME"] = str(tests_dir)
+config_dir = to_path(appdirs.user_config_dir()).relative_to(tests_dir)
+data_dir = to_path(appdirs.user_data_dir()).relative_to(tests_dir)
 
 # schema for test cases {{{2
 emborg_schema = Schema({
@@ -86,17 +90,24 @@ class EmborgTester(object):
         # args, expected, and cmp_dirs may contain the literal text fragment: ⟪EMBORG⟫
         # that is replaced by the absolute path to the emborg directory: .../emborg
 
-        # replace ⟪EMBORG⟫ and ⟪DATE⟫ macros
+        # replace ⟪EMBORG⟫, ⟪DATE⟫, ⟪CONFIG_DIR⟫, and ⟪DATA_DIR⟫ macros
         date = arrow.now().format("YYYY-MM-DD")
+        def replace_macros(s):
+            return (
+                s.replace("⟪EMBORG⟫", emborg_dir_wo_slash)
+                 .replace("⟪DATE⟫", date)
+                 .replace("⟪CONFIG_DIR⟫", str(config_dir))
+                 .replace("⟪DATA_DIR⟫", str(data_dir))
+            )
         args = args.split() if is_str(args) else args
-        args = [a.replace("⟪EMBORG⟫", emborg_dir_wo_slash) for a in args]
-        args = [a.replace("⟪DATE⟫", date) for a in args]
+        args = [replace_macros(a) for a in args]
         if expected is not None:
-            expected = expected.replace("⟪EMBORG⟫", emborg_dir_wo_slash)
-            expected = expected.replace("⟪DATE⟫", date)
+            expected = replace_macros(expected)
         if cmp_dirs:
-            cmp_dirs = cmp_dirs.replace("⟪EMBORG⟫", emborg_dir_wo_slash)
-            cmp_dirs = cmp_dirs.replace("⟪DATE⟫", date)
+            cmp_dirs = replace_macros(cmp_dirs)
+        # Do remove.split() before replacing macros rather than afterward.
+        # This matters on macOS, where CONFIG_DIR contains a space character.
+        remove = [replace_macros(x) for x in remove.split()]
 
         self.args = args
         self.expected = expected
@@ -111,7 +122,7 @@ class EmborgTester(object):
     def run(self):
         # remove requested files and directories
         if self.remove:
-            rm(self.remove.split())
+            rm(self.remove)
         if '❬PASS❭' in self.args:
             return True
 
@@ -185,27 +196,27 @@ class EmborgTester(object):
 @pytest.fixture(scope="session")
 def initialize(dependency_options):
     with cd(tests_dir):
-        rm("configs .config .local repositories configs.symlink".split())
+        rm("configs", config_dir, data_dir, "repositories", "configs.symlink")
+        # On macOS, borg creates .config and we need to delete it, too.
+        # On linux this is redundant with rm(config_dir), above.
+        rm(".config")
         cp("STARTING_CONFIGS", "configs")
-        mkdir(".config repositories .local".split())
-        ln("~/.local/bin", ".local/bin")
-        ln("~/.local/lib", ".local/lib")
+        mkdir(config_dir, data_dir, "repositories")
         ln("configs", "configs.symlink")
-        os.environ["HOME"] = str(cwd())
-        os.environ["EMBORG_TEST"] = "1"
     return dependency_options
 
 # initialize_configs fixture {{{3
 @pytest.fixture(scope="session")
 def initialize_configs(initialize, dependency_options):
     with cd(tests_dir):
-        cp("STARTING_CONFIGS", ".config/emborg")
-        rm(".config/emborg/subdir")
-        for p in lsf(".config/emborg"):
+        cp("STARTING_CONFIGS", config_dir / "emborg")
+        rm(config_dir / "emborg/subdir")
+        for p in lsf(config_dir / "emborg"):
             contents = p.read_text()
             contents = contents.replace('⟪EMBORG⟫', emborg_dir)
+            contents = contents.replace('⟪DATA_DIR⟫', str(data_dir))
             p.write_text(contents)
-        touch(".config/.nobackup")
+        touch(config_dir / ".nobackup")
     return dependency_options
 
 # missing dependencies {{{2
@@ -271,15 +282,17 @@ def test_emborg_overdue(
     skip_test_if_missing_dependencies(initialize, dependencies)
     with cd(tests_dir):
         if conf:
-            with open('.config/overdue.conf', 'w') as f:
+            with open(config_dir / 'overdue.conf', 'w') as f:
                 f.write(conf)
         try:
             args = args.split() if is_str(args) else args
-            overdue = Run(emborg_overdue_exe + args, "sOEW")
+            overdue = Run(emborg_overdue_exe + args, "sOEW*")
+            print(overdue.stdout)
             if 'regex' in expected_type.split():
                 assert bool(re.fullmatch(expected, overdue.stdout)), f"Test ‘{name}’ fails."
             else:
                 assert expected == overdue.stdout, f"Test ‘{name}’ fails."
+            assert overdue.status == 0, f"Test '{name}' fails."
         except Error as e:
             assert str(e) == expected, f"Test ‘{name}’ fails."
 
@@ -291,9 +304,9 @@ def test_emborg_api(initialize):
     # get available configs
     # do this before changing the working directory so as to test the ability
     # to explicitly set the config_dir
-    config_dir = tests_dir / '.config/emborg'
+    emborg_config_dir = tests_dir / config_dir / 'emborg'
     try:
-        with Emborg('tests', config_dir=config_dir) as emborg:
+        with Emborg('tests', config_dir=emborg_config_dir) as emborg:
             configs = emborg.configs
     except Error as e:
         e.report()
