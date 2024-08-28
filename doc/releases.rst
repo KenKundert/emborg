@@ -6,10 +6,26 @@ Latest development release
 | Version: 1.40
 | Released: 2024-08-05
 
+- Allow location of config and data directory to be overridden with 
+  `XDG_CONFIG_HOME` and `XDG_DATA_HOME` environment variables.  This replaces an 
+  earlier behavior that simply treated `~/.config/` as the configuration 
+  directory if it exists.  No provision was made previously to support an 
+  alternative data directory.
+
+.. note::
+
+    If your configuration files are in `~/.config/emborg` and you are not on 
+    a Linux system you will now have to set `XDG_CONFIG_HOME` to 
+    `$HOME/.config`.
+
+- When *Emborg* encounters an error when operating on a composite configuration 
+  it will terminate the problematic configuration and move to the next.  
+  Previously it would exit without attempting the remaining configs.
+
 
 1.40 (2024-08-05)
 -----------------
-- Enhance :ref:`emborg-overdue <emborg-overdue>` command.
+- Enhance :ref:`emborg-overdue <emborg_overdue>` command.
 - Fix bug in :ref:`restore <restore>` when there are multiple roots.
 
 

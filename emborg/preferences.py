@@ -17,9 +17,9 @@
 # along with this program.  If not, see http://www.gnu.org/licenses.
 
 # Imports {{{1
-from .shlib import to_path
 from appdirs import user_config_dir, user_data_dir
 from inform import dedent
+import os
 
 # Preferences {{{1
 # Constants {{{2
@@ -32,12 +32,15 @@ BORG = "borg"
 # always preferred by users, whereas the directory used by Linux
 # (~/.config/emborg) seems to have universal appeal.  So, use the Linux path if
 # it exists and backstop with the system preferred location.
-config_dir = to_path("~/.config/emborg")
-if config_dir.exists():
-    CONFIG_DIR = str(config_dir)
+
+if 'XDG_CONFIG_HOME' in os.environ:
+    CONFIG_DIR = os.sep.join([os.environ['XDG_CONFIG_HOME'], PROGRAM_NAME])
 else:
     CONFIG_DIR = user_config_dir(PROGRAM_NAME)
-DATA_DIR = user_data_dir(PROGRAM_NAME)
+if 'XDG_DATA_HOME' in os.environ:
+    DATA_DIR = os.sep.join([os.environ['XDG_DATA_HOME'], PROGRAM_NAME])
+else:
+    DATA_DIR = user_data_dir(PROGRAM_NAME)
 
 SETTINGS_FILE = "settings"
 OVERDUE_FILE = "overdue.conf"

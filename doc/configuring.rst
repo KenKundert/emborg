@@ -4,11 +4,12 @@ Configuring
 ===========
 
 Typically the settings files go in the default location for configuration files 
-on your system.  On Linux systems, that location is ~/.config/emborg.  Other 
-systems use more awkward locations, so while *Emborg* creates initial versions 
-in the default location, you are free to move them to ~/.config/emborg if you 
-prefer.  *Emborg* always checks for the files in ~/.config/emborg if it exists 
-before looking in the default location for your system.
+on your system.  On Linux systems, that location is `~/.config/emborg`.  Other 
+systems use more awkward locations, so *Emborg* allows you to specify the 
+configuration directory using the `XDG_CONFIG_HOME` environment variable.  If 
+`XDG_CONFIG_HOME` is set to `/home/$HOME/.config`, then the *Emborg* 
+configuration directory will be `/home/$HOME/.config/emborg`, as on Linux 
+systems.
 
 You need a shared settings file and then one file for each backup configuration 
 you need.  Except for :ref:`configurations` and :ref:`default_configuration` any 

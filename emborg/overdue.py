@@ -21,9 +21,11 @@ Options:
     -M, --message <msg>  Status message template for each repository
     --version            Show software version
 
-The program requires a configuration file: ~/.config/emborg/overdue.conf. The
-contents are described here:
-    https://emborg.readthedocs.io/en/stable/utilities.html#overdue
+The program requires a configuration file, overdue.conf, which should be placed
+in the Emborg configuration directory, typically ~/.config/emborg.  The contents
+are described here:
+
+    https://emborg.readthedocs.io/en/stable/monitoring.html#overdue
 
 The message given by --message may contain the following keys in braces:
     host: replaced by the host field from the config file, a string.

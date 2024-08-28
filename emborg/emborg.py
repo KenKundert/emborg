@@ -663,7 +663,12 @@ class Emborg:
             except Error as e:
                 if is_str(cmd):
                     cmd = cmd.split()
-                e.reraise(culprit=(setting, i, cmd[0]))
+                if 'before' in setting:
+                    e.reraise(culprit=(setting, i, cmd[0]))
+                elif 'after' in setting:
+                    e.report(culprit=(setting, i, cmd[0]))
+                else:
+                    raise NotImplementedError
 
         # the following two statements are only useful from run_before_borg
         self.settings[setting] = []  # erase the setting so it is not run again

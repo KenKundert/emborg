@@ -3,14 +3,15 @@ name = "emborg"
 version = "1.40"
 description = "Borg front end."
 readme = "README.rst"
-keywords = ["emborg", "borg", "borgmatic", "backups"]
+keywords = ["emborg", "borg", "borgbackup", "borgmatic", "vorta", "backups"]
 authors = [
     {name = "Ken Kundert"},
     {email = "emborg@nurdletech.com"}
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Natural Language :: English",
     "Operating System :: POSIX :: Linux",

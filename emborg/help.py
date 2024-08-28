@@ -155,7 +155,7 @@ class Precautions(HelpMessage):
 
             Better yet is to simply not store the passphrase.  This can be
             arranged if you are using Avendesora
-            (https://github.com/KenKundert/avendesora), which is a flexible
+            (https://avendesora.readthedocs.io/en/stable), which is a flexible
             password management system. The interface to Avendesora is already
             built in to Emborg, but its use is optional (it need not be
             installed).

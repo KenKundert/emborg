@@ -5,6 +5,25 @@ Monitoring
 ==========
 
 
+Log Files
+---------
+
+When there are problems, the log file can help you understand what is going 
+wrong.  *Emborg* writes a log file to the *Emborg* data directory.  On Linux 
+systems that would be `~/.local/share/emborg`.  Other systems use more awkward 
+locations, so *Emborg* allows you to specify the data directory using the 
+`XDG_DATA_HOME` environment variable.  If `XDG_DATA_HOME` is set to 
+`/home/$HOME/.local/share`, then the *Emborg* log files will be written to 
+`/home/$HOME/.local/share/emborg`, as on Linux systems.
+
+Besides visiting the *Emborg* data directory and viewing the log file directly,
+you can use the :ref:`log command <log>` to view the log file.
+
+*Emborg* overwrites its log file every time it runs.  You can use :ref:`ntlog 
+<ntlog accessory>` to gather log files as they are created into a composite log 
+file.
+
+
 Due and Info
 ------------
 
@@ -28,8 +47,9 @@ Checking for Overdue Backups from the Server
 
 *Emborg* contains an additional executable, *emborg-overdue*, that can be run on 
 the destination server to determine whether the backups have been performed 
-recently.  It reads its own settings file in ~/.config/emborg/overdue.conf that 
-is also a Python file and may contain the following settings:
+recently.  It reads its own settings file in `overdue.conf`, contained in the 
+:ref:`Emborg configuration directory <configuring_emborg>`,  that is also 
+a Python file and may contain the following settings:
 
 .. code-block:: text
 
@@ -190,7 +210,6 @@ overdue and there is not access to the tty (your terminal).
 
 Alternately you can run *emborg-overdue* from cron.daily (described in the 
 :ref:`root example <root example>`).
-
 
 
 .. _client_overdue:

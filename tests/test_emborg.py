@@ -191,6 +191,8 @@ def initialize(dependency_options):
         ln("~/.local/bin", ".local/bin")
         ln("~/.local/lib", ".local/lib")
         ln("configs", "configs.symlink")
+        os.environ["XDG_CONFIG_HOME"] = str(f"{cwd()}/.config")
+        os.environ["XDG_DATA_HOME"] = str(f"{cwd()}/.local/share")
         os.environ["HOME"] = str(cwd())
     return dependency_options
 

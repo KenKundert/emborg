@@ -234,7 +234,7 @@ And this one sends an email:
 
     0 * * * * emborg --mute due --days 1 --mail me@mydomain.com
 
-Alternately, you can use :ref:`emborg-overdue <client_overdue>`.
+Alternately, you can use :ref:`emborg-overdue <emborg_overdue>`.
 
 
 .. _snapshot example:

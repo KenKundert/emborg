@@ -122,7 +122,7 @@ def main():
                     except Error as e:
                         exit_status = 2
                         settings.fail(e, cmd=' '.join(sys.argv))
-                        e.terminate()
+                        e.report()
 
                 if exit_status and exit_status > worst_exit_status:
                     worst_exit_status = exit_status
