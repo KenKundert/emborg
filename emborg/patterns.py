@@ -116,6 +116,8 @@ def check_patterns(
         codicil = repr(pattern)
         kind = pattern[0:1]
         arg = pattern[1:].lstrip()
+        if not kind or not arg:
+            raise Error(f"invalid pattern: ‘{pattern}’")
         if kind in ["", "#"]:
             continue  # is comment
         if kind not in known_kinds:

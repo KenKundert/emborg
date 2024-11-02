@@ -1,6 +1,8 @@
 # Commands
 
 # License {{{1
+# Copyright (C) 2016-2024 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -774,7 +776,6 @@ class CreateCommand(Command):
             activity = "checking"
             check_status = 0
             if settings.check_after_create:
-                announce("Checking repository ...")
                 if settings.check_after_create == "latest":
                     args = []
                 elif settings.check_after_create in [True, "all"]:
@@ -789,6 +790,10 @@ class CreateCommand(Command):
                         cuplrit = "check_after_create",
                     )
                     args = []
+                if '--all' in args:
+                    announce("Checking repository ...")
+                else:
+                    announce("Checking archive ...")
                 check = CheckCommand()
                 try:
                     check.run("check", args, settings, options)

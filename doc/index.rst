@@ -326,6 +326,13 @@ flood, that claims your original files. One option is RSync_.  Another is
 BorgBase_.  I have experience with both, and both seem quite good.  One I have 
 not tried is Hetzner_.
 
+*Borg* supports many different ways of excluding files and directories from your 
+backup.  Thus it is always possible that a small mistake results essential files 
+from being excluded from your backups.  Once you have performed your first 
+backup you should :ref:`mount <mount>` the most recent archive and then 
+carefully examine the resulting snapshot and make sure it contains all the 
+expected files.
+
 Finally, it is a good idea to practice a recovery. Pretend that you have lost
 all your files and then see if you can do a restore from backup. Doing this and
 working out the kinks before you lose your files can save you if you ever do

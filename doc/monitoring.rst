@@ -94,6 +94,14 @@ The dictionaries in *repositories* can contain the following fields: *host*,
     modification time of the target of this path is used as the time of the last 
     backup.  If *path* is an absolute path, it is used, otherwise it is added to 
     the end of *root*.
+
+    If the path contains a colon (‘:’), then everything before the colon is 
+    taken to be an SSH hostname and everything after the colon is assumed to be 
+    the name of the *emborg-overdue* command on that local machine without 
+    arguments.  In most cases the colon will be the last character of the path, 
+    in which case the command name is assumed to be ‘emborg-overdue’.  This 
+    command is run on the remote host and the results reported locally.  The 
+    version of *emborg* on the remote host must be 1.41 or greater.
 *maintainer*:
     An email address, an email is sent to this address if there is an issue.  
     *max_age* is the number of hours that may pass before an archive is 
@@ -160,7 +168,7 @@ There are some additional settings available:
 
     - strings than include field width and justification, ex. {host:>20}
     - floats can include width, precision and form, ex. {hours:0.1f}
-    - datetime can include Arrow formats, ex: {mdime:DD MMM YY @ H:mm A}
+    - datetime can include Arrow formats, ex: {mtime:DD MMM YY @ H:mm A}
     - overdue can include true/false strings: {overdue:PAST DUE!/current}
 
 To run the program interactively, just make sure *emborg-overdue* has been 

@@ -15,6 +15,7 @@ Options:
     -h, --help           Output basic usage information
     -m, --mail           Send mail message if backup is overdue
     -n, --notify         Send notification if backup is overdue
+    -N, --nt             Output summary in NestedText format
     -p, --no-passes      Do not show hosts that are not overdue
     -q, --quiet          Suppress output to stdout
     -v, --verbose        Give more information about each repository
@@ -39,11 +40,13 @@ The status message is a Python formatted string, and so the various fields can i
 formatting directives.  For example:
 - strings than include field width and justification, ex. {host:>20}
 - floats can include width, precision and form, ex. {hours:0.1f}
-- datetime can include Arrow formats, ex: {mdime:DD MMM YY @ H:mm A}
+- datetime can include Arrow formats, ex: {mtime:DD MMM YY @ H:mm A}
 - overdue can include true/false strings: {overdue:PAST DUE!/current}
 """
 
 # License {{{1
+# Copyright (C) 2018-2024 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -62,7 +65,6 @@ formatting directives.  For example:
 import os
 import pwd
 import socket
-from textwrap import dedent
 import arrow
 from docopt import docopt
 from inform import (
@@ -71,17 +73,19 @@ from inform import (
     Inform,
     InformantFactory,
     conjoin,
+    dedent,
     display,
     error,
     fatal,
-    fmt,
     get_prog_name,
     is_str,
     os_error,
+    output,
     terminate,
     truth,
     warn,
 )
+import nestedtext as nt
 
 from . import __released__, __version__
 from .preferences import CONFIG_DIR, DATA_DIR, OVERDUE_FILE, OVERDUE_LOG_FILE
@@ -95,10 +99,12 @@ username = pwd.getpwuid(os.getuid()).pw_name
 hostname = socket.gethostname()
 now = arrow.now()
 
+# colors {{{2
 default_colorscheme = "dark"
 current_color = "green"
 overdue_color = "red"
 
+# message templates {{{2
 verbose_status_message = dedent("""\
     HOST: {host}
         sentinel file: {path!s}
@@ -106,25 +112,69 @@ verbose_status_message = dedent("""\
         since last change: {hours:0.1f} hours
         maximum age: {max_age} hours
         overdue: {overdue}
-""")
-terse_status_message = "{host}: {age} ago"
-mail_status_message = dedent(
-    f"""
-    Backup of {{host}} is overdue:
-       from: {username}@{hostname} at {now}
-       message: the backup sentinel file has not changed in {{hours:0.1f}} hours.
-       sentinel file: {{path!s}}
-    """
-).strip()
+""", strip_nl='l')
 
-error_message = dedent(
-    f"""
+terse_status_message = "{host}: {age} ago{overdue: — PAST DUE}"
+
+mail_status_message = dedent("""
+    Backup of {host} is overdue:
+       the backup sentinel file has not changed in {hours:0.1f} hours.
+""", strip_nl='b')
+
+error_message = dedent(f"""
     {get_prog_name()} generated the following error:
         from: {username}@{hostname} at {now}
         message: {{}}
-    """
-)
+""", strip_nl='b')
 
+# Utilities {{{1
+# get_local_data {{{2
+def get_local_data(path, host, max_age):
+    if path.is_dir():
+        paths = list(path.glob("index.*"))
+        if not paths:
+            raise Error("no sentinel file found.", culprit=path)
+        if len(paths) > 1:
+            raise Error("too many sentinel files.", *paths, sep="\n    ")
+        path = paths[0]
+    mtime = arrow.get(path.stat().st_mtime)
+    if path.suffix == '.nt':
+        latest = read_latest(path)
+        mtime = latest.get('create last run')
+        if not mtime:
+            raise Error('backup time is not available.', culprit=path)
+    delta = now - mtime
+    hours = 24 * delta.days + delta.seconds / 3600
+    overdue = truth(hours > max_age)
+    yield dict(
+        host=host, path=path, mtime=mtime,
+        hours=hours, max_age=max_age, overdue=overdue
+    )
+
+# get_remote_data {{{2
+def get_remote_data(name, path):
+    host, _, cmd = path.partition(':')
+    cmd = cmd or "emborg-overdue"
+    display(f"\n{name}:")
+    try:
+        ssh = Run(['ssh', host, cmd, '--nt'], 'sOEW1')
+        for repo_data in nt.loads(ssh.stdout, top=list):
+            if 'mtime' in repo_data:
+                repo_data['mtime'] = arrow.get(repo_data['mtime'])
+            if 'overdue' in repo_data:
+                repo_data['overdue'] = truth(repo_data['overdue'] == 'yes')
+            if 'hours' in repo_data:
+                repo_data['hours'] = float(repo_data['hours'])
+            if 'max_age' in repo_data:
+                repo_data['max_age'] = float(repo_data['max_age'])
+            yield repo_data
+    except Error as e:
+        e.report(culprit=host)
+
+# fixed() {{{2
+# formats float using fixed point notation while removing trailing zeros
+def fixed(num, prec=2):
+    return format(num, f".{prec}f").strip('0').strip('.')
 
 # Main {{{1
 def main():
@@ -175,9 +225,11 @@ def main():
                 log = False
 
     with Inform(
-        flush=True, quiet=quiet, logfile=log,
+        flush=True, quiet=quiet or cmdline["--nt"], logfile=log,
         colorscheme=colorscheme, version=version
     ):
+        overdue_hosts = {}
+
         # process repositories table
         backups = []
         if is_str(repositories):
@@ -207,46 +259,34 @@ def main():
         # check age of repositories
         for host, path, maintainer, max_age in backups:
             maintainer = default_maintainer if not maintainer else maintainer
-            max_age = float(max_age) if max_age else default_max_age
+            max_age = float(max_age if max_age else default_max_age)
             try:
-                path = to_path(root, path)
-                if path.is_dir():
-                    paths = list(path.glob("index.*"))
-                    if not paths:
-                        raise Error("no sentinel file found.", culprit=path)
-                    if len(paths) > 1:
-                        raise Error("too many sentinel files.", *paths, sep="\n    ")
-                    path = paths[0]
-                mtime = arrow.get(path.stat().st_mtime)
-                if path.suffix == '.nt':
-                    latest = read_latest(path)
-                    mtime = latest.get('create last run')
-                    if not mtime:
-                        raise Error('backup time is not available.', culprit=path)
-                delta = now - mtime
-                hours = 24 * delta.days + delta.seconds / 3600
-                age = mtime.humanize(only_distance=True)
-                overdue = truth(hours > max_age)
-                report = report_as_overdue if overdue else report_as_current
-                if overdue or not cmdline["--no-passes"]:
-                    replacements = dict(
-                        host=host, path=path, mtime=mtime, age=age,
-                        hours=hours, max_age=max_age, overdue=overdue
-                    )
-                    try:
-                        report(status_message.format(**replacements))
-                    except KeyError as e:
-                        fatal(
-                            f"‘{e.args[0]}’ is an unknown key.",
-                            culprit='--message',
-                            codicil=f"Choose from: {conjoin(replacements.keys())}.",
-                        )
+                if ':' in str(path):
+                    repos_data = get_remote_data(host, str(path))
+                else:
+                    repos_data = get_local_data(to_path(root, path), host, max_age)
+                for repo_data in repos_data:
+                    repo_data['age'] = repo_data['mtime'].humanize(only_distance=True)
+                    overdue = repo_data['overdue']
+                    report = report_as_overdue if overdue else report_as_current
 
-                if overdue:
-                    problem = True
-                    subject = f"backup of {host} is overdue"
-                    msg = fmt(mail_status_message)
-                    send_mail(maintainer, subject, msg)
+                    if overdue or not cmdline["--no-passes"]:
+                        if cmdline["--nt"]:
+                            output(nt.dumps([repo_data], converters={float:fixed}, default=str))
+                        else:
+                            try:
+                                report(status_message.format(**repo_data))
+                            except KeyError as e:
+                                fatal(
+                                    f"‘{e.args[0]}’ is an unknown key.",
+                                    culprit='--message',
+                                    codicil=f"Choose from: {conjoin(repo_data.keys())}.",
+                                )
+
+                    if overdue:
+                        problem = True
+                        overdue_hosts[host] = mail_status_message.format(**repo_data)
+
             except OSError as e:
                 problem = True
                 msg = os_error(e)
@@ -266,4 +306,13 @@ def main():
                         f"{get_prog_name()} error",
                         error_message.format(str(e)),
                     )
+
+        if overdue_hosts:
+            if len(overdue_hosts) > 1:
+                subject = "backups are overdue"
+            else:
+                subject = "backup is overdue"
+            messages = '\n\n'.join(overdue_hosts.values())
+            send_mail(maintainer, subject, messages)
+
         terminate(problem)

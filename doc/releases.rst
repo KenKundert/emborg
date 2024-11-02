@@ -18,9 +18,14 @@ Latest development release
     a Linux system you will now have to set `XDG_CONFIG_HOME` to 
     `$HOME/.config`.
 
+1.41 (2024-11-??)
+-----------------
+
 - When *Emborg* encounters an error when operating on a composite configuration 
   it will terminate the problematic configuration and move to the next.  
   Previously it would exit without attempting the remaining configs.
+- :ref:`emborg-overdue <emborg_overdue>` can now run an *emborg-overdue* process 
+  on a remote host and include the result in its report.
 
 
 1.40 (2024-08-05)

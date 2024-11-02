@@ -21,6 +21,8 @@ Options:
 """
 
 # License {{{1
+# Copyright (C) 2018-2024 Kenneth S. Kundert
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -126,6 +128,7 @@ def main():
 
                 if exit_status and exit_status > worst_exit_status:
                     worst_exit_status = exit_status
+                    inform.errors_accrued(reset=True)
 
             # execute the command termination
             exit_status = cmd.execute_late(cmd_name, args, None, emborg_opts)
