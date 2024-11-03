@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.40
-| Released: 2024-08-05
+| Version: 1.40.1
+| Released: 2024-11-03
 
 - Allow location of config and data directory to be overridden with 
   `XDG_CONFIG_HOME` and `XDG_DATA_HOME` environment variables.  This replaces an 
