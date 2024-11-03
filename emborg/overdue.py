@@ -13,6 +13,7 @@ Usage:
 Options:
     -c, --no-color       Do not color the output
     -h, --help           Output basic usage information
+    -l, --local          Only report on local repositories
     -m, --mail           Send mail message if backup is overdue
     -n, --notify         Send notification if backup is overdue
     -N, --nt             Output summary in NestedText format
@@ -262,7 +263,10 @@ def main():
             max_age = float(max_age if max_age else default_max_age)
             try:
                 if ':' in str(path):
-                    repos_data = get_remote_data(host, str(path))
+                    if cmdline['--local']:
+                        repos_data = []
+                    else:
+                        repos_data = get_remote_data(host, str(path))
                 else:
                     repos_data = get_local_data(to_path(root, path), host, max_age)
                 for repo_data in repos_data:

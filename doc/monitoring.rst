@@ -239,9 +239,19 @@ file.  For example:
     repositories = [
         dict(host='earth (cache)', path='cache.latest.nt', max_age=0.2),
         dict(host='earth (home)', path='home.latest.nt'),
+        dict(host='sol', path='sol:'),
     ]
 
-Again, *emborg-overdue* is generally run from cron.
+Notice the last entry, the one for *sol*.  Its path contains a colon, so it is 
+a remote check.  The others are local checks.  The remote check splits *path* at 
+the colon.  In this case, the split gives 'sol' and ''.  The first component is 
+taken to be a host name and the second is the name of the emborg-overdue command 
+on that host.  In this case the second component is empty so *emborg-overdue* is 
+used.  On the remote checks, the *emborg-overdue* command is run remotely on the 
+specified host and the results are included in the output.  This generally 
+requires that you have the SSH keys for the remote host in your SSH agent, which 
+is generally not the case when *emborg-overdue* is being run from cron.  In this 
+case you should use the ``--local`` option to suppress remote queries.
 
 
 .. _monitoring_services:
