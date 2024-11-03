@@ -35,14 +35,15 @@ The message given by --message may contain the following keys in braces:
     mtime: replaced by modification time, a datetime object.
     hours: replaced by the number of hours since last update, a float.
     age: replaced by time since last update, a string.
-    overdue: is the back-up overdue.
+    overdue: is the back-up overdue, a boolean.
+    locked: is the back-up currently active, a boolean.
 
 The status message is a Python formatted string, and so the various fields can include
 formatting directives.  For example:
 - strings than include field width and justification, ex. {host:>20}
 - floats can include width, precision and form, ex. {hours:0.1f}
-- datetime can include Arrow formats, ex: {mtime:DD MMM YY @ H:mm A}
-- overdue can include true/false strings: {overdue:PAST DUE!/current}
+- datetimes can include Arrow formats, ex: {mtime:DD MMM YY @ H:mm A}
+- boolean can include true/false strings, ex: {overdue:PAST DUE!/current}
 """
 
 # License {{{1
@@ -115,7 +116,7 @@ verbose_status_message = dedent("""\
         overdue: {overdue}
 """, strip_nl='l')
 
-terse_status_message = "{host}: {age} ago{overdue: — PAST DUE}"
+terse_status_message = "{host}: {age} ago{locked: (currently active)}{overdue: — PAST DUE}"
 
 mail_status_message = dedent("""
     Backup of {host} is overdue:
@@ -138,6 +139,14 @@ def get_local_data(path, host, max_age):
         if len(paths) > 1:
             raise Error("too many sentinel files.", *paths, sep="\n    ")
         path = paths[0]
+        locked = list(path.glob("lock.*"))
+    else:
+        if path.name.endswith('.latest.nt'):
+            lockfile = path.name.replace('.latest.nt', '.lock')
+            locked = to_path(path.parent, lockfile).exists()
+        else:
+            warn('local paths should end with ‘.latest.nt’.', culprit=host)
+            locked = False
     mtime = arrow.get(path.stat().st_mtime)
     if path.suffix == '.nt':
         latest = read_latest(path)
@@ -147,9 +156,10 @@ def get_local_data(path, host, max_age):
     delta = now - mtime
     hours = 24 * delta.days + delta.seconds / 3600
     overdue = truth(hours > max_age)
+    locked = truth(locked)
     yield dict(
-        host=host, path=path, mtime=mtime,
-        hours=hours, max_age=max_age, overdue=overdue
+        host=host, path=path, mtime=mtime, hours=hours, max_age=max_age,
+        overdue=overdue, locked=locked
     )
 
 # get_remote_data {{{2
@@ -168,6 +178,10 @@ def get_remote_data(name, path):
                 repo_data['hours'] = float(repo_data['hours'])
             if 'max_age' in repo_data:
                 repo_data['max_age'] = float(repo_data['max_age'])
+            if 'locked' in repo_data:
+                repo_data['locked'] = truth(repo_data['locked'] == 'yes')
+            else:
+                repo_data['locked'] = truth(False)
             yield repo_data
     except Error as e:
         e.report(culprit=host)

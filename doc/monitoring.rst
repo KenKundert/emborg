@@ -161,15 +161,16 @@ There are some additional settings available:
     | *mtime*: replaced by modification time, a datetime object.
     | *hours*: replaced by the number of hours since last update, a float.
     | *age*: replaced by time since last update, a string.
-    | *overdue*: is the back-up overdue.
+    | *overdue*: is the back-up overdue, a boolean.
+    | *locked*: is the back-up currently active, a boolean.
 
     The message is a Python formatted string, and so the various fields can include
     formatting directives.  For example:
 
     - strings than include field width and justification, ex. {host:>20}
     - floats can include width, precision and form, ex. {hours:0.1f}
-    - datetime can include Arrow formats, ex: {mtime:DD MMM YY @ H:mm A}
-    - overdue can include true/false strings: {overdue:PAST DUE!/current}
+    - datetimes can include Arrow formats, ex: {mtime:DD MMM YY @ H:mm A}
+    - booleans can include true/false strings: ex. {overdue:PAST DUE!/current}
 
 To run the program interactively, just make sure *emborg-overdue* has been 
 installed and is on your path. Then type:
