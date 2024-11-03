@@ -3,7 +3,7 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.40.1
+| Version: 1.40.2
 | Released: 2024-11-03
 
 1.41 (2024-11-??)
