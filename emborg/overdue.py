@@ -114,6 +114,7 @@ verbose_status_message = dedent("""\
         since last change: {hours:0.1f} hours
         maximum age: {max_age} hours
         overdue: {overdue}
+        locked: {locked}
 """, strip_nl='l')
 
 terse_status_message = "{host}: {age} ago{locked: (currently active)}{overdue: — PAST DUE}"
@@ -139,17 +140,11 @@ def get_local_data(path, host, max_age):
         if len(paths) > 1:
             raise Error("too many sentinel files.", *paths, sep="\n    ")
         path = paths[0]
-        locked = list(path.glob("lock.*"))
-    else:
-        if path.name.endswith('.latest.nt'):
-            lockfile = path.name.replace('.latest.nt', '.lock')
-            locked = to_path(path.parent, lockfile).exists()
-        else:
-            warn('local paths should end with ‘.latest.nt’.', culprit=host)
-            locked = False
+        locked = path.glob('lock.*')
     mtime = arrow.get(path.stat().st_mtime)
     if path.suffix == '.nt':
         latest = read_latest(path)
+        locked = (path.parent / path.name.replace('.latest.nt', '.lock')).exists()
         mtime = latest.get('create last run')
         if not mtime:
             raise Error('backup time is not available.', culprit=path)
@@ -175,9 +170,9 @@ def get_remote_data(name, path):
             if 'overdue' in repo_data:
                 repo_data['overdue'] = truth(repo_data['overdue'] == 'yes')
             if 'hours' in repo_data:
-                repo_data['hours'] = float(repo_data['hours'])
+                repo_data['hours'] = float(repo_data.get('hours', 0))
             if 'max_age' in repo_data:
-                repo_data['max_age'] = float(repo_data['max_age'])
+                repo_data['max_age'] = float(repo_data.get('max_age', 0))
             if 'locked' in repo_data:
                 repo_data['locked'] = truth(repo_data['locked'] == 'yes')
             else:
@@ -294,10 +289,12 @@ def main():
                         else:
                             try:
                                 report(status_message.format(**repo_data))
+                            except ValueError as e:
+                                fatal(e, culprit=(host, '--message'))
                             except KeyError as e:
                                 fatal(
                                     f"‘{e.args[0]}’ is an unknown key.",
-                                    culprit='--message',
+                                    culprit=(host, '--message'),
                                     codicil=f"Choose from: {conjoin(repo_data.keys())}.",
                                 )
 
