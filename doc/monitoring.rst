@@ -57,6 +57,7 @@ a Python file and may contain the following settings:
     default_max_age (hours)
     dumper (email address -- mail is sent from this person)
     root (default directory for repositories)
+    status_message (a template for the message to be printed for each repository)
     repositories (string or array of dictionaries)
 
 Here is an example config file:
@@ -151,7 +152,7 @@ There are some additional settings available:
 *colorscheme*:
     The color scheme of your terminal.  May be "dark" or "light" or None.  If 
     None, the output is not colored.
-*message*:
+*status_message*:
     The format of the summary for each host.  The string may contain keys within 
     braces that will be replaced before output.  The following keys are 
     supported:

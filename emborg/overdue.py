@@ -140,7 +140,7 @@ def get_local_data(path, host, max_age):
         if len(paths) > 1:
             raise Error("too many sentinel files.", *paths, sep="\n    ")
         path = paths[0]
-        locked = path.glob('lock.*')
+        locked = list(path.glob('lock.*'))
     mtime = arrow.get(path.stat().st_mtime)
     if path.suffix == '.nt':
         latest = read_latest(path)
