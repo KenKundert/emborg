@@ -236,7 +236,8 @@ def main():
 
     with Inform(
         flush=True, quiet=quiet or cmdline["--nt"], logfile=log,
-        colorscheme=colorscheme, version=version
+        colorscheme=colorscheme, version=version,
+        stream_policy = 'header' if cmdline['--nt'] else 'termination'
     ):
         overdue_hosts = {}
 
