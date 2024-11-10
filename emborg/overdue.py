@@ -163,7 +163,7 @@ def get_remote_data(name, path):
     cmd = cmd or "emborg-overdue"
     display(f"\n{name}:")
     try:
-        ssh = Run(['ssh', host, cmd, '--nt'], 'sOEW1')
+        ssh = Run(['ssh', host, cmd, '--nt'], 'sOEW2')
         for repo_data in nt.loads(ssh.stdout, top=list):
             if 'mtime' in repo_data:
                 repo_data['mtime'] = arrow.get(repo_data['mtime'])
@@ -180,6 +180,12 @@ def get_remote_data(name, path):
             yield repo_data
     except Error as e:
         e.report(culprit=host)
+
+    if ssh.status > 1:
+        raise Error(
+            "error found by remote overdue process.",
+                culprit=host, codicil=ssh.stderr.strip()
+        )
 
 # fixed() {{{2
 # formats float using fixed point notation while removing trailing zeros
@@ -207,7 +213,7 @@ def main():
     version = f"{__version__} ({__released__})"
     cmdline = docopt(__doc__, version=version)
     quiet = cmdline["--quiet"]
-    problem = False
+    exit_status = 0
     report_as_current = InformantFactory(
         clone=display, message_color=current_color
     )
@@ -300,11 +306,11 @@ def main():
                                 )
 
                     if overdue:
-                        problem = True
+                        exit_status = max(exit_status, 1)
                         overdue_hosts[host] = mail_status_message.format(**repo_data)
 
             except OSError as e:
-                problem = True
+                exit_status = max(exit_status, 2)
                 msg = os_error(e)
                 error(msg)
                 if maintainer:
@@ -314,7 +320,7 @@ def main():
                         error_message.format(msg),
                     )
             except Error as e:
-                problem = True
+                exit_status = max(exit_status, 2)
                 e.report()
                 if maintainer:
                     send_mail(
@@ -331,4 +337,4 @@ def main():
             messages = '\n\n'.join(overdue_hosts.values())
             send_mail(maintainer, subject, messages)
 
-        terminate(problem)
+        terminate(exit_status)
