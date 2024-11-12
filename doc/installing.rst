@@ -34,20 +34,20 @@ Finally, you can install it using `pip
 
 .. code-block:: bash
 
-    $ pip install --user borgbackup
+    $ pip install borgbackup
 
 Download and install *Emborg* as follows (requires Python3.6 or better):
 
 .. code-block:: bash
 
-    $ pip install --user emborg
+    $ pip install emborg
 
 Or, if you want the development version, use:
 
 .. code-block:: bash
 
     $ git clone https://github.com/KenKundert/emborg.git
-    $ pip install --user ./emborg
+    $ pip install ./emborg
 
 You may also need to install and configure either a notification daemon or 
 a mail daemon.  This allows errors to be reported when you are not running 
