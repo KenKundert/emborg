@@ -21,6 +21,24 @@ repository.  The philosophy of *Emborg* is to provide commands that you would
 use often and in an interactive manner with the expectation that you would use 
 *Borg* directly for more unusual or esoteric situations.
 
+.. important::
+
+    The *Borg* developers are currently working to release *Borg 2.0*, which is 
+    a substantial change from *Borg 1.4*.  *Borg 2.0* is a breaking change.  
+    Existing repositories must be transformed before they can be used with the 
+    new version, and the new version has a somewhat different and more powerful 
+    use model.  *Emborg* does not and will not support *Borg 2.0*.  Instead it 
+    being replaced by Assimilate_, which is the next generation of *Emborg*.  
+    Like *Borg 2*, *Assimilate* is a breaking change.  The format of the 
+    configuration files has changed and some of the settings have been renamed.  
+    Also, the more powerful use model of *Borg 2* is adopted.
+
+    *Emborg* will not support *Borg 2* and *Assimilate* will not support *Borg 
+    1*.  You should use *Emborg* until you are ready to transition to *Borg 2*, 
+    at which point you should also transition to *Assimilate*.
+
+    All future development is moving to *Assimilate* and *Emborg* is␣
+    transitioning to maintenance support only.
 
 Why Emborg?
 -----------
@@ -362,14 +380,15 @@ Contents
 
 * :ref:`genindex`
 
+.. _Assimilate: https://assimilate.readthedocs.io
+.. _Avendesora: https://avendesora.readthedocs.io
+.. _BorgBase: https://www.borgbase.com
 .. _Borg: https://borgbackup.readthedocs.io
 .. _BorgMatic: https://torsion.org/borgmatic
-.. _Vorta: https://github.com/borgbase/vorta
 .. _Duplicity: http://duplicity.nongnu.org
-.. _HealthChecks.io: https://healthchecks.io
-.. _SpareKeys: https://github.com/kalekundert/sparekeys
-.. _Avendesora: https://avendesora.readthedocs.io
-.. _RSync: https://www.rsync.net/products/attic.html
-.. _BorgBase: https://www.borgbase.com
-.. _Hetzner: https://www.hetzner.com/storage/storage-box
 .. _GitHub: https://github.com/KenKundert/emborg/issues
+.. _HealthChecks.io: https://healthchecks.io
+.. _Hetzner: https://www.hetzner.com/storage/storage-box
+.. _RSync: https://www.rsync.net/products/attic.html
+.. _SpareKeys: https://github.com/kalekundert/sparekeys
+.. _Vorta: https://github.com/borgbase/vorta

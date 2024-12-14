@@ -8,7 +8,7 @@ Emborg — Front-End to Borg Backup
 :Released: 2024-11-11
 
 *Emborg* is a simple command line utility to orchestrate backups. It is built as 
-a front-end to Borg, a powerful and fast deduplicating backup program.  With 
+a front-end to Borg_, a powerful and fast deduplicating backup program.  With 
 *Emborg*, you specify all the details about your backups once in advance, and 
 then use a very simple command line interface for your day-to-day activities.  
 
@@ -17,13 +17,16 @@ repository.  The philosophy of *Emborg* is to provide commands that you would
 use often and in an interactive manner with the expectation that you would use 
 Borg directly for the remaining commands.
 
+*Emborg* is not intended for use with *Borg* version 2.0 or later.  Instead, the 
+successor to *Emborg* should be used: Assimilate_.
+
 
 Getting Help
 ------------
 
-You can find the documentation on `ReadTheDocs <https://emborg.readthedocs.io>`_.
+You can find the documentation here: Emborg_.
 
-The *help* command provides information on how to use Avendesora's various
+The *help* command provides information on how to use Emborg's various
 features.  To get a listing of the topics available, use::
 
     emborg help
@@ -35,6 +38,10 @@ Then, for information on a specific topic use::
 It is worth browsing all of the available topics at least once to get a sense of
 all that *Emborg* can do.
 
+
+.. _borg: https://borgbackup.readthedocs.io
+.. _assimilate: https://assimilate.readthedocs.io
+.. _emborg: https://emborg.readthedocs.io
 
 .. |downloads| image:: https://pepy.tech/badge/emborg/month
     :target: https://pepy.tech/project/emborg
