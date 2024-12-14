@@ -37,7 +37,7 @@ use often and in an interactive manner with the expectation that you would use
     1*.  You should use *Emborg* until you are ready to transition to *Borg 2*, 
     at which point you should also transition to *Assimilate*.
 
-    All future development is moving to *Assimilate* and *Emborg* is␣
+    All future development is moving to *Assimilate* and *Emborg* is 
     transitioning to maintenance support only.
 
 Why Emborg?
