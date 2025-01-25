@@ -101,7 +101,7 @@ def when(time, relative_to=None, as_past=None, as_future=None):
         relative_to (datetime):
             Time to compare against to form the time difference.  If not given,
             the current time is used.
-        as_ast (bool or str):
+        as_past (bool or str):
             If true, the word “ago” will be added to the end of the returned
             time difference if it is negative, indicating it occurred in the
             past.  It it a string, it should contain ‘{}’, which is replaced
