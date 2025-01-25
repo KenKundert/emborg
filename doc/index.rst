@@ -21,6 +21,19 @@ repository.  The philosophy of *Emborg* is to provide commands that you would
 use often and in an interactive manner with the expectation that you would use 
 *Borg* directly for more unusual or esoteric situations.
 
+Why Emborg?
+-----------
+
+There are alternatives to *Emborg* such as BorgMatic_ and Vorta_, both of which 
+are also front-ends to *BorgBackup*.  *BorgMatic* has a command line interface 
+like *Emborg* while *Vorta* is GUI-based.  *Emborg* distinguishes itself by 
+providing a command line interface that is very efficient for common tasks, such 
+as creating archives (backups), restoring files or directories, or comparing 
+existing files to those in an archive.  Also, *Emborg* naturally supports 
+multiple destination repositories.  This feature can be used to simultaneously 
+backup to a local repository, which provides rapid restores, and an off-site 
+repository, which provides increased safety in case of a local disaster.
+
 .. important::
 
     The *Borg* developers are currently working to release *Borg 2.0*, which is 
@@ -39,19 +52,6 @@ use often and in an interactive manner with the expectation that you would use
 
     All future development is moving to *Assimilate* and *Emborg* is 
     transitioning to maintenance support only.
-
-Why Emborg?
------------
-
-There are alternatives to *Emborg* such as BorgMatic_ and Vorta_, both of which 
-are also front-ends to *BorgBackup*.  *BorgMatic* has a command line interface 
-like *Emborg* while *Vorta* is GUI-based.  *Emborg* distinguishes itself by 
-providing a command line interface that is very efficient for common tasks, such 
-as creating archives (backups), restoring files or directories, or comparing 
-existing files to those in an archive.  Also, *Emborg* naturally supports 
-multiple destination repositories.  This feature can be used to simultaneously 
-backup to a local repository, which provides rapid restores, and an off-site 
-repository, which provides increased safety in case of a local disaster.
 
 
 Why Borg?

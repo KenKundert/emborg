@@ -319,8 +319,7 @@ class Emborg:
                 codicil(f"Recommend running: chmod 600 {path!s}")
 
         # add command name to settings so it can be used in expansions
-        if 'cmd_name' in kwargs:
-            settings['cmd_name'] = kwargs['cmd_name']
+        settings['cmd_name'] = kwargs.get('cmd_name', '')
 
         self.settings.update(settings)
 

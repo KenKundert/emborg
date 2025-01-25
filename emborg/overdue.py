@@ -65,10 +65,11 @@ formatting directives.  For example:
 
 # Imports {{{1
 import os
+import sys
 import pwd
 import socket
 import arrow
-from docopt import docopt
+from docopt import docopt, DocoptExit
 from inform import (
     Color,
     Error,
@@ -93,7 +94,7 @@ from . import __released__, __version__
 from .preferences import CONFIG_DIR, DATA_DIR, OVERDUE_FILE, OVERDUE_LOG_FILE
 from .python import PythonFile
 from .shlib import Run, to_path, set_prefs as set_shlib_prefs
-from .utilities import read_latest
+from .utilities import read_latest, when
 
 # Globals {{{1
 set_shlib_prefs(use_inform=True, log_cmd=True)
@@ -211,7 +212,11 @@ def main():
     status_message = settings.get("status_message", terse_status_message)
 
     version = f"{__version__} ({__released__})"
-    cmdline = docopt(__doc__, version=version)
+    try:
+        cmdline = docopt(__doc__, version=version)
+    except DocoptExit as e:
+        sys.stderr.write(str(e) + '\n')
+        terminate(3)
     quiet = cmdline["--quiet"]
     exit_status = 0
     report_as_current = InformantFactory(
@@ -242,7 +247,7 @@ def main():
 
     with Inform(
         flush=True, quiet=quiet or cmdline["--nt"], logfile=log,
-        colorscheme=colorscheme, version=version,
+        error_status=2, colorscheme=colorscheme, version=version,
         stream_policy = 'header' if cmdline['--nt'] else 'termination'
     ):
         overdue_hosts = {}
@@ -286,7 +291,7 @@ def main():
                 else:
                     repos_data = get_local_data(to_path(root, path), host, max_age)
                 for repo_data in repos_data:
-                    repo_data['age'] = repo_data['mtime'].humanize(only_distance=True)
+                    repo_data['age'] = when(repo_data['mtime'])
                     overdue = repo_data['overdue']
                     report = report_as_overdue if overdue else report_as_current
 

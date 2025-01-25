@@ -347,7 +347,7 @@ emborg with configs:
             >                 archive: '{config_name}-{{now}}'
             >                          'test0-{now}'
             >      check_after_create: True
-            >                cmd_name: 'settings'
+            >                cmd_name: ''
             >              config_dir: '/⟪EMBORG⟫/tests/.config/emborg'
             >             config_name: 'test0'
             >          configurations: """
