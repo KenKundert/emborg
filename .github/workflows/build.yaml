@@ -22,7 +22,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Borg
         run: |
-          sudo apt install libxxhash-dev borgbackup
+          sudo apt python3-pyfuse3 borgbackup
       - name: Install packages
         run: |
           python -m pip install --upgrade pip
