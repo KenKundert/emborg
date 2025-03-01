@@ -57,12 +57,12 @@ composite log file::
     run_after_borg = [
         [
             'ntlog',
-            '--keep-for', '1w',
-            '--day', 'D MMMM YYYY  {{{{{{1',
-            '--entry', 'h:mm A  {{{{{{2',
-            '--description', '{cmd_name}',
-            '--fold-marker', '{{{{{{ ❬❬❬',
-            '--editor', 'vim',
+            '--keep-for=1w',
+            '--day=D MMMM YYYY  {{{{{{1',
+            '--entry=h:mm A  {{{{{{2',
+            '--description={cmd_name}',
+            '--fold-marker={{{{{{ ❬❬❬',
+            '--editor=vim',
             '{log_dir}/{config_name}.log',
         ],
     ]
