@@ -6,6 +6,11 @@ Latest development release
 | Version: 1.41
 | Released: 2024-11-11
 
+1.42 (2025-06-14)
+-----------------
+- Allow empty lines in a patterns file (resolves issue #84).
+
+
 1.41 (2024-11-11)
 -----------------
 - When *Emborg* encounters an error when operating on a composite configuration 
