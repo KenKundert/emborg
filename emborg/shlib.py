@@ -4,7 +4,7 @@
 # shell-script-like things relatively easily in Python.
 
 # License {{{1
-# Copyright (C) 2016-2024 Kenneth S. Kundert
+# Copyright (C) 2016-2025 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-__version__ = "1.6"
-__released__ = "2023-05-18"
+__version__ = "1.7"
+__released__ = "2025-05-20"
 
 # Imports {{{1
 try:

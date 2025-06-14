@@ -112,12 +112,14 @@ def check_patterns(
     default_style = "sh"
     for pattern in patterns:
         pattern = pattern.strip()
+        if not pattern:
+            continue
         culprit = src
         codicil = repr(pattern)
         kind = pattern[0:1]
         arg = pattern[1:].lstrip()
         if not kind or not arg:
-            raise Error(f"invalid pattern: ‘{pattern}’")
+            raise Error(f"invalid pattern: ‘{pattern}’", culprit=culprit)
         if kind in ["", "#"]:
             continue  # is comment
         if kind not in known_kinds:
