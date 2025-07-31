@@ -150,7 +150,7 @@ def get_local_data(path, host, max_age):
         if not mtime:
             raise Error('backup time is not available.', culprit=path)
     delta = now - mtime
-    hours = 24 * delta.days + delta.seconds / 3600
+    hours = 24*delta.days + delta.seconds/3600
     overdue = truth(hours > max_age)
     locked = truth(locked)
     yield dict(
@@ -191,7 +191,7 @@ def get_remote_data(name, path):
 # fixed() {{{2
 # formats float using fixed point notation while removing trailing zeros
 def fixed(num, prec=2):
-    return format(num, f".{prec}f").strip('0').strip('.')
+    return format(num, f".{prec}f").rstrip('0').rstrip('.')
 
 # Main {{{1
 def main():

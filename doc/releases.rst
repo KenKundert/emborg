@@ -6,6 +6,9 @@ Latest development release
 | Version: 1.42
 | Released: 2025-06-14
 
+- Fix issues in :ref:`emborg-overdue <emborg_overdue>` *hours*.
+
+
 1.42 (2025-06-14)
 -----------------
 - Allow empty lines in a patterns file (resolves issue #84).
