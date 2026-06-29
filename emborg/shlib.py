@@ -6,8 +6,8 @@
 # MIT License {{{1
 # Copyright (C) 2016-2026 Kenneth S. Kundert
 
-__version__ = "1.8"
-__released__ = "2025-08-24"
+__version__ = "1.8.1"
+__released__ = "2026-06-28"
 
 # Imports {{{1
 try:
