@@ -143,6 +143,7 @@ emborg without configs:
             > Borg settings:
             >                append_only: create an append-only mode repository
             >             chunker_params: specify the chunker parameters
+            >                    comment: add a comment text to the archive
             >                compression: compression algorithm
             >             exclude_caches: exclude directories that contain a
             >                             CACHEDIR.TAG file
@@ -281,6 +282,7 @@ emborg with configs:
             > Borg settings:
             >                append_only: create an append-only mode repository
             >             chunker_params: specify the chunker parameters
+            >                    comment: add a comment text to the archive
             >                compression: compression algorithm
             >             exclude_caches: exclude directories that contain a
             >                             CACHEDIR.TAG file
@@ -955,7 +957,8 @@ emborg with configs:
 
     execute:
         args: --quiet --config test5 mount
-        expected: Mounting filesystem
+        expected: .*Mounting filesystem.*
+        expected_type: regex
         cmp_dirs: EMBORG/⟪EMBORG⟫/tests/configs STARTING_CONFIGS
         dependencies: fuse
 
@@ -970,12 +973,14 @@ emborg with configs:
 
     simpleton:
         args: --quiet --config test5 compare configs
-        expected: Mounting filesystem
+        expected: .*Mounting filesystem.*
+        expected_type: regex
         dependencies: fuse
 
     resound:
         args: --quiet --config test5 compare --interactive configs
-        expected: Mounting filesystem
+        expected: .*Mounting filesystem.*
+        expected_type: regex
         dependencies: fuse
 
     acquit:
