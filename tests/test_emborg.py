@@ -129,7 +129,7 @@ class EmborgTester(object):
                 expected = '\n'.join(sorted(expected.splitlines()))
                 result = '\n'.join(sorted(result.splitlines()))
             if 'regex' in self.expected_type:
-                matches = bool(re.fullmatch(expected, result))
+                matches = bool(re.fullmatch(expected, result, re.DOTALL))
             else:
                 if 'error' in self.expected_type:
                     # because error messages use wrapping the white space can

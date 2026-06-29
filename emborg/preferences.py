@@ -121,6 +121,11 @@ BORG_SETTINGS = dict(
         arg = "PARAMS",
         desc = "specify the chunker parameters"
     ),
+    comment = dict(
+        cmds = ["create"],
+        arg = "COMMENT",
+        desc = "add a comment text to the archive"
+    ),
     compression = dict(
         cmds = ["create"],
         arg = "COMPRESSION",
@@ -199,9 +204,14 @@ BORG_SETTINGS = dict(
         desc = "set remote network upload rate limit in kiB/s (default: 0=unlimited)",
     ),
     sparse = dict(
-        cmds = ["create"],
+        cmds = ["create", "extract"],
         desc = "detect sparse holes in input (supported only by fixed chunker)"
     ),
+    # timestamp = dict(
+    #     cmds = ["create"],
+    #     arg = "TIMESTAMP",
+    #     desc = "manually specify the archive creation date/time (UTC, yyyy-mm-ddThh:mm:ss format). Alternatively, give a reference file/directory."
+    # ),
     threshold = dict(
         cmds = ["compact"],
         arg = "PERCENT",

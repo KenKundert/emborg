@@ -3,24 +3,11 @@
 # A light-weight package with few dependencies that allows users to do
 # shell-script-like things relatively easily in Python.
 
-# License {{{1
-# Copyright (C) 2016-2025 Kenneth S. Kundert
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see [http://www.gnu.org/licenses/].
+# MIT License {{{1
+# Copyright (C) 2016-2026 Kenneth S. Kundert
 
-__version__ = "1.7"
-__released__ = "2025-05-20"
+__version__ = "1.8"
+__released__ = "2025-08-24"
 
 # Imports {{{1
 try:
@@ -335,7 +322,8 @@ def ls(*paths, **kwargs):
             matched from the right (see pathlib match function).  If an absolute
             path is given the entire path must match.
         only:
-            Specifies the type of returned paths, choose from 'file' or 'dir'.
+            Specifies the type of returned paths, choose from 'file', 'dir' or 
+            'socket'.
         hidden (bool):
             Specifies whether hidden files should be returned, if not given
             hidden files are returned if select string starts with '.'.
@@ -374,6 +362,8 @@ def ls(*paths, **kwargs):
         if only == "file" and not path.is_file():
             return False
         if only == "dir" and not path.is_dir():
+            return False
+        if only == "socket" and not path.is_socket():
             return False
         if not retain_hidden and path.name.startswith("."):
             return False

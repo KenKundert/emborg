@@ -135,7 +135,7 @@ error_message = dedent(f"""
 # get_local_data {{{2
 def get_local_data(path, host, max_age):
     if path.is_dir():
-        paths = list(path.glob("index.*"))
+        paths = list(p for p in path.glob("index.*") if p.suffix != '.tmp')
         if not paths:
             raise Error("no sentinel file found.", culprit=path)
         if len(paths) > 1:
