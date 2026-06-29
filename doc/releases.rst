@@ -3,8 +3,8 @@ Releases
 
 Latest development release
 --------------------------
-| Version: 1.42
-| Released: 2025-06-14
+| Version: 1.43
+| Released: 2026-06-28
 
 - Fix issues in :ref:`emborg-overdue <emborg_overdue>` *hours*.
 
