@@ -9,7 +9,8 @@ Usage:
     emborg [options] [<command> [<args>...]]
 
 Options:
-    -c <cfgname>, --config <cfgname>  Specifies the configuration to use.
+    -c <cfgname>, --config <cfgname>  Specifies the configuration to use. May be
+                                      a comma-separated list of configurations.
     -d, --dry-run                     Run Borg in dry run mode.
     -h, --help                        Output basic usage information.
     -m, --mute                        Suppress all output.
