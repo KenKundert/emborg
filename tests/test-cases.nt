@@ -428,6 +428,24 @@ emborg with configs:
             > run_after_last_backup on test3
             > run_after_borg on test3
 
+    # list on a composite config must run on every subconfig, not just the first
+    roster:
+        args: --quiet --config tests list
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
+            > run_before_borg on test1
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test1
+            > run_before_borg on test2
+            > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test2
+            > run_before_borg on test3
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test3
+        expected_type: regex
+
     motif:
         args: --quiet --config test0 list
         expected:

@@ -1519,7 +1519,7 @@ class ListCommand(Command):
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = "first"
+    COMPOSITE_CONFIGS = "all"
     LOG_COMMAND = True
 
     @classmethod
