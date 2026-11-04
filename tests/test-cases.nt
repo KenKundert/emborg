@@ -599,6 +599,31 @@ emborg with configs:
             > run_after_borg on test0
         expected_type: regex
 
+    # test0 has two archives at this point (created by gravy and whiplash); the
+    # --first and --last options are forwarded to borg to limit the listing
+    nibble:
+        args: --quiet --config test0 list --first 1
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
+        expected_type: regex
+
+    quibble:
+        args: --quiet --config test0 list --last 1
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
+        expected_type: regex
+
+    # borg does not allow --first and --last together, so emborg rejects the
+    # combination up front, before any configuration (or hook) is run
+    squabble:
+        args: --quiet --config test0 list --first 1 --last 1
+        expected: emborg error: --first and --last cannot be used together.
+        expected_type: error
+
     spoof:
         args: --quiet --config test0 prune
         expected:

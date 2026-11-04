@@ -1516,6 +1516,8 @@ class ListCommand(Command):
         Options:
             -e, --include-external   list all archives in repository, not just
                                      those associated with this configuration
+            -f <N>, --first <N>      only show the first <N> archives
+            -l <N>, --last <N>       only show the last <N> archives
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1523,15 +1525,33 @@ class ListCommand(Command):
     LOG_COMMAND = True
 
     @classmethod
+    def run_early(cls, command, args, settings, options):
+        # validate the command line once, before any configuration is processed
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        if cmdline["--first"] and cmdline["--last"]:
+            # borg treats these as mutually exclusive
+            raise Error("--first and --last cannot be used together.")
+
+    @classmethod
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         include_external_archives = cmdline["--include-external"]
+        first = cmdline["--first"]
+        last = cmdline["--last"]
+
+        # build borg command line arguments
+        borg_args = ["--short"]
+        if first:
+            borg_args.extend(["--first", first])
+        if last:
+            borg_args.extend(["--last", last])
+        borg_args.append(settings.destination())
 
         # run borg
         borg = settings.run_borg(
             cmd = "list",
-            args = ["--short", settings.destination()],
+            args = borg_args,
             emborg_opts = options,
             strip_prefix = include_external_archives,
         )
