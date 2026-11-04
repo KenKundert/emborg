@@ -428,6 +428,56 @@ emborg with configs:
             > run_after_last_backup on test3
             > run_after_borg on test3
 
+    # list on a composite config must run on every subconfig, not just the first
+    roster:
+        args: --quiet --config tests list
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
+            > run_before_borg on test1
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test1
+            > run_before_borg on test2
+            > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test2
+            > run_before_borg on test3
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test3
+        expected_type: regex
+
+    # a comma-separated --config forms an ad-hoc composite of the listed configs
+    tandem:
+        args: --quiet --config test0,test1 list
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
+            > run_before_borg on test1
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test1
+        expected_type: regex
+
+    # a comma-separated --config may mix a scalar config and a composite group;
+    # the scalar (test0) is also a member of the group (tests), so it is only
+    # listed once (duplicates are removed while order is preserved)
+    medley:
+        args: --quiet --config test0,tests list
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
+            > run_before_borg on test1
+            > test1-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test1
+            > run_before_borg on test2
+            > test2-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test2
+            > run_before_borg on test3
+            > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test3
+        expected_type: regex
+
     motif:
         args: --quiet --config test0 list
         expected:
@@ -548,6 +598,31 @@ emborg with configs:
             > test3-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
             > run_after_borg on test0
         expected_type: regex
+
+    # test0 has two archives at this point (created by gravy and whiplash); the
+    # --first and --last options are forwarded to borg to limit the listing
+    nibble:
+        args: --quiet --config test0 list --first 1
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
+        expected_type: regex
+
+    quibble:
+        args: --quiet --config test0 list --last 1
+        expected:
+            > run_before_borg on test0
+            > test0-\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d
+            > run_after_borg on test0
+        expected_type: regex
+
+    # borg does not allow --first and --last together, so emborg rejects the
+    # combination up front, before any configuration (or hook) is run
+    squabble:
+        args: --quiet --config test0 list --first 1 --last 1
+        expected: emborg error: --first and --last cannot be used together.
+        expected_type: error
 
     spoof:
         args: --quiet --config test0 prune

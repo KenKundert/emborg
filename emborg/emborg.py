@@ -146,24 +146,32 @@ class ConfigQueue:
         if not name:
             name = default
         if name:
-            if name not in config_groups:
-                raise Error(
-                    "unknown configuration.",
-                    culprit = name,
-                    codicil = (
-                        "Perhaps you forgot to add it to the ‘configurations’ setting?.",
-                        f"Choose from: {conjoin(all_configs)}.",
+            # a comma-separated list of configs may be given, in which case an
+            # ad-hoc composite config is formed from the listed configs/groups
+            requested = [n.strip() for n in name.split(",") if n.strip()]
+            for n in requested:
+                if n not in config_groups:
+                    raise Error(
+                        "unknown configuration.",
+                        culprit = n,
+                        codicil = (
+                            "Perhaps you forgot to add it to the ‘configurations’ setting?.",
+                            f"Choose from: {conjoin(all_configs)}.",
+                        )
                     )
-                )
         else:
             if len(config_groups) > 0:
-                name = list(config_groups.keys())[0]
+                requested = [list(config_groups.keys())[0]]
             else:
                 raise Error("no known configurations.", culprit=CONFIGS_SETTING)
 
         # set the config queue
-        # convert configs to list while preserving order and eliminating dupes
-        configs = list(dict.fromkeys(config_groups[name]))
+        # expand each requested config/group into its subconfigs, then convert
+        # to a list while preserving order and eliminating dupes
+        configs = []
+        for n in requested:
+            configs.extend(config_groups[n])
+        configs = list(dict.fromkeys(configs))
         self.configs = configs[:]
         num_configs = len(configs)
         if num_configs > 1:
